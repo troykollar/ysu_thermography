@@ -41,7 +41,7 @@ def remove_top(img,
             img[i] = min_value
 
 
-def remove_bottom(img, temp_data):
+def remove_bottom(img, temp_data, min_value=174):
     lower_bounds = find_lower_bounds(temp_data)
     for i in range(0, len(lower_bounds)):
         x = lower_bounds[i][0]
