@@ -48,7 +48,6 @@ class NpVidTool:
         self.video_array = None
         self.remove_reflection = remove_reflection
         self.remove_lower = remove_lower
-        self.speed = 1
         self.window_name = window_name
 
         self.max_temp = []
@@ -114,7 +113,8 @@ class NpVidTool:
             i = i + 1
 
         # Release video_writer from memory
-        video_writer.release()
+        if save_video:
+            video_writer.release()
 
     def play_video(self, waitKey=1):
         if self.video_array is None:
