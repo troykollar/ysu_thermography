@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import datetime
 import os
-import np_vid_viewer
+import video_tools
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("directory", type=str, help="Directory containing files.")
@@ -14,12 +14,8 @@ DIR = ARGS.directory
 
 os.chdir(DIR)
 
-VIEWER = np_vid_viewer.NpVidViewer(
-    "thermal_cam_temps.npy",
-    melt_pool_data="melt_pool_data.npy",
-    tc_times="thermal_cam_times.npy",
-    remove_reflection=True,
-    remove_lower=True,
-)
+VideoTool = video_tools.NpVidTool(remove_reflection=True,
+                                  remove_lower=True,
+                                  mp_data_on_img=True)
 
-VIEWER.generate_video()
+VideoTool.generate_video(True)

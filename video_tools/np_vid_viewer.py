@@ -2,10 +2,11 @@ import cv2
 import numpy as np
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from np_vid_viewer import reflection_remover
+from tkinter.filedialog import asksaveasfilename
+from video_tools.reflection_remover import ReflectionRemover
 
 
-class NpVidViewer:
+class NpVidTool:
     """NpVidViewer
     Stores information relating to a video to be able to easily display a video from a numpy array
 
@@ -13,25 +14,22 @@ class NpVidViewer:
     ----------
     _remove_reflection : bool
         Whether or not to remove the reflection from each frame while playing the video.
-    _array
+    temp_data
         Numpy array of thermal cam temps loaded from the file.
     _speed : int
         Delay between each frame in ms.
-    _window_name : str
+    window_name : str
         Name of the window for the video to be displayed in.
-    _timestamps
+    video_timestamps
         Numpy array of the thermal camera timestamps.
-    _melt_pool_data
+    meltpool_data
         Numpy array of the melt pool data.
     _mp_data_index : int
-        Current index of `_melt_pool_data` numpy array.
-    _lower_bounds
+        Current index of `meltpool_data` numpy array.
+    lower_bounds
         List of lower bounds of part. Used to remove the bottom reflection.
     """
     def __init__(self,
-                 filename: str,
-                 melt_pool_data,
-                 tc_times,
                  window_name="Video",
                  mp_data_on_img=False,
                  remove_reflection=False,
@@ -40,50 +38,59 @@ class NpVidViewer:
 
         Parameters
         ----------
-        file_name : str
-            Name of the numpy file that contains the thermal cam temps.
         window_name : str
             Name of the window that the video will be displayed in.
-        melt_pool_data : str
-            Name of the numpy file that contains the melt pool data.
-        tc_times : str
-            Name of the numpy file that contains the thermal camera timestamps.
         remove_reflection : bool
             Run the remove reflection function if true.
         remove_lower : bool
             Run the remove_lower reflection function if true.
         """
-        Tk().withdraw  #prevent tkinter from opening root window
-        self._array = np.load(
-            askopenfilename(title="Select thermal cam temperature data."),
-            mmap_mode="r",
-            allow_pickle=True)
-        self._timestamps = np.load(
-            askopenfilename(title="Select video timestamp data."),
-            allow_pickle=True)
-        self._melt_pool_data = np.load(
-            askopenfilename(title="Select meltpool data."), allow_pickle=True)
+        self.video_array = None
+        self.remove_reflection = remove_reflection
+        self.remove_lower = remove_lower
+        self.speed = 1
+        self.window_name = window_name
 
-        self._remove_reflection = remove_reflection
-        self._remove_lower = remove_lower
-        self._speed = 1
-        self._window_name = window_name
-        self._num_frames = self.array.shape[0]
-        self._mp_data_index = 0
-        self.match_vid_to_meltpool()
-        self._lower_bounds = self.find_lower_bounds()
         self.max_temp = []
         self.mp_data_on_img = mp_data_on_img
 
-    def generate_video(self):
+    def generate_video(self, save_video=False):
+        Tk().withdraw  #prevent tkinter from opening root window
+        # Load temperature data
+        self.temp_data = np.load(
+            askopenfilename(title="Select thermal cam temperature data."),
+            mmap_mode="r",
+            allow_pickle=True)
+        self.num_frames = self.temp_data.shape[0]  # Save number of frames
+
+        # Load video timestamp data
+        self.video_timestamps = np.load(
+            askopenfilename(title="Select video timestamp data."),
+            allow_pickle=True)
+
+        # Load meltpool data
+        self.meltpool_data = np.load(
+            askopenfilename(title="Select meltpool data."), allow_pickle=True)
+
         self.video_array = []
         # Match the meltpool data to each frame of video
         self.match_vid_to_meltpool()
 
+        if save_video:
+            framerate = 60
+            height = self.temp_data[0].shape[0]
+            width = self.temp_data[0].shape[1]
+            size = (width, height)
+            filename = asksaveasfilename()
+            video_writer = cv2.VideoWriter(
+                filename, cv2.VideoWriter_fourcc("f", "m", "p", "4"),
+                framerate, size)
+
         # Loop through each frame of data
         i = 0
-        for frame in self.array:
-            print("Generating Video: " + str(i) + "/" + str(len(self.array)))
+        for frame in self.temp_data:
+            print("Generating Video: " + str(i + 1) + "/" +
+                  str(len(self.temp_data)))
 
             if self.remove_reflection:
                 pass
@@ -100,7 +107,22 @@ class NpVidViewer:
 
             # Add image to video array
             self.video_array.append(img)
+
+            if save_video:
+                # Write image to current video file
+                video_writer.write(img)
             i = i + 1
+
+        # Release video_writer from memory
+        video_writer.release()
+
+    def play_video(self, waitKey=1):
+        if self.video_array is None:
+            self.generate_video()
+        for frame in self.video_array:
+            cv2.imshow("Video", frame)
+            cv2.waitKey(waitKey)
+        cv2.destroyAllWindows()
 
     def find_lower_bounds(self):
         """Find the lower bounds of the piece.
@@ -110,7 +132,7 @@ class NpVidViewer:
         max_locations
             List of the first points at the zero level below the each max temp.
         """
-        img_array = self.array
+        img_array = self.temp_data
         i = 0
         # Find the x and y value of the max temp of first frame
         max_x = np.where(img_array[0] == np.amax(img_array[0]))[1][0]
@@ -146,30 +168,26 @@ class NpVidViewer:
             max_locations.append((i, max_y_locations[j][1]))
         return max_locations
 
-    @property
-    def lower_bounds(self):
-        """Return the lower bounds"""
-        return self._lower_bounds
-
     def match_vid_to_meltpool(self):
         """Shuffle the meltpool data and thermal camera data together based on timestamp"""
         self.matched_array = []
-        for i in range(0, self.array.shape[0]):
-            if self.mp_data_index + 1 < self.melt_pool_data.shape[0]:
-                if self.timestamps[i] >= self.melt_pool_data[self.mp_data_index
-                                                             + 1][0]:
+        self.mp_data_index = 0
+        for i in range(0, self.temp_data.shape[0]):
+            if self.mp_data_index + 1 < self.meltpool_data.shape[0]:
+                if self.video_timestamps[i] >= self.meltpool_data[
+                        self.mp_data_index + 1][0]:
                     self.mp_data_index = self.mp_data_index + 1
             self.matched_array.append([
-                i, self.timestamps[i],
-                self.melt_pool_data[self.mp_data_index][0],
-                self.melt_pool_data[self.mp_data_index][1],
-                self.melt_pool_data[self.mp_data_index][2],
-                self.melt_pool_data[self.mp_data_index][3],
-                self.melt_pool_data[self.mp_data_index][4]
+                i, self.video_timestamps[i],
+                self.meltpool_data[self.mp_data_index][0],
+                self.meltpool_data[self.mp_data_index][1],
+                self.meltpool_data[self.mp_data_index][2],
+                self.meltpool_data[self.mp_data_index][3],
+                self.meltpool_data[self.mp_data_index][4]
             ])
 
     def save_video(self, filename="Video.avi", framerate=60):
-        """Generate video based on `_array` information, and save under `filename`.
+        """Generate video based on `temp_data` information, and save under `filename`.
 
         Parameters
         ----------
@@ -178,16 +196,16 @@ class NpVidViewer:
         framerate : int
             Framerate to generate the video with.
         """
-        height = self.array[0].shape[0]
-        width = self.array[0].shape[1]
+        height = self.temp_data[0].shape[0]
+        width = self.temp_data[0].shape[1]
         size = (width, height)
         out = cv2.VideoWriter(filename,
                               cv2.VideoWriter_fourcc("f", "m", "p", "4"),
                               framerate, size)
-        for i in range(0, self.array.shape[0]):
-            percent = (i / self.array.shape[0]) * 100
+        for i in range(0, self.temp_data.shape[0]):
+            percent = (i / self.temp_data.shape[0]) * 100
             print("Saving video: " + str("%.2f" % percent) + "%")
-            img = self.array[i]
+            img = self.temp_data[i]
             normalized_img = img.copy()
             if self.remove_reflection:
                 ReflectionRemover.remove(normalized_img,
@@ -206,16 +224,6 @@ class NpVidViewer:
             out.write(normalized_img)
 
         out.release()
-
-    @property
-    def remove_reflection(self):
-        """Return `_remove_reflection` attribute"""
-        return self._remove_reflection
-
-    @property
-    def num_frames(self):
-        """Return `_num_frames` attritbute. The number of frames in the video."""
-        return self._num_frames
 
     def video_timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
@@ -240,56 +248,6 @@ class NpVidViewer:
     def mp_area(self, frame):
         """Return the meltpool area value based on the frame"""
         return self.matched_array[frame][6]
-
-    @property
-    def mp_data_index(self):
-        """Return the current index of the meltpool data array"""
-        return self._mp_data_index
-
-    @mp_data_index.setter
-    def mp_data_index(self, value: int):
-        """Set the `_mp_data_index` ensuring it is within bounds of the `_melt_pool_data` array."""
-        if value < 0:
-            self._mp_data_index = 0
-        elif value > self._melt_pool_data.shape[0]:
-            self._mp_data_index = self._melt_pool_data.shape[:0][0]
-        else:
-            self._mp_data_index = value
-
-    @property
-    def melt_pool_data(self):
-        """Return the `_melt_pool_data` array"""
-        return self._melt_pool_data
-
-    @property
-    def window_name(self):
-        """Return the name of the window"""
-        return self._window_name
-
-    @property
-    def array(self):
-        """Return the array containing the thermal cam temp data"""
-        return self._array
-
-    @property
-    def speed(self):
-        """Return `_speed`"""
-        return self._speed
-
-    @speed.setter
-    def speed(self, new_speed):
-        """Set the speed, ensuring it is within OpenCV bounds of 1 <= speed <= 1000"""
-        if new_speed < 1:
-            self._speed = 1
-        elif new_speed > 1000:
-            self._speed = 1000
-        else:
-            self._speed = new_speed
-
-    @property
-    def timestamps(self):
-        """Return the thermal camera timestamps"""
-        return self._timestamps
 
     def print_info(self, frame):
         """Print the information about the current frame to console"""
@@ -317,8 +275,8 @@ class NpVidViewer:
         normalized_img
             Numpy array of the updated image of the current frame.
         """
-        img = self.array[frame]
-        self.max_temp.append(np.amax(self.array[frame]))
+        img = self.temp_data[frame]
+        self.max_temp.append(np.amax(self.temp_data[frame]))
         normalized_img = img.copy()
         if self.remove_reflection:
             reflection_remover.ReflectionRemover.remove(
@@ -342,8 +300,8 @@ class NpVidViewer:
 
     def highlight_max_temp(self, frame, img):
         max_temp = self.max_temp[frame]
-        max_temp_y = np.where(self.array[frame] == max_temp)[0][0]
-        max_temp_x = np.where(self.array[frame] == max_temp)[1][0]
+        max_temp_y = np.where(self.temp_data[frame] == max_temp)[0][0]
+        max_temp_x = np.where(self.temp_data[frame] == max_temp)[1][0]
         img[max_temp_y, max_temp_x] = (255, 255, 255)
 
     def add_mp_data_to_img(self, img, frame):
@@ -392,53 +350,3 @@ class NpVidViewer:
             font_size,
             font_color,
         )
-        img = cv2.putText(img, "Max Temp: " + str(self.max_temp[frame]),
-                          (50, int((5 / 16) * img_height)), font, font_size,
-                          font_color)
-
-    def play_video(self, speed=1):
-        """Play the video.
-
-        Arguments
-        ---------
-        speed : int
-            Delay in ms between showing each frame. Must be 1-1000.
-        """
-        cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(self.window_name, 640, 480)
-        self.speed = speed
-        pause = False
-        frame = 0
-        while True:
-            key = cv2.waitKey(self.speed)
-            if not pause:
-                img = self.update_image(frame)
-                cv2.imshow(self.window_name, img)
-                frame = frame + 1
-            elif pause:
-                if key == ord("s"):
-                    np.savetxt(
-                        "tc_temps-" + str(frame + 1) + ".csv",
-                        img,
-                        fmt="%d",
-                        delimiter=",",
-                    )
-                elif key == ord("l"):
-                    frame = frame + 10
-                    img = self.update_image(frame)
-                    cv2.imshow(self.window_name, img)
-                elif key == ord("j"):
-                    if frame > 10:
-                        frame = frame - 10
-                    else:
-                        frame = 0
-                    img = self.update_image(frame)
-                    cv2.imshow(self.window_name, img)
-
-            if key == ord("q"):
-                break
-            elif key == ord("k"):
-                pause = not pause
-            elif frame >= self.num_frames:
-                break
-        cv2.destroyAllWindows()
