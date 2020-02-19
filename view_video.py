@@ -22,4 +22,4 @@ VIEWER = np_vid_viewer.NpVidViewer(
     remove_lower=True,
 )
 
-VIEWER.play_video(1)
+VIEWER.generate_video()

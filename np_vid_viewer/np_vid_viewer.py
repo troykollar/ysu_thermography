@@ -33,6 +33,7 @@ class NpVidViewer:
                  melt_pool_data,
                  tc_times,
                  window_name="Video",
+                 mp_data_on_img=False,
                  remove_reflection=False,
                  remove_lower=False):
         """Create an NpVidViewer Object.
@@ -72,6 +73,34 @@ class NpVidViewer:
         self.match_vid_to_meltpool()
         self._lower_bounds = self.find_lower_bounds()
         self.max_temp = []
+        self.mp_data_on_img = mp_data_on_img
+
+    def generate_video(self):
+        self.video_array = []
+        # Match the meltpool data to each frame of video
+        self.match_vid_to_meltpool()
+
+        # Loop through each frame of data
+        i = 0
+        for frame in self.array:
+            print("Generating Video: " + str(i) + "/" + str(len(self.array)))
+
+            if self.remove_reflection:
+                pass
+            # Normalize the image to 8 bit color
+            img = frame.copy()
+            img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
+
+            # Apply colormap to image
+            img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
+
+            # Add meltpool data onto the image
+            if self.mp_data_on_img:
+                self.add_mp_data_to_img(img, i)
+
+            # Add image to video array
+            self.video_array.append(img)
+            i = i + 1
 
     def find_lower_bounds(self):
         """Find the lower bounds of the piece.
@@ -124,13 +153,13 @@ class NpVidViewer:
 
     def match_vid_to_meltpool(self):
         """Shuffle the meltpool data and thermal camera data together based on timestamp"""
-        self._matched_array = []
+        self.matched_array = []
         for i in range(0, self.array.shape[0]):
             if self.mp_data_index + 1 < self.melt_pool_data.shape[0]:
                 if self.timestamps[i] >= self.melt_pool_data[self.mp_data_index
                                                              + 1][0]:
                     self.mp_data_index = self.mp_data_index + 1
-            self._matched_array.append([
+            self.matched_array.append([
                 i, self.timestamps[i],
                 self.melt_pool_data[self.mp_data_index][0],
                 self.melt_pool_data[self.mp_data_index][1],
@@ -211,11 +240,6 @@ class NpVidViewer:
     def mp_area(self, frame):
         """Return the meltpool area value based on the frame"""
         return self.matched_array[frame][6]
-
-    @property
-    def matched_array(self):
-        """Return the array of meltpool and video matched values"""
-        return self._matched_array
 
     @property
     def mp_data_index(self):
