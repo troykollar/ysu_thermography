@@ -11,12 +11,15 @@ class NpVidTool:
 
     Attributes
     ----------
-    _remove_reflection : bool
-        Whether or not to remove the reflection from each frame while playing the video.
+    video_array : list
+        List of images that will be used for displaying/saving video.
+        Images contain all adjustments/overlays.
     temp_data
         Numpy array of thermal cam temps loaded from the file.
-    _speed : int
-        Delay between each frame in ms.
+    remove_top_reflection : bool
+        Attempt to remove the top reflection if true.
+    remove_bottom_reflection : bool
+        Attempt to remove the bottom reflection if true.
     window_name : str
         Name of the window for the video to be displayed in.
     video_timestamps
@@ -31,8 +34,8 @@ class NpVidTool:
     def __init__(self,
                  window_name="Video",
                  mp_data_on_vid=False,
-                 remove_reflection=False,
-                 remove_lower=False):
+                 remove_top_reflection=False,
+                 remove_bottom_reflection=False):
         """Create an NpVidViewer Object.
 
         Parameters
@@ -47,8 +50,8 @@ class NpVidTool:
             Run the remove_lower reflection function if true.
         """
         self.video_array = None
-        self.remove_reflection = remove_reflection
-        self.remove_lower = remove_lower
+        self.remove_top_reflection = remove_top_reflection
+        self.remove_bottom_reflection = remove_bottom_reflection
         self.window_name = window_name
 
         self.max_temp = []
