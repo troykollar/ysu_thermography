@@ -42,12 +42,11 @@ def remove_top(img,
 
 
 def remove_bottom(img, lower_bounds):
-    if remove_lower:
-        for i in range(0, len(lower_bounds)):
-            x = lower_bounds[i][0]
-            y = lower_bounds[i][1]
-            img[y:, x] = min_value
-            if i == 0:
-                img[y:, :x] = min_value
-            elif i == len(lower_bounds) - 1:
-                img[y:, x:] = min_value
+    for i in range(0, len(lower_bounds)):
+        x = lower_bounds[i][0]
+        y = lower_bounds[i][1]
+        img[y:, x] = min_value
+        if i == 0:
+            img[y:, :x] = min_value
+        elif i == len(lower_bounds) - 1:
+            img[y:, x:] = min_value
