@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from reflection_remover import ReflectionRemover
+from np_vid_viewer import reflection_remover
 
 
 class NpVidViewer:
@@ -297,7 +297,7 @@ class NpVidViewer:
         self.max_temp.append(np.amax(self.array[frame]))
         normalized_img = img.copy()
         if self.remove_reflection:
-            ReflectionRemover.remove(
+            reflection_remover.ReflectionRemover.remove(
                 normalized_img,
                 zero_level_threshold=180,
                 max_temp_threshold=700,
