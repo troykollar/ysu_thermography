@@ -1,2 +1,2 @@
-from video_tools.np_vid_viewer import NpVidTool
-from video_tools import reflection_remover
+from np_vid_viewer.np_vid_viewer import NpVidTool
+from np_vid_viewer import reflection_remover

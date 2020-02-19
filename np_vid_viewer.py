@@ -3,7 +3,6 @@ import numpy as np
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
-from video_tools.reflection_remover import ReflectionRemover
 
 
 class NpVidTool:
