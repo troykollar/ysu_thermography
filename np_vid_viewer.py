@@ -95,7 +95,7 @@ class NpVidTool:
             print("Generating Video: " + str(i + 1) + "/" +
                   str(len(self.temp_data)))
 
-            if self.remove_reflection:
+            if self.remove_top_reflection:
                 pass
             # Normalize the image to 8 bit color
             img = frame.copy()
