@@ -57,7 +57,7 @@ class NpVidTool:
 
         self.mp_data_on_vid = mp_data_on_vid
 
-    def generate_video(self, save_video=False):
+    def generate_video(self):
         Tk().withdraw  #prevent tkinter from opening root window
         # Load temperature data
         self.temp_data = np.load(
@@ -78,16 +78,6 @@ class NpVidTool:
         self.video_array = []
         # Match the meltpool data to each frame of video
         self.match_vid_to_meltpool()
-
-        if save_video:
-            framerate = 60
-            height = self.temp_data[0].shape[0]
-            width = self.temp_data[0].shape[1]
-            size = (width, height)
-            filename = asksaveasfilename()
-            video_writer = cv2.VideoWriter(
-                filename, cv2.VideoWriter_fourcc("f", "m", "p", "4"),
-                framerate, size)
 
         if self.remove_bottom_reflection:
             lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
@@ -125,15 +115,8 @@ class NpVidTool:
             # Add image to video array
             self.video_array.append(img)
 
-            if save_video:
-                # Write image to current video file
-                video_writer.write(img)
             i = i + 1
             prev_percent = percent
-
-        # Release video_writer from memory
-        if save_video:
-            video_writer.release()
 
     def play_video(self, waitKey=1):
         if self.video_array is None:
@@ -163,6 +146,38 @@ class NpVidTool:
             cv2.imshow("Video", frame)
 
         cv2.destroyAllWindows()
+
+    def save_video(self, playback_speed=15, realtime_framerate=4):
+        if self.video_array is None:
+            self.generate_video()
+
+        framerate = playback_speed * realtime_framerate
+        height = self.temp_data[0].shape[0]
+        width = self.temp_data[0].shape[1]
+        size = (width, height)
+        filename = asksaveasfilename()
+
+        video_writer = cv2.VideoWriter(filename,
+                                       cv2.VideoWriter_fourcc(*'MPEG'),
+                                       framerate, size)
+
+        prev_percent = 0
+        i = 0
+        print("Saving video...")
+        for frame in self.video_array:
+            # Display completion percentage
+            percent = round((i + 1) / len(self.video_array), 3)
+            if (percent -
+                    round(percent, 2) == 0) and (prev_percent != percent):
+                round_percent = int(percent * 100)
+                print(str(round_percent) + "%")
+
+            video_writer.write(frame)
+
+            i = i + 1
+            prev_percent = percent
+
+        video_writer.release()
 
     def match_vid_to_meltpool(self):
         """Shuffle the meltpool data and thermal camera data together based on timestamp"""
