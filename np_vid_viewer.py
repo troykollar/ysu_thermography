@@ -86,13 +86,14 @@ class NpVidTool:
         # Loop through each frame of data
         i = 0
         prev_percent = 0
+        print("Generating Video...")
         for frame in self.temp_data:
             frame = frame.copy()  # Make copy since file is read-only
             percent = round((i + 1) / len(self.temp_data), 3)
             if (percent -
                     round(percent, 2) == 0) and (prev_percent != percent):
                 round_percent = int(percent * 100)
-                print("Generating Video: " + str(round_percent) + "%")
+                print(str(round_percent) + "%")
 
             if self.remove_top_reflection:
                 np_vid_viewer.reflection_remover.remove_top(
