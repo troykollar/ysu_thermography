@@ -95,10 +95,14 @@ class NpVidTool:
 
         # Loop through each frame of data
         i = 0
+        prev_percent = 0
         for frame in self.temp_data:
             frame = frame.copy()  # Make copy since file is read-only
-            print("Generating Video: " + str(i + 1) + "/" +
-                  str(len(self.temp_data)))
+            percent = round((i + 1) / len(self.temp_data), 3)
+            if (percent -
+                    round(percent, 2) == 0) and (prev_percent != percent):
+                round_percent = int(percent * 100)
+                print("Generating Video: " + str(round_percent) + "%")
 
             if self.remove_top_reflection:
                 np_vid_viewer.reflection_remover.remove_top(
@@ -125,6 +129,7 @@ class NpVidTool:
                 # Write image to current video file
                 video_writer.write(img)
             i = i + 1
+            prev_percent = percent
 
         # Release video_writer from memory
         if save_video:
