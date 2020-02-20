@@ -3,6 +3,7 @@ import numpy as np
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
+import np_vid_viewer.reflection_remover
 
 
 class NpVidTool:
@@ -89,14 +90,24 @@ class NpVidTool:
                 filename, cv2.VideoWriter_fourcc("f", "m", "p", "4"),
                 framerate, size)
 
+        if self.remove_bottom_reflection:
+            lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
+                self.temp_data)
+
         # Loop through each frame of data
         i = 0
         for frame in self.temp_data:
+            frame = frame.copy()  # Make copy since file is read-only
             print("Generating Video: " + str(i + 1) + "/" +
                   str(len(self.temp_data)))
 
             if self.remove_top_reflection:
-                pass
+                np_vid_viewer.reflection_remover.remove_top(
+                    frame, zero_level_threshold=180, max_temp_threshold=700)
+
+            if self.remove_bottom_reflection:
+                np_vid_viewer.reflection_remover.remove_bottom(
+                    frame, lower_bounds)
             # Normalize the image to 8 bit color
             img = frame.copy()
             img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
