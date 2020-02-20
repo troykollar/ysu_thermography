@@ -166,6 +166,7 @@ class NpVidTool:
 
     def match_vid_to_meltpool(self):
         """Shuffle the meltpool data and thermal camera data together based on timestamp"""
+        print("Matching meltpool data to video...")
         self.matched_array = []
         self.mp_data_index = 0
         for i in range(0, self.temp_data.shape[0]):
