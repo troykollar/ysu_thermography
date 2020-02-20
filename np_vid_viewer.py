@@ -123,6 +123,8 @@ class NpVidTool:
     def play_video(self, waitKey=1):
         if self.video_array is None:
             self.generate_video()
+        cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Video", 640, 480)
         for frame in self.video_array:
             cv2.imshow("Video", frame)
             cv2.waitKey(waitKey)
