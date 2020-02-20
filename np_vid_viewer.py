@@ -125,9 +125,28 @@ class NpVidTool:
             self.generate_video()
         cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Video", 640, 480)
-        for frame in self.video_array:
+
+        frame_num = 0
+        pause = False
+        while True:
+            key = cv2.waitKey(waitKey)
+            if key == ord("q"):
+                break
+            elif key == ord("k"):
+                pause = not pause
+            elif key == ord("l"):
+                frame_num += 10
+            elif key == ord("j"):
+                frame_num -= 10
+
+            if not pause:
+                frame_num += 1
+            else:
+                pass
+
+            frame = self.video_array[frame_num]
             cv2.imshow("Video", frame)
-            cv2.waitKey(waitKey)
+
         cv2.destroyAllWindows()
 
     def match_vid_to_meltpool(self):
