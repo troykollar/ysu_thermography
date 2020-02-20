@@ -55,7 +55,6 @@ class NpVidTool:
         self.remove_bottom_reflection = remove_bottom_reflection
         self.window_name = window_name
 
-        self.max_temp = []
         self.mp_data_on_vid = mp_data_on_vid
 
     def generate_video(self, save_video=False):
@@ -165,6 +164,7 @@ class NpVidTool:
         self.matched_array = []
         self.mp_data_index = 0
         for i in range(0, self.temp_data.shape[0]):
+            max_temp = np.amax(self.temp_data[i])
             if self.mp_data_index + 1 < self.meltpool_data.shape[0]:
                 if self.video_timestamps[i] >= self.meltpool_data[
                         self.mp_data_index + 1][0]:
@@ -175,7 +175,7 @@ class NpVidTool:
                 self.meltpool_data[self.mp_data_index][1],
                 self.meltpool_data[self.mp_data_index][2],
                 self.meltpool_data[self.mp_data_index][3],
-                self.meltpool_data[self.mp_data_index][4]
+                self.meltpool_data[self.mp_data_index][4], max_temp
             ])
 
     def video_timestamp(self, frame):
@@ -201,6 +201,10 @@ class NpVidTool:
     def mp_area(self, frame):
         """Return the meltpool area value based on the frame"""
         return self.matched_array[frame][6]
+
+    def max_temp(self, frame):
+        """Return the max temp of the given frame"""
+        return self.matched_array[frame][7]
 
     def print_info(self, frame):
         """Print the information about the current frame to console"""
@@ -264,6 +268,14 @@ class NpVidTool:
             img,
             "Area: " + str(self.mp_area(frame)),
             (50, int((4 / 16) * img_height)),
+            font,
+            font_size,
+            font_color,
+        )
+        img = cv2.putText(
+            img,
+            "Max Temp: " + str(self.max_temp(frame)),
+            (50, int((5 / 16) * img_height)),
             font,
             font_size,
             font_color,
