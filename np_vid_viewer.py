@@ -184,7 +184,15 @@ class NpVidTool:
         print("Matching meltpool data to video...")
         self.matched_array = []
         self.mp_data_index = 0
+        prev_percent = 0
         for i in range(0, self.temp_data.shape[0]):
+            # Display completion percentage
+            percent = round((i + 1) / len(self.temp_data), 3)
+            if (percent -
+                    round(percent, 2) == 0) and (prev_percent != percent):
+                round_percent = int(percent * 100)
+                print(str(round_percent) + "%")
+
             max_temp = np.amax(self.temp_data[i])
             if self.mp_data_index + 1 < self.meltpool_data.shape[0]:
                 if self.video_timestamps[i] >= self.meltpool_data[
@@ -198,6 +206,7 @@ class NpVidTool:
                 self.meltpool_data[self.mp_data_index][3],
                 self.meltpool_data[self.mp_data_index][4], max_temp
             ])
+            prev_percent = percent
 
     def video_timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
