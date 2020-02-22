@@ -251,11 +251,7 @@ class NpVidTool:
             "| MP Area: " + str(self.mp_area(frame)),
         )
 
-    def highlight_max_temp(self, frame, img):
-        max_temp = self.max_temp[frame]
-        max_temp_y = np.where(self.temp_data[frame] == max_temp)[0][0]
-        max_temp_x = np.where(self.temp_data[frame] == max_temp)[1][0]
-        img[max_temp_y, max_temp_x] = (255, 255, 255)
+    #TODO: Add Highlight max temp function
 
     def add_mp_data_to_img(self, img, frame):
         """Add meltpool data to the image.
