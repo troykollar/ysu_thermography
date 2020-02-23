@@ -21,8 +21,6 @@ class NpVidTool:
         Attempt to remove the top reflection if true.
     remove_bottom_reflection : bool
         Attempt to remove the bottom reflection if true.
-    window_name : str
-        Name of the window for the video to be displayed in.
     video_timestamps
         Numpy array of the thermal camera timestamps.
     meltpool_data
@@ -33,7 +31,6 @@ class NpVidTool:
         List of lower bounds of part. Used to remove the bottom reflection.
     """
     def __init__(self,
-                 window_name="Video",
                  mp_data_on_vid=False,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False):
@@ -41,7 +38,6 @@ class NpVidTool:
 
         Parameters
         ----------
-        window_name : str
             Name of the window that the video will be displayed in.
         mp_data_on_vid : bool
             Add meltpool data on top of the video if true
@@ -53,7 +49,6 @@ class NpVidTool:
         self.video_array = None
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
-        self.window_name = window_name
 
         self.mp_data_on_vid = mp_data_on_vid
 
@@ -64,18 +59,15 @@ class NpVidTool:
             mmap_mode="r",
             allow_pickle=True)
         self.num_frames = self.temp_data.shape[0]  # Save number of frames
-        self.temp_data.withdraw()
 
         # Load video timestamp data
         self.video_timestamps = np.load(
             askopenfilename(title="Select video timestamp data."),
             allow_pickle=True)
-        self.video_timestamps.withdraw()
 
         # Load meltpool data
         self.meltpool_data = np.load(
             askopenfilename(title="Select meltpool data."), allow_pickle=True)
-        self.meltpool_data.withdraw()
 
         self.video_array = []
         # Match the meltpool data to each frame of video
