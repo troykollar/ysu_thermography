@@ -58,22 +58,24 @@ class NpVidTool:
         self.mp_data_on_vid = mp_data_on_vid
 
     def generate_video(self):
-        Tk().withdraw  #prevent tkinter from opening root window
         # Load temperature data
         self.temp_data = np.load(
             askopenfilename(title="Select thermal cam temperature data."),
             mmap_mode="r",
             allow_pickle=True)
         self.num_frames = self.temp_data.shape[0]  # Save number of frames
+        self.temp_data.withdraw()
 
         # Load video timestamp data
         self.video_timestamps = np.load(
             askopenfilename(title="Select video timestamp data."),
             allow_pickle=True)
+        self.video_timestamps.withdraw()
 
         # Load meltpool data
         self.meltpool_data = np.load(
             askopenfilename(title="Select meltpool data."), allow_pickle=True)
+        self.meltpool_data.withdraw()
 
         self.video_array = []
         # Match the meltpool data to each frame of video
