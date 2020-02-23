@@ -1,8 +1,7 @@
-import cv2
-import numpy as np
-from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
+import cv2
+import numpy as np
 import np_vid_viewer.reflection_remover
 
 
@@ -49,6 +48,13 @@ class NpVidTool:
         self.video_array = None
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
+
+        self.temp_data = np.empty((0, 0))
+        self.num_frames = 0
+        self.video_timestamps = np.empty((0, 0))
+        self.meltpool_data = np.empty((0, 0))
+        self.matched_array = [
+        ]  # Array to hold matched thermal video and mp data
 
         self.mp_data_on_vid = mp_data_on_vid
 
@@ -116,6 +122,7 @@ class NpVidTool:
     def play_video(self, waitKey=1):
         if self.video_array is None:
             self.generate_video()
+        # TODO: Automatically make the window name the name of the build
         cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Video", 640, 480)
 
@@ -176,9 +183,7 @@ class NpVidTool:
 
     def match_vid_to_meltpool(self):
         """Shuffle the meltpool data and thermal camera data together based on timestamp"""
-        print("Matching meltpool data to video...")
-        self.matched_array = []
-        self.mp_data_index = 0
+        mp_data_index = 0
         prev_percent = 0
         for i in range(0, self.temp_data.shape[0]):
             # Display completion percentage
@@ -189,17 +194,17 @@ class NpVidTool:
                 print(str(round_percent) + "%")
 
             max_temp = np.amax(self.temp_data[i])
-            if self.mp_data_index + 1 < self.meltpool_data.shape[0]:
-                if self.video_timestamps[i] >= self.meltpool_data[
-                        self.mp_data_index + 1][0]:
-                    self.mp_data_index = self.mp_data_index + 1
+            if mp_data_index + 1 < self.meltpool_data.shape[0]:
+                if self.video_timestamps[i] >= self.meltpool_data[mp_data_index
+                                                                  + 1][0]:
+                    mp_data_index = mp_data_index + 1
             self.matched_array.append([
                 i, self.video_timestamps[i],
-                self.meltpool_data[self.mp_data_index][0],
-                self.meltpool_data[self.mp_data_index][1],
-                self.meltpool_data[self.mp_data_index][2],
-                self.meltpool_data[self.mp_data_index][3],
-                self.meltpool_data[self.mp_data_index][4], max_temp
+                self.meltpool_data[mp_data_index][0],
+                self.meltpool_data[mp_data_index][1],
+                self.meltpool_data[mp_data_index][2],
+                self.meltpool_data[mp_data_index][3],
+                self.meltpool_data[mp_data_index][4], max_temp
             ])
             prev_percent = percent
 
