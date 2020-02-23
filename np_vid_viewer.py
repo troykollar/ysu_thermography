@@ -60,6 +60,7 @@ class NpVidTool:
         self.mp_data_on_vid = mp_data_on_vid
 
     def generate_video(self):
+        """Load temperature and meltpool data, match them, and create the video array"""
         # Load temperature data
         self.temp_data = np.load(
             askopenfilename(title="Select thermal cam temperature data."),
@@ -121,6 +122,14 @@ class NpVidTool:
             prev_percent = percent
 
     def play_video(self, waitKey=1):
+        """Create a window and play the video stored in video_array. 
+        generate_video will be run automatically if it has not been run.
+        
+        Parameters
+        -----------
+        waitKey : int, optional
+            Time (ms) delay between showing each frame.
+        """
         if self.video_array is None:
             self.generate_video()
         # TODO: Automatically make the window name the name of the build
