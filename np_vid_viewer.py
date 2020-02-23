@@ -35,15 +35,16 @@ class NpVidTool:
                  mp_data_on_vid=False,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False):
-        """Create an NpVidViewer Object.
+        """Create an NpVidTool Object.
 
         Parameters
         ----------
-            Name of the window that the video will be displayed in.
         mp_data_on_vid : bool
             Add meltpool data on top of the video if true
-        remove_reflection : bool
-            Run the remove reflection function if true.
+        remove_top_reflection : bool
+            Run remove_top_reflection if true
+        remove_bottom_reflection : bool
+            Run remove_bottom_reflection if true
         """
         self.video_array = None
         self.remove_top_reflection = remove_top_reflection
