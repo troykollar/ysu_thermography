@@ -40,11 +40,11 @@ class NpVidTool:
         Parameters
         ----------
         mp_data_on_vid : bool
-            Add meltpool data on top of the video if true
+            Add meltpool data on top of the video if true.
         remove_top_reflection : bool
-            Run remove_top_reflection if true
+            Run remove_top_reflection if true.
         remove_bottom_reflection : bool
-            Run remove_bottom_reflection if true
+            Run remove_bottom_reflection if true.
         """
         self.video_array = None
         self.remove_top_reflection = remove_top_reflection
@@ -160,6 +160,15 @@ class NpVidTool:
         cv2.destroyAllWindows()
 
     def save_video(self, playback_speed=15, realtime_framerate=4):
+        """Save the video as a .avi file.
+
+        Parameters
+        ----------
+        playback_speed : int, optional
+            Multiple of realtime speed to playback video at.
+        realtime_framerate : int, optional
+            Number of frames taken by the thermal camera in real time.
+        """
         if self.video_array is None:
             self.generate_video()
 
