@@ -13,21 +13,23 @@ class NpVidTool:
     ----------
     video_array : list
         List of images that will be used for displaying/saving video.
-        Images contain all adjustments/overlays.
-    temp_data
-        Numpy array of thermal cam temps loaded from the file.
+        Images contain all adjustments and overlays.
     remove_top_reflection : bool
         Attempt to remove the top reflection if true.
     remove_bottom_reflection : bool
         Attempt to remove the bottom reflection if true.
+    temp_data
+        Numpy array of thermal cam temps loaded from the file.
+    num_frames : int
+        Number of frames in the video
     video_timestamps
         Numpy array of the thermal camera timestamps.
     meltpool_data
         Numpy array of the melt pool data.
-    _mp_data_index : int
-        Current index of `meltpool_data` numpy array.
-    lower_bounds
-        List of lower bounds of part. Used to remove the bottom reflection.
+    matched_array : list
+        List containing the relevant data video and meltpool data after matching
+    mp_data_on_vid : bool
+        Overlay meltpool data on the video if true.
     """
     def __init__(self,
                  mp_data_on_vid=False,
@@ -42,8 +44,6 @@ class NpVidTool:
             Add meltpool data on top of the video if true
         remove_reflection : bool
             Run the remove reflection function if true.
-        remove_lower : bool
-            Run the remove_lower reflection function if true.
         """
         self.video_array = None
         self.remove_top_reflection = remove_top_reflection
@@ -53,8 +53,8 @@ class NpVidTool:
         self.num_frames = 0
         self.video_timestamps = np.empty((0, 0))
         self.meltpool_data = np.empty((0, 0))
-        self.matched_array = [
-        ]  # Array to hold matched thermal video and mp data
+        # Array to hold matched thermal video and mp data
+        self.matched_array = []
 
         self.mp_data_on_vid = mp_data_on_vid
 
