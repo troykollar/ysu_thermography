@@ -75,15 +75,13 @@ class NpVidTool:
 
         # Loop through each frame of data
         i = 0
-        prev_percent = 0
-        print("Generating Video...")
         for frame in self.temp_data:
             frame = frame.copy()  # Make copy since file is read-only
-            percent = round((i + 1) / len(self.temp_data), 3)
-            if (percent -
-                    round(percent, 2) == 0) and (prev_percent != percent):
-                round_percent = int(percent * 100)
-                print(str(round_percent) + "%")
+
+            progress_bar.printProgressBar(i,
+                                          self.num_frames,
+                                          prefix='Generating Video...',
+                                          length=50)
 
             if self.remove_top_reflection:
                 np_vid_viewer.reflection_remover.remove_top(
@@ -107,7 +105,6 @@ class NpVidTool:
             self.video_array.append(img)
 
             i = i + 1
-            prev_percent = percent
 
     def play_video(self, waitKey=1):
         """Create a window and play the video stored in video_array. 
@@ -174,21 +171,18 @@ class NpVidTool:
                                        cv2.VideoWriter_fourcc(*'MPEG'),
                                        framerate, size)
 
-        prev_percent = 0
         i = 0
         print("Saving video...")
         for frame in self.video_array:
             # Display completion percentage
-            percent = round((i + 1) / len(self.video_array), 3)
-            if (percent -
-                    round(percent, 2) == 0) and (prev_percent != percent):
-                round_percent = int(percent * 100)
-                print(str(round_percent) + "%")
+            progress_bar.printProgressBar(i,
+                                          self.num_frames,
+                                          prefix='Saving Video...',
+                                          length=50)
 
             video_writer.write(frame)
 
             i = i + 1
-            prev_percent = percent
 
         video_writer.release()
 
