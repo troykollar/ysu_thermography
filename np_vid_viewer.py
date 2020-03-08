@@ -1,4 +1,3 @@
-from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 import cv2
 import numpy as np
@@ -108,7 +107,7 @@ class NpVidTool:
 
             i = i + 1
 
-    def play_video(self, waitKey=1):
+    def play_video(self, temp_filename: str, data_filename: str, waitKey=1):
         """Create a window and play the video stored in video_array. 
         generate_video will be run automatically if it has not been run.
         
@@ -118,7 +117,7 @@ class NpVidTool:
             Time (ms) delay between showing each frame.
         """
         if self.video_array is None:
-            self.generate_video()
+            self.generate_video(temp_filename, data_filename)
         # TODO: Automatically make the window name the name of the build
         cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Video", 640, 480)
@@ -183,48 +182,40 @@ class NpVidTool:
                                           length=50)
 
             video_writer.write(frame)
-
             i = i + 1
 
         video_writer.release()
 
     #TODO: Update return functions to use new merged dataset
-    def video_timestamp(self, frame):
+    def timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
-        return self.matched_array[frame][1]
-
-    def mp_timestamp(self, frame):
-        """Return the timestamp of the melt pool data based on the frame."""
-        return self.matched_array[frame][2]
+        return self.merged_data[frame][0]
 
     def mp_x(self, frame):
         """Return the meltpool x value based on the frame"""
-        return self.matched_array[frame][3]
+        return self.merged_data[frame][1]
 
     def mp_y(self, frame):
         """Return the meltpool y value based on the frame"""
-        return self.matched_array[frame][4]
+        return self.merged_data[frame][2]
 
     def mp_z(self, frame):
         """Return the meltpool z value based on the frame"""
-        return self.matched_array[frame][5]
+        return self.merged_data[frame][3]
 
     def mp_area(self, frame):
         """Return the meltpool area value based on the frame"""
-        return self.matched_array[frame][6]
+        return self.merged_data[frame][4]
 
     def max_temp(self, frame):
-        """Return the max temp of the given frame"""
-        return self.matched_array[frame][7]
+        max_temp = np.amax(self.temp_data[frame])[0]
 
     def print_info(self, frame):
         """Print the information about the current frame to console"""
         print(
             "Frame: " + str(frame),
-            "| TC time: " +
-            str(self.mp_timestamp(frame).replace(microsecond=0)),
-            "| MP time: " +
-            str(self.mp_timestamp(frame).replace(microsecond=0)),
+            "| Timestamps: " +
+            str(self.timestamp(frame).replace(microsecond=0)),
             "| MP X: " + str(self.mp_x(frame)),
             "| MP Y: " + str(self.mp_y(frame)),
             "| MP Z: " + str(self.mp_z(frame)),
