@@ -5,6 +5,8 @@ import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
 
+#TODO: Update documenation
+
 
 class NpVidTool:
     """NpVidViewer
@@ -186,6 +188,7 @@ class NpVidTool:
 
         video_writer.release()
 
+    #TODO: Update return functions to use new merged dataset
     def video_timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
         return self.matched_array[frame][1]
