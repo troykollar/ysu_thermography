@@ -49,37 +49,24 @@ class NpVidTool:
         self.video_array = None
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
-
-        self.temp_data = np.empty((0, 0))
-        self.num_frames = 0
-        self.video_timestamps = np.empty((0, 0))
-        self.meltpool_data = np.empty((0, 0))
-        # Array to hold matched thermal video and mp data
-        self.matched_array = []
-
         self.mp_data_on_vid = mp_data_on_vid
 
-    def generate_video(self):
+        self.temp_data = None
+        self.num_frames = 0
+        self.merged_data = None
+
+    def generate_video(self, temp_filename: str, data_filename: str):
         """Load temperature and meltpool data, match them, and create the video array"""
         # Load temperature data
-        self.temp_data = np.load(
-            askopenfilename(title="Select thermal cam temperature data."),
-            mmap_mode="r",
-            allow_pickle=True)
+        self.temp_data = np.load(temp_filename,
+                                 mmap_mode="r",
+                                 allow_pickle=True)
         self.num_frames = self.temp_data.shape[0]  # Save number of frames
 
-        # Load video timestamp data
-        self.video_timestamps = np.load(
-            askopenfilename(title="Select video timestamp data."),
-            allow_pickle=True)
-
-        # Load meltpool data
-        self.meltpool_data = np.load(
-            askopenfilename(title="Select meltpool data."), allow_pickle=True)
+        # Load merged data
+        self.merged_data = np.load(data_filename, allow_pickle=True)
 
         self.video_array = []
-        # Match the meltpool data to each frame of video
-        self.match_vid_to_meltpool()
 
         if self.remove_bottom_reflection:
             lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
@@ -159,7 +146,11 @@ class NpVidTool:
 
         cv2.destroyAllWindows()
 
-    def save_video(self, playback_speed=15, realtime_framerate=4):
+    def save_video(self,
+                   temp_filename: str,
+                   data_filename: str,
+                   playback_speed=15,
+                   realtime_framerate=4):
         """Save the video as a .avi file.
 
         Parameters
@@ -170,7 +161,7 @@ class NpVidTool:
             Number of frames taken by the thermal camera in real time.
         """
         if self.video_array is None:
-            self.generate_video()
+            self.generate_video(temp_filename, data_filename)
 
         framerate = playback_speed * realtime_framerate
         height = self.temp_data[0].shape[0]
