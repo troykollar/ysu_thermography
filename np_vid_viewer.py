@@ -169,9 +169,9 @@ class NpVidTool:
         size = (width, height)
         filename = asksaveasfilename()
 
-        video_writer = cv2.VideoWriter(filename,
-                                       cv2.VideoWriter_fourcc(*'MPEG'),
-                                       framerate, size)
+        video_writer = cv2.VideoWriter(
+            filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
+            size)
 
         i = 0
         print("Saving video...")
