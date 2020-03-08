@@ -3,6 +3,7 @@ from tkinter.filedialog import asksaveasfilename
 import cv2
 import numpy as np
 import np_vid_viewer.reflection_remover
+import np_vid_viewer.progress_bar as progress_bar
 
 
 class NpVidTool:
