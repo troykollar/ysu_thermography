@@ -186,33 +186,6 @@ class NpVidTool:
 
         video_writer.release()
 
-    def match_vid_to_meltpool(self):
-        """Shuffle the meltpool data and thermal camera data together based on timestamp"""
-        mp_data_index = 0
-        prev_percent = 0
-        for i in range(0, self.temp_data.shape[0]):
-            # Display completion percentage
-            percent = round((i + 1) / len(self.temp_data), 3)
-            if (percent -
-                    round(percent, 2) == 0) and (prev_percent != percent):
-                round_percent = int(percent * 100)
-                print(str(round_percent) + "%")
-
-            max_temp = np.amax(self.temp_data[i])
-            if mp_data_index + 1 < self.meltpool_data.shape[0]:
-                if self.video_timestamps[i] >= self.meltpool_data[mp_data_index
-                                                                  + 1][0]:
-                    mp_data_index = mp_data_index + 1
-            self.matched_array.append([
-                i, self.video_timestamps[i],
-                self.meltpool_data[mp_data_index][0],
-                self.meltpool_data[mp_data_index][1],
-                self.meltpool_data[mp_data_index][2],
-                self.meltpool_data[mp_data_index][3],
-                self.meltpool_data[mp_data_index][4], max_temp
-            ])
-            prev_percent = percent
-
     def video_timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
         return self.matched_array[frame][1]
