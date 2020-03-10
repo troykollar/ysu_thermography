@@ -118,9 +118,9 @@ class NpVidTool:
         """
         if self.video_array is None:
             self.generate_video(temp_filename, data_filename)
-        # TODO: Automatically make the window name the name of the build
-        cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("Video", 640, 480)
+        window_name = temp_filename[(temp_filename.rfind('/') + 1):]
+        cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(window_name, 640, 480)
 
         frame_num = 0
         pause = False
@@ -141,7 +141,7 @@ class NpVidTool:
                 pass
 
             frame = self.video_array[frame_num]
-            cv2.imshow("Video", frame)
+            cv2.imshow(window_name, frame)
 
         cv2.destroyAllWindows()
 
