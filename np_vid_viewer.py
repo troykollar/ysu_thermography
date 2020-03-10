@@ -186,7 +186,6 @@ class NpVidTool:
 
         video_writer.release()
 
-    #TODO: Update return functions to use new merged dataset
     def timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
         return self.merged_data[frame][0]
@@ -208,7 +207,7 @@ class NpVidTool:
         return self.merged_data[frame][4]
 
     def max_temp(self, frame):
-        max_temp = np.amax(self.temp_data[frame])[0]
+        return np.amax(self.temp_data[frame])
 
     def print_info(self, frame):
         """Print the information about the current frame to console"""
