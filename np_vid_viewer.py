@@ -34,6 +34,8 @@ class NpVidTool:
         Overlay meltpool data on the video if true.
     """
     def __init__(self,
+                 temp_filename: str,
+                 data_filename: str,
                  mp_data_on_vid=False,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False):
@@ -53,13 +55,8 @@ class NpVidTool:
         self.remove_bottom_reflection = remove_bottom_reflection
         self.mp_data_on_vid = mp_data_on_vid
 
-        self.temp_data = None
-        self.num_frames = 0
-        self.merged_data = None
-
-    def generate_video(self, temp_filename: str, data_filename: str):
-        """Load temperature and meltpool data, match them, and create the video array"""
         # Load temperature data
+        self.temp_filename = temp_filename
         self.temp_data = np.load(temp_filename,
                                  mmap_mode="r",
                                  allow_pickle=True)
@@ -67,6 +64,9 @@ class NpVidTool:
 
         # Load merged data
         self.merged_data = np.load(data_filename, allow_pickle=True)
+
+    def generate_video(self):
+        """Load temperature and meltpool data, match them, and create the video array"""
 
         self.video_array = []
 
@@ -107,7 +107,7 @@ class NpVidTool:
 
             i = i + 1
 
-    def play_video(self, temp_filename: str, data_filename: str, waitKey=1):
+    def play_video(self, waitKey=1):
         """Create a window and play the video stored in video_array. 
         generate_video will be run automatically if it has not been run.
         
@@ -116,8 +116,9 @@ class NpVidTool:
         waitKey : int, optional
             Time (ms) delay between showing each frame.
         """
+        temp_filename = self.temp_filename
         if self.video_array is None:
-            self.generate_video(temp_filename, data_filename)
+            self.generate_video()
         window_name = temp_filename[(temp_filename.rfind('/') + 1):]
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(window_name, 640, 480)
