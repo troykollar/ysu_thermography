@@ -183,6 +183,42 @@ class NpVidTool:
 
         video_writer.release()
 
+    def save_hotspot_video(self, playback_speed=15, realtime_framerate=4):
+        framerate = playback_speed * realtime_framerate
+        height = self.temp_data[0].shape[0]
+        width = self.temp_data[0].shape[1]
+        size = (width, height)
+        filename = asksaveasfilename()
+
+        video_writer = cv2.VideoWriter(
+            filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
+            size)
+
+        hotspot_img = np.zeros((height, width), dtype=int)
+
+        for i, frame in enumerate(self.temp_data, 0):
+            # Display completion percentage
+            progress_bar.printProgressBar(i,
+                                          self.num_frames,
+                                          prefix='Saving Hotspot Video...',
+                                          length=50)
+
+            current_max = np.amax(frame)
+            current_max_y = np.where(frame == current_max)[0][0]
+            current_max_x = np.where(frame == current_max)[1][0]
+
+            hotspot_img[current_max_y, current_max_x] = current_max
+            hotspot_img_frame = hotspot_img.copy()
+            hotspot_img_frame = cv2.normalize(hotspot_img_frame,
+                                              hotspot_img_frame, 0, 255,
+                                              cv2.NORM_MINMAX, cv2.CV_8UC1)
+            hotspot_img_frame = cv2.applyColorMap(hotspot_img_frame,
+                                                  cv2.COLORMAP_INFERNO)
+
+            video_writer.write(hotspot_img_frame)
+
+        video_writer.release()
+
     def timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
         return self.merged_data[frame][0]
