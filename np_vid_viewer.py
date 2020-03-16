@@ -146,11 +146,7 @@ class NpVidTool:
 
         cv2.destroyAllWindows()
 
-    def save_video(self,
-                   temp_filename: str,
-                   data_filename: str,
-                   playback_speed=15,
-                   realtime_framerate=4):
+    def save_video(self, playback_speed=15, realtime_framerate=4):
         """Save the video as a .avi file.
 
         Parameters
@@ -161,7 +157,7 @@ class NpVidTool:
             Number of frames taken by the thermal camera in real time.
         """
         if self.video_array is None:
-            self.generate_video(temp_filename, data_filename)
+            self.generate_video()
 
         framerate = playback_speed * realtime_framerate
         height = self.temp_data[0].shape[0]
