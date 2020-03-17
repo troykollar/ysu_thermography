@@ -212,9 +212,13 @@ class NpVidTool:
 
             hotspot_img[current_max_y, current_max_x] = current_max
             hotspot_img_frame = hotspot_img.copy()
-            hotspot_img_frame = cv2.normalize(hotspot_img_frame,
-                                              hotspot_img_frame, 0, 255,
-                                              cv2.NORM_MINMAX, cv2.CV_8UC1)
+            hotspot_img_frame = cv2.normalize(
+                src=np.float32(hotspot_img_frame),
+                dst=np.float32(hotspot_img_frame),
+                alpha=0,
+                beta=255,
+                norm_type=cv2.NORM_MINMAX,
+                dtype=cv2.CV_8UC1)
             hotspot_img_frame = cv2.applyColorMap(hotspot_img_frame,
                                                   cv2.COLORMAP_INFERNO)
 
