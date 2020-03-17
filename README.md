@@ -29,9 +29,14 @@ Once the `np_video_viewer` package is installed within your project directory. T
 ```python
 import np_vid_viewer
 
-VIEWER = np_vid_viewer.NpVidTool(remove_top_reflection=True,
-                                 remove_bottom_reflection=True,
-                                 mp_data_on_vid=True)
+temp_data_file = "/media/troy/TroyUSB/thermography/4-8_part_merged_data/4-8_part_merged_data/thermal_cam_temps.npy"
+merged_data_file = "/media/troy/TroyUSB/thermography/4-8_part_merged_data/4-8_part_merged_data/merged_data.npy"
 
-VIEWER.save_video(100)
+VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
+                                 data_filename=merged_data_file,
+                                 mp_data_on_vid=True,
+                                 remove_top_reflection=True,
+                                 remove_bottom_reflection=True)
+
+VIEWER.play_video()
 ```
