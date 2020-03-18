@@ -197,7 +197,7 @@ class NpVidTool:
             filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
             size)
 
-        hotspot_img = np.zeros((height, width), dtype=int)
+        hotspot_img = np.zeros((height, width), dtype=np.float32)
 
         for i, frame in enumerate(self.temp_data, 0):
             # Display completion percentage
@@ -320,3 +320,32 @@ class NpVidTool:
             font_size,
             font_color,
         )
+
+    def generate_threshold_image(self, threshold=800):
+        height = self.temp_data[0].shape[0]
+        width = self.temp_data[0].shape[1]
+        size = (width, height)
+        threshold_img = np.zeros((height, width), dtype=np.float32)
+        for i, frame in enumerate(self.temp_data, 0):
+            # Show progress
+            progress_bar.printProgressBar(
+                i,
+                self.num_frames,
+                prefix='Generating threshold image...',
+                length=50)
+
+            # Check each pixel, if pixel is over threshold, increment that pixel in theshold_img
+            for y, row in enumerate(frame):
+                for x, pixel in enumerate(row):
+                    if pixel > threshold:
+                        threshold_img[y, x] += 1
+
+        threshold_img = cv2.normalize(src=threshold_img,
+                                      dst=threshold_img,
+                                      alpha=0,
+                                      beta=255,
+                                      norm_type=cv2.NORM_MINMAX,
+                                      dtype=cv2.CV_8UC1)
+        threshold_img = cv2.applyColorMap(threshold_img, cv2.COLORMAP_INFERNO)
+
+        cv2.imwrite("threshold_img.png", threshold_img)
