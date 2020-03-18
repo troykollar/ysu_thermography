@@ -141,6 +141,8 @@ class NpVidTool:
             else:
                 pass
 
+            if frame_num == self.num_frames - 1:
+                pause = True
             frame = self.video_array[frame_num]
             cv2.imshow(window_name, frame)
 
