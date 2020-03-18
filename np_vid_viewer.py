@@ -132,9 +132,15 @@ class NpVidTool:
             elif key == ord("k"):
                 pause = not pause
             elif key == ord("l"):
-                frame_num += 10
+                if frame_num < self.num_frames - 11:
+                    frame_num += 10
+                else:
+                    frame_num = self.num_frames - 1
             elif key == ord("j"):
-                frame_num -= 10
+                if frame_num > 10:
+                    frame_num -= 10
+                else:
+                    frame_num = 0
 
             if not pause:
                 frame_num += 1
