@@ -6,6 +6,8 @@ import np_vid_viewer.progress_bar as progress_bar
 
 #TODO: Update documenation
 
+# Random test comment
+
 
 class NpVidTool:
     """NpVidViewer
