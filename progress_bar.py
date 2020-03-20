@@ -3,7 +3,7 @@ def printProgressBar(iteration,
                      prefix='',
                      suffix='',
                      decimals=1,
-                     length=100,
+                     length=40,
                      fill='█',
                      printEnd="\r"):
     """
@@ -25,4 +25,4 @@ def printProgressBar(iteration,
     print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end=printEnd)
     # Print New Line on Complete
     if iteration == total:
-        print()
+        print('\n')
