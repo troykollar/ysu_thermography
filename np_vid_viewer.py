@@ -81,8 +81,7 @@ class NpVidTool:
 
             progress_bar.printProgressBar(i,
                                           self.num_frames,
-                                          prefix='Generating Video...',
-                                          length=50)
+                                          prefix='Generating Video...')
 
             if self.remove_top_reflection:
                 np_vid_viewer.reflection_remover.remove_top(
@@ -130,6 +129,11 @@ class NpVidTool:
         frame_num = 0
         pause = False
         while True:
+            #TODO:  Change progressbar to show timestamp (relative to video)
+            #       instead of percentage
+            progress_bar.printProgressBar(frame_num,
+                                          self.num_frames - 1,
+                                          prefix='Playing Video: ')
             key = cv2.waitKey(waitKey)
             if key == ord("q"):
                 break
@@ -152,9 +156,13 @@ class NpVidTool:
                 pass
 
             if frame_num == self.num_frames - 1:
-                pause = True
+                frame_num = 0  #Start video over at end
             frame = self.video_array[frame_num]
             cv2.imshow(window_name, frame)
+
+        print(
+            '\n'
+        )  # Print blank line to remove progressbar if video was quit before ending
 
         cv2.destroyAllWindows()
 
@@ -187,8 +195,7 @@ class NpVidTool:
             # Display completion percentage
             progress_bar.printProgressBar(i,
                                           self.num_frames,
-                                          prefix='Saving Video...',
-                                          length=50)
+                                          prefix='Saving Video...')
 
             video_writer.write(frame)
             i = i + 1
@@ -213,10 +220,11 @@ class NpVidTool:
 
         for i, frame in enumerate(self.temp_data, 0):
             # Display completion percentage
-            progress_bar.printProgressBar(i,
-                                          self.num_frames,
-                                          prefix='Saving Hotspot Video...',
-                                          length=50)
+            progress_bar.printProgressBar(
+                i,
+                self.num_frames,
+                prefix='Saving Hotspot Video...',
+            )
 
             current_max = np.amax(frame)
             current_max_y = np.where(frame == current_max)[0][0]
@@ -336,15 +344,11 @@ class NpVidTool:
     def generate_threshold_image(self, threshold=800):
         height = self.temp_data[0].shape[0]
         width = self.temp_data[0].shape[1]
-        size = (width, height)
         threshold_img = np.zeros((height, width), dtype=np.float32)
         for i, frame in enumerate(self.temp_data, 0):
             # Show progress
             progress_bar.printProgressBar(
-                i,
-                self.num_frames,
-                prefix='Generating threshold image...',
-                length=50)
+                i, self.num_frames, prefix='Generating threshold image...')
 
             # Check each pixel, if pixel is over threshold, increment that pixel in theshold_img
             for y, row in enumerate(frame):
