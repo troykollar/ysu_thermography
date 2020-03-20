@@ -67,7 +67,13 @@ class NpVidTool:
         # Load merged data
         self.merged_data = np.load(data_filename, allow_pickle=True)
 
-    def generate_frame(self, frame_num, lower_bounds):
+        if self.remove_bottom_reflection:
+            self.lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
+                self.temp_data)
+        else:
+            self.lower_bounds = None
+
+    def generate_frame(self, frame_num):
         frame = self.temp_data[frame_num].copy()
 
         if self.remove_top_reflection:
@@ -75,7 +81,8 @@ class NpVidTool:
                 frame, zero_level_threshold=180, max_temp_threshold=700)
 
         if self.remove_bottom_reflection:
-            np_vid_viewer.reflection_remover.remove_bottom(frame, lower_bounds)
+            np_vid_viewer.reflection_remover.remove_bottom(
+                frame, self.lower_bounds)
 
         # Normalize the image to 8 bit color
         img = frame.copy()
@@ -182,7 +189,7 @@ class NpVidTool:
             else:
                 pass
 
-            img = self.generate_frame(frame_num, lower_bounds)
+            img = self.generate_frame(frame_num)
 
             if frame_num == self.num_frames - 1:
                 frame_num = 0  #Start video over at end
