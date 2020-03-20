@@ -212,8 +212,6 @@ class NpVidTool:
         realtime_framerate : int, optional
             Number of frames taken by the thermal camera in real time.
         """
-        if self.video_array is None:
-            self.generate_video()
 
         framerate = playback_speed * realtime_framerate
         height = self.temp_data[0].shape[0]
@@ -225,16 +223,15 @@ class NpVidTool:
             filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
             size)
 
-        i = 0
-        print("Saving video...")
-        for frame in self.video_array:
+        for i, frame in enumerate(self.temp_data):
             # Display completion percentage
             progress_bar.printProgressBar(i,
                                           self.num_frames,
                                           prefix='Saving Video...')
 
-            video_writer.write(frame)
-            i = i + 1
+            img = self.generate_frame(i)
+
+            video_writer.write(img)
 
         video_writer.release()
 
