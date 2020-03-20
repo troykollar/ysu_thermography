@@ -118,8 +118,11 @@ class NpVidTool:
             Time (ms) delay between showing each frame.
         """
         temp_filename = self.temp_filename
-        if self.video_array is None:
-            self.generate_video()
+
+        if self.remove_bottom_reflection:
+            lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
+                self.temp_data)
+
         window_name = temp_filename[(temp_filename.rfind('/') + 1):]
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(window_name, 640, 480)
@@ -157,10 +160,31 @@ class NpVidTool:
             else:
                 pass
 
+            frame = self.temp_data[frame_num].copy()
+
+            if self.remove_top_reflection:
+                np_vid_viewer.reflection_remover.remove_top(
+                    frame, zero_level_threshold=180, max_temp_threshold=700)
+
+            if self.remove_bottom_reflection:
+                np_vid_viewer.reflection_remover.remove_bottom(
+                    frame, lower_bounds)
+
+            # Normalize the image to 8 bit color
+            img = frame.copy()
+            img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
+
+            # Apply colormap to image
+            img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
+
+            # Add meltpool data onto the image
+            if self.mp_data_on_vid:
+                self.add_mp_data_to_img(img, frame_num)
+
             if frame_num == self.num_frames - 1:
                 frame_num = 0  #Start video over at end
-            frame = self.video_array[frame_num]
-            cv2.imshow(window_name, frame)
+
+            cv2.imshow(window_name, img)
 
         print(
             '\n'
