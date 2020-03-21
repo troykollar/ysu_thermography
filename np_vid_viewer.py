@@ -37,6 +37,7 @@ class NpVidTool:
                  data_filename: str,
                  mp_data_on_vid=False,
                  scale_factor=1,
+                 frame_delay=1,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False):
         """Create an NpVidTool Object.
@@ -72,7 +73,11 @@ class NpVidTool:
         else:
             self.lower_bounds = None
 
+        # Set scale factor for resizing frames of video
         self.scale_factor = scale_factor
+
+        # Set frame delay for playing video
+        self.frame_delay = frame_delay
 
     def generate_frame(self, frame_num):
         frame = self.temp_data[frame_num].copy()
@@ -146,7 +151,7 @@ class NpVidTool:
 
             i = i + 1
 
-    def play_video(self, waitKey=1):
+    def play_video(self):
         """Create a window and play the video stored in video_array. 
         generate_video will be run automatically if it has not been run.
         
@@ -173,7 +178,7 @@ class NpVidTool:
             progress_bar.printProgressBar(frame_num,
                                           self.num_frames - 1,
                                           prefix='Playing Video: ')
-            key = cv2.waitKey(waitKey)
+            key = cv2.waitKey(self.frame_delay)
             if key == ord("q"):
                 break
             elif key == ord("k"):
@@ -380,8 +385,8 @@ class NpVidTool:
         )
 
     def generate_threshold_image(self, threshold=800):
-        height = self.temp_data[0].shape[0] * scale_factor
-        width = self.temp_data[0].shape[1] * scale_factor
+        height = self.temp_data[0].shape[0] * self.scale_factor
+        width = self.temp_data[0].shape[1] * self.scale_factor
         threshold_img = np.zeros((height, width), dtype=np.float32)
         for i, frame in enumerate(self.temp_data, 0):
             # Show progress
