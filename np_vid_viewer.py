@@ -245,8 +245,8 @@ class NpVidTool:
                            realtime_framerate=4,
                            save_img=False):
         framerate = playback_speed * realtime_framerate
-        height = self.temp_data[0].shape[0]
-        width = self.temp_data[0].shape[1]
+        height = self.temp_data[0].shape[0] * self.scale_factor
+        width = self.temp_data[0].shape[1] * self.scale_factor
         size = (width, height)
         filename = asksaveasfilename()
 
@@ -380,8 +380,8 @@ class NpVidTool:
         )
 
     def generate_threshold_image(self, threshold=800):
-        height = self.temp_data[0].shape[0]
-        width = self.temp_data[0].shape[1]
+        height = self.temp_data[0].shape[0] * scale_factor
+        width = self.temp_data[0].shape[1] * scale_factor
         threshold_img = np.zeros((height, width), dtype=np.float32)
         for i, frame in enumerate(self.temp_data, 0):
             # Show progress
