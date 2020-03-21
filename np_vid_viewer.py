@@ -15,9 +15,6 @@ class NpVidTool:
 
     Attributes
     ----------
-    video_array : list
-        List of images that will be used for displaying/saving video.
-        Images contain all adjustments and overlays.
     remove_top_reflection : bool
         Attempt to remove the top reflection if true.
     remove_bottom_reflection : bool
@@ -39,6 +36,7 @@ class NpVidTool:
                  temp_filename: str,
                  data_filename: str,
                  mp_data_on_vid=False,
+                 scale_factor=1,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False):
         """Create an NpVidTool Object.
@@ -67,11 +65,14 @@ class NpVidTool:
         # Load merged data
         self.merged_data = np.load(data_filename, allow_pickle=True)
 
+        # Find lower bounds of piece if remove_lower reflection is selected
         if self.remove_bottom_reflection:
             self.lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
                 self.temp_data)
         else:
             self.lower_bounds = None
+
+        self.scale_factor = scale_factor
 
     def generate_frame(self, frame_num):
         frame = self.temp_data[frame_num].copy()
@@ -90,6 +91,13 @@ class NpVidTool:
 
         # Apply colormap to image
         img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
+
+        # Scale image according to scale_factor
+        width = int(img.shape[1] * self.scale_factor)
+        height = int(frame.shape[0] * self.scale_factor)
+        size = (width, height)
+
+        img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
 
         # Add meltpool data onto the image
         if self.mp_data_on_vid:
@@ -211,8 +219,8 @@ class NpVidTool:
         """
 
         framerate = playback_speed * realtime_framerate
-        height = self.temp_data[0].shape[0]
-        width = self.temp_data[0].shape[1]
+        height = self.temp_data[0].shape[0] * self.scale_factor
+        width = self.temp_data[0].shape[1] * self.scale_factor
         size = (width, height)
         filename = asksaveasfilename()
 
