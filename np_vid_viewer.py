@@ -149,9 +149,6 @@ class NpVidTool:
         """
         temp_filename = self.temp_filename
 
-        lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
-            self.temp_data)
-
         window_name = temp_filename[(temp_filename.rfind('/') + 1):]
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(window_name, 640, 480)
