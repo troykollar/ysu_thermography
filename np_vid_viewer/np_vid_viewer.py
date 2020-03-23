@@ -105,13 +105,14 @@ class NpVidTool:
         img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
 
         # Extend frame for mp_data
-        img = cv2.copyMakeBorder(img,
-                                 80,
-                                 0,
-                                 0,
-                                 0,
-                                 cv2.BORDER_CONSTANT,
-                                 value=(255, 255, 255))
+        if self.mp_data_on_vid:
+            img = cv2.copyMakeBorder(img,
+                                     80,
+                                     0,
+                                     0,
+                                     0,
+                                     cv2.BORDER_CONSTANT,
+                                     value=(255, 255, 255))
 
         # Add meltpool data onto the image
         if self.mp_data_on_vid:
