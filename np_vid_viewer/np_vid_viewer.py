@@ -107,7 +107,7 @@ class NpVidTool:
         # Extend frame for mp_data
         if self.mp_data_on_vid:
             img = cv2.copyMakeBorder(img,
-                                     int(height * (8 / 16)),
+                                     int(height * (11 / 16)),
                                      0,
                                      0,
                                      0,
@@ -350,13 +350,16 @@ class NpVidTool:
             Frame number to grab meltpool data for
         """
         img_height = img.shape[:1][0]
+        img_width = img.shape[1]
         font = cv2.FONT_HERSHEY_DUPLEX
         font_size = img_height / 480
         font_color = (0, 0, 0)
+        column1_x = 25
+        column2_x = int(img_width * .5)
         img = cv2.putText(
             img,
             "X: " + str(self.mp_x(frame)),
-            (50, int((1 / 16) * img_height)),
+            (column1_x, int((1 / 16) * img_height)),
             font,
             font_size,
             font_color,
@@ -364,7 +367,7 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Y: " + str(self.mp_y(frame)),
-            (50, int((2 / 16) * img_height)),
+            (column1_x, int((2 / 16) * img_height)),
             font,
             font_size,
             font_color,
@@ -372,7 +375,7 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Z: " + str(self.mp_z(frame)),
-            (50, int((3 / 16) * img_height)),
+            (column1_x, int((3 / 16) * img_height)),
             font,
             font_size,
             font_color,
@@ -380,7 +383,7 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Area: " + str(self.mp_area(frame)),
-            (50, int((4 / 16) * img_height)),
+            (column1_x, int((4 / 16) * img_height)),
             font,
             font_size,
             font_color,
@@ -388,11 +391,15 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Max Temp: " + str(self.max_temp(frame)),
-            (50, int((5 / 16) * img_height)),
+            (column1_x, int((5 / 16) * img_height)),
             font,
             font_size,
             font_color,
         )
+        img = cv2.putText(
+            img, "Frame: " + str(frame + 1) + "/" + str(self.num_frames),
+            (column1_x, int(
+                (6 / 16) * img_height)), font, font_size, font_color)
 
     def generate_threshold_image(self, threshold=800):
         height = self.temp_data[0].shape[0] * self.scale_factor
