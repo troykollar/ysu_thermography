@@ -107,7 +107,7 @@ class NpVidTool:
         # Extend frame for mp_data
         if self.mp_data_on_vid:
             img = cv2.copyMakeBorder(img,
-                                     80,
+                                     int(height * (8 / 16)),
                                      0,
                                      0,
                                      0,
