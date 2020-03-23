@@ -140,7 +140,8 @@ class NpVidTool:
             "'J' - Rewind 10 frames \t\t| 'N' - Rewind 1 frame\t\t| 'I' - Rewind 100 frames\n"
             +
             "'L' - Fast Forward 10 frames \t| 'M' - Fast Forward 1 frame\t| 'O' - Fast-forward 100 frames\n"
-            + "'S' - Save frame as PNG\n" + "'Q' - Quit")
+            + "'F' - Jump to specific frame\n" + "'S' - Save frame as PNG\n" +
+            "'Q' - Quit")
 
         frame_num = 0
         pause = False
