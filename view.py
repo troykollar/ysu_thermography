@@ -35,6 +35,7 @@ parser.add_argument(
     default=False,
     required=False,
     help='0 or 1 specifying wether or not to remove top reflections')
+
 parser.add_argument(
     '-bot',
     type=int,
@@ -42,8 +43,17 @@ parser.add_argument(
     required=False,
     help='0 or 1 specifying wether or not to remove bottom reflections')
 
+parser.add_argument(
+    '--build',
+    type=str,
+    default=False,
+    required=False,
+    help='Name of build'
+)
+
 args = parser.parse_args()
 
+build = args.build
 temp_data_file = args.temp_data
 merged_data_file = args.merged_data
 scale_factor = args.scale
@@ -51,7 +61,8 @@ frame_delay = args.delay
 top = bool(args.top)
 bot = bool(args.bot)
 
-VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
+VIEWER = np_vid_viewer.NpVidTool(build=build,
+                                temp_filename=temp_data_file,
                                  data_filename=merged_data_file,
                                  scale_factor=scale_factor,
                                  frame_delay=frame_delay,
