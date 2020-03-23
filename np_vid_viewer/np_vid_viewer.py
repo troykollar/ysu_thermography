@@ -191,6 +191,17 @@ class NpVidTool:
                     '/')] + "/frame_" + str(frame_num + 1) + ".png"
                 print("Saved image to: " + filename)
                 cv2.imwrite(filename, self.generate_frame(frame_num))
+            elif key == ord('f'):
+                pause = True
+                input_frame = -1
+                error = True
+                while error:
+                    input_frame = input("Enter a frame to jump to:\n")
+                    if input_frame.isdigit():
+                        error = False
+                    else:
+                        error = True
+                frame_num = int(input_frame) - 1
 
             if not pause:
                 frame_num += 1
