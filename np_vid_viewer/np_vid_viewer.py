@@ -191,7 +191,8 @@ class NpVidTool:
             key = cv2.waitKey(self.frame_delay)
             if key == ord("q"):
                 break
-            elif key == ord("k"):
+            elif key == ord(
+                    "k") or key == 32:  # key == 32 means spacebar is pressed
                 pause = not pause
             elif key == ord("l"):
                 if frame_num < self.num_frames - 11:
