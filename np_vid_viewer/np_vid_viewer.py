@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
+import os
 
 #TODO: Update documenation
 
@@ -15,6 +16,8 @@ class NpVidTool:
 
     Attributes
     ----------
+    build : str 
+        Name of the build to create the dir of images for
     remove_top_reflection : bool
         Attempt to remove the top reflection if true.
     remove_bottom_reflection : bool
@@ -33,6 +36,7 @@ class NpVidTool:
         Overlay meltpool data on the video if true.
     """
     def __init__(self,
+                 build: str,
                  temp_filename: str,
                  data_filename: str,
                  mp_data_on_vid=False,
@@ -44,6 +48,8 @@ class NpVidTool:
 
         Parameters
         ----------
+        build : str
+            directory to create for frame images
         mp_data_on_vid : bool
             Add meltpool data on top of the video if true.
         remove_top_reflection : bool
@@ -51,10 +57,20 @@ class NpVidTool:
         remove_bottom_reflection : bool
             Run remove_bottom_reflection if true.
         """
+        self.imgdir = build
         self.video_array = None
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
         self.mp_data_on_vid = mp_data_on_vid
+
+        if build is not None:
+            try: 
+                os.mkdir(build)
+            except OSError:
+                print ("Creation of the directory %s failed" % build)
+            else:
+                print ("Successfully created the directory %s " % build)
+
 
         # Load temperature data
         self.temp_filename = temp_filename
@@ -214,7 +230,9 @@ class NpVidTool:
             if frame_num == self.num_frames - 1:
                 frame_num = 0  #Start video over at end
 
+            path = self.imgdir + "/" + str(frame_num) + ".png"
             cv2.imshow(window_name, img)
+            cv2.imwrite(path, img)
 
         print(
             '\n'
