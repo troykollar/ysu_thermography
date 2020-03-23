@@ -186,6 +186,11 @@ class NpVidTool:
                     frame_num -= 100
                 else:
                     frame_num = 0
+            elif key == ord('s'):
+                filename = temp_filename[:temp_filename.rfind(
+                    '/')] + "/frame_" + str(frame_num + 1) + ".png"
+                print("Saved image to: " + filename)
+                cv2.imwrite(filename, self.generate_frame(frame_num))
 
             if not pause:
                 frame_num += 1
