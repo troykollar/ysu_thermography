@@ -120,47 +120,6 @@ class NpVidTool:
 
         return img
 
-    def generate_video(self):
-        """Load temperature and meltpool data, match them, and create the video array"""
-
-        self.video_array = []
-
-        if self.remove_bottom_reflection:
-            lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
-                self.temp_data)
-
-        # Loop through each frame of data
-        i = 0
-        for frame in self.temp_data:
-            frame = frame.copy()  # Make copy since file is read-only
-
-            progress_bar.printProgressBar(i,
-                                          self.num_frames,
-                                          prefix='Generating Video...')
-
-            if self.remove_top_reflection:
-                np_vid_viewer.reflection_remover.remove_top(
-                    frame, zero_level_threshold=180, max_temp_threshold=700)
-
-            if self.remove_bottom_reflection:
-                np_vid_viewer.reflection_remover.remove_bottom(
-                    frame, lower_bounds)
-            # Normalize the image to 8 bit color
-            img = frame.copy()
-            img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
-
-            # Apply colormap to image
-            img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
-
-            # Add meltpool data onto the image
-            if self.mp_data_on_vid:
-                self.add_mp_data_to_img(img, i)
-
-            # Add image to video array
-            self.video_array.append(img)
-
-            i = i + 1
-
     def play_video(self):
         """Create a window and play the video stored in video_array. 
         generate_video will be run automatically if it has not been run.
