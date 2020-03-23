@@ -176,10 +176,12 @@ class NpVidTool:
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(window_name, 640, 480)
 
-        print("'K'/'Space' - Play/Pause\n" +
-              "'J' - Rewind 10 frames \t\t| 'N' - Rewind 1 frame\n" +
-              "'L' - Fast Forward 10 frames \t| 'M' - Fast Forward 1 frame\n" +
-              "'Q' - Quit")
+        print(
+            "'K'/'Space' - Play/Pause\n" +
+            "'J' - Rewind 10 frames \t\t| 'N' - Rewind 1 frame\t\t| 'I' - Rewind 100 frames\n"
+            +
+            "'L' - Fast Forward 10 frames \t| 'M' - Fast Forward 1 frame\t| 'O' - Fast-forward 100 frames\n"
+            + "'Q' - Quit")
 
         frame_num = 0
         pause = False
