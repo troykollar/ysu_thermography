@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
+import matplotlib.pyplot as plt
 
 #TODO: Update documenation
 
@@ -188,10 +189,7 @@ class NpVidTool:
                 else:
                     frame_num = 0
             elif key == ord('s'):
-                filename = temp_filename[:temp_filename.rfind(
-                    '/')] + "/frame_" + str(frame_num + 1) + ".png"
-                print("Saved image to: " + filename)
-                cv2.imwrite(filename, self.generate_frame(frame_num))
+                self.save_frame16(frame_num)
             elif key == ord('f'):
                 pause = True
                 input_frame = -1
@@ -221,6 +219,13 @@ class NpVidTool:
         )  # Print blank line to remove progressbar if video was quit before ending
 
         cv2.destroyAllWindows()
+
+    def save_frame16(self, frame):
+        temp_filename = self.temp_filename
+        filename = temp_filename[:temp_filename.rfind('/')] + "/frame_" + str(
+            frame + 1) + ".png"
+        print("Saved image to: " + filename)
+        plt.imsave(filename, self.temp_data[frame], cmap='inferno')
 
     def save_video(self, playback_speed=15, realtime_framerate=4):
         """Save the video as a .avi file.
