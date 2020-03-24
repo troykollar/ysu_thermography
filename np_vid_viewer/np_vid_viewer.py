@@ -410,23 +410,21 @@ class NpVidTool:
         height = self.temp_data[0].shape[0] * self.scale_factor
         width = self.temp_data[0].shape[1] * self.scale_factor
         threshold_img = np.zeros((height, width), dtype=np.float32)
-        for i, frame in enumerate(self.temp_data, 0):
+
+        # Check each pixel, if pixel is over threshold, increment that pixel in theshold_img
+        for i, frame in enumerate(self.temp_data):
             # Show progress
             progress_bar.printProgressBar(
                 i, self.num_frames, prefix='Generating threshold image...')
+            over_thresh_array = np.where(frame > threshold)
 
-            # Check each pixel, if pixel is over threshold, increment that pixel in theshold_img
-            for y, row in enumerate(frame):
-                for x, pixel in enumerate(row):
-                    if pixel > threshold:
-                        threshold_img[y, x] += 1
+            if over_thresh_array[0].size > 0:
+                for x_index, y in enumerate(over_thresh_array[0]):
+                    x = over_thresh_array[1][x_index]
+                    threshold_img[y, x] += 1
 
-        threshold_img = cv2.normalize(src=threshold_img,
-                                      dst=threshold_img,
-                                      alpha=0,
-                                      beta=255,
-                                      norm_type=cv2.NORM_MINMAX,
-                                      dtype=cv2.CV_8UC1)
-        threshold_img = cv2.applyColorMap(threshold_img, cv2.COLORMAP_INFERNO)
-
-        cv2.imwrite("threshold_img.png", threshold_img)
+        temp_filename = self.temp_filename
+        filename = temp_filename[:temp_filename.rfind('/'
+                                                      )] + "/threshold_img.png"
+        print("Saved image to: " + filename)
+        plt.imsave(filename, threshold_img, cmap='inferno')
