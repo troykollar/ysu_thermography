@@ -424,7 +424,7 @@ class NpVidTool:
                     threshold_img[y, x] += 1
 
         temp_filename = self.temp_filename
-        filename = temp_filename[:temp_filename.rfind('/'
-                                                      )] + "/threshold_img.png"
+        filename = temp_filename[:temp_filename.rfind(
+            '/')] + "/threshold_img" + str(threshold) + ".png"
         print("Saved image to: " + filename)
         plt.imsave(filename, threshold_img, cmap='inferno')
