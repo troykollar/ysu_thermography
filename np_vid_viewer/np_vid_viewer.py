@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
+import np_vid_viewer.helper_functions as helper_functions
 import matplotlib.pyplot as plt
 
 #TODO: Update documenation
@@ -76,6 +77,9 @@ class NpVidTool:
 
         # Set scale factor for resizing frames of video
         self.scale_factor = scale_factor
+        if self.scale_factor == 1:
+            self.scale_factor = helper_functions.min_scale_factor(
+                self.temp_data[0])
 
         # Set frame delay for playing video
         self.frame_delay = frame_delay
@@ -260,6 +264,7 @@ class NpVidTool:
             img = self.generate_frame(i)
 
             video_writer.write(img)
+        print('\n')  #print a newline to get rid of progress bar
 
         video_writer.release()
 
