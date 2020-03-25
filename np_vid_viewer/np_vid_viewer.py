@@ -238,9 +238,12 @@ class NpVidTool:
             Number of frames taken by the thermal camera in real time.
         """
 
+        # generate a test frame to save correct height and width for videowriter
+        test_img = self.generate_frame(0)
+        height = test_img.shape[0]
+        width = test_img.shape[1]
+
         framerate = playback_speed * realtime_framerate
-        height = self.temp_data[0].shape[0] * self.scale_factor
-        width = self.temp_data[0].shape[1] * self.scale_factor
         size = (width, height)
         filename = asksaveasfilename()
 
