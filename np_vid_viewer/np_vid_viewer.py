@@ -436,3 +436,42 @@ class NpVidTool:
             '/')] + "/threshold_img" + str(threshold) + ".png"
         print("Saved image to: " + filename)
         plt.imsave(filename, threshold_img, cmap='inferno')
+
+    def save_partial_video(self,
+                           start,
+                           end,
+                           playback_speed=15,
+                           realtime_framerate=4):
+        # generate a test frame to save correct height and width for videowriter
+        test_img = self.generate_frame(0)
+        height = test_img.shape[0]
+        width = test_img.shape[1]
+
+        framerate = playback_speed * realtime_framerate
+        size = (width, height)
+
+        temp_filename = self.temp_filename
+        filename = temp_filename[:temp_filename.rfind(
+            '/')] + "/partial_" + str(start) + "-" + str(end) + ".avi"
+
+        video_writer = cv2.VideoWriter(
+            filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
+            size)
+
+        progress = 0
+        total = end - start
+        for i in range(start, end):
+            # Display completion percentage
+            progress_bar.printProgressBar(progress,
+                                          total,
+                                          prefix='Saving Video...')
+
+            img = self.generate_frame(i)
+
+            video_writer.write(img)
+            progress += 1
+
+        print("Partial video saved as: '" + str(filename) +
+              "'")  #print a newline to get rid of progress bar
+
+        video_writer.release()
