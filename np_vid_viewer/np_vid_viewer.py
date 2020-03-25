@@ -3,7 +3,11 @@ import cv2
 import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
+import np_vid_viewer.draw_line as draw_line
 import os
+import math
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 #TODO: Update documenation
 
@@ -16,7 +20,7 @@ class NpVidTool:
 
     Attributes
     ----------
-    build : str 
+    build : str
         Name of the build to create the dir of images for
     remove_top_reflection : bool
         Attempt to remove the top reflection if true.
@@ -62,9 +66,11 @@ class NpVidTool:
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
         self.mp_data_on_vid = mp_data_on_vid
-
+        self.maxTemps = []
+        self.building = False
         if build is not None:
-            try: 
+            self.building = True
+            try:
                 os.mkdir(build)
             except OSError:
                 print ("Creation of the directory %s failed" % build)
@@ -108,8 +114,14 @@ class NpVidTool:
 
         # Normalize the image to 8 bit color
         img = frame.copy()
+        maxpoint = self.findHottestPoint(img)
+        endpoint = self.findCoolestAdjacent(img, maxpoint)
+        points = draw_line.findline(img, maxpoint)
+        #img = self.drawHeatDisArrows(img)
         img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
-
+        img = cv2.circle(img, maxpoint, 1,(0,255,0),1)
+        img = draw_line.drawline(img, points)
+        #img = cv2.arrowedLine(img, maxpoint, endpoint, (0,0,0),1)
         # Apply colormap to image
         img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
 
@@ -137,9 +149,9 @@ class NpVidTool:
         return img
 
     def play_video(self):
-        """Create a window and play the video stored in video_array. 
+        """Create a window and play the video stored in video_array.
         generate_video will be run automatically if it has not been run.
-        
+
         Parameters
         -----------
         waitKey : int, optional
@@ -172,6 +184,7 @@ class NpVidTool:
                 break
             elif key == ord(
                     "k") or key == 32:  # key == 32 means spacebar is pressed
+                self.heatFluxDraw(img)
                 pause = not pause
             elif key == ord("l"):
                 if frame_num < self.num_frames - 11:
@@ -227,12 +240,19 @@ class NpVidTool:
 
             img = self.generate_frame(frame_num)
 
+
+
             if frame_num == self.num_frames - 1:
                 frame_num = 0  #Start video over at end
 
-            path = self.imgdir + "/" + str(frame_num) + ".png"
+
+            #self.heatFluxDraw(img)
+            #img = cv2.imread("tmp.png")
+
             cv2.imshow(window_name, img)
-            cv2.imwrite(path, img)
+            if self.building:
+                path = self.imgdir + "/" + str(frame_num) + ".png"
+                cv2.imwrite(path, img)
 
         print(
             '\n'
@@ -359,7 +379,7 @@ class NpVidTool:
 
     def add_mp_data_to_img(self, img, frame):
         """Add meltpool data to the image.
-        
+
         Parameters
         ----------
         img
@@ -443,3 +463,108 @@ class NpVidTool:
         threshold_img = cv2.applyColorMap(threshold_img, cv2.COLORMAP_INFERNO)
 
         cv2.imwrite("threshold_img.png", threshold_img)
+
+
+    def heatFluxDraw(self, image):
+
+        print(image[125,150,:])
+
+        vertical_max, horizontal_max, colorValues = np.shape(image)
+
+        horizontal_min, horizontal_stepsize = 0, 1 #set bounds for plot
+        vertical_min, vertical_stepsize = 0, 1
+
+        horizontal_dist = horizontal_max-horizontal_min
+        vertical_dist = vertical_max-vertical_min
+
+        horizontal_stepsize = horizontal_dist / float(math.ceil(horizontal_dist/float(horizontal_stepsize)))
+        vertical_stepsize = vertical_dist / float(math.ceil(vertical_dist/float(vertical_stepsize)))
+
+        xv, yv =np.meshgrid(np.arange(horizontal_min, horizontal_max, horizontal_stepsize),
+                            np.arange(vertical_min, vertical_max, vertical_stepsize))
+
+        xv+=horizontal_stepsize/2.0 #Arrow placed in center of each pixel
+        yv+=vertical_stepsize/2.0
+        result_matrix = np.asmatrix(image[:,:,0]) #convert data to np matrix
+        yd, xd = np.gradient(result_matrix)
+
+        skip = (slice(None, None, 2), slice(None, None, 2)) #sets amount of arrows shown
+
+
+        def func_to_vectorize(x, y, dx, dy, scaling=0.01):
+            plt.arrow(x, y, dx*scaling, dy*scaling, fc="k", ec="k", head_width=0.2, head_length=0.2) #scales arrow size
+
+        vectorized_arrow_drawing = np.vectorize(func_to_vectorize)
+
+        fig = plt.imshow(np.flip(result_matrix,0), extent=[horizontal_min, horizontal_max, vertical_min, vertical_max])
+        vectorized_arrow_drawing(xv[skip], yv[skip], -xd[skip], -yd[skip], 0.001) #scale of vector magnitude
+
+
+
+        sns.heatmap(image[:,:,0], fmt="d")
+        #plt.colorbar()
+        plt.axis("off")
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
+        plt.savefig("tmp.png", bbox='tight', pad_inches=0)
+        #plt.show()
+
+
+    def findHottestPoint(self, image):
+        color = (0, 0, 0)
+        thickness = 1
+        tmpmax = 0
+        x = 0
+        for row in image:
+            y = 0
+            for cell in row:
+                if int(cell) > tmpmax:
+                    tmpmax = int(cell)
+                    maxpoint = (y,x)
+                y = y + 1
+            x = x + 1
+        self.maxTemps.append(tmpmax)
+        return maxpoint
+
+    def findCoolestAdjacent(self, image, maxpoint):
+        adjacent = np.arange(-3, 4)
+        tmpmin = 999999
+        minpoint = maxpoint
+        for i in range(adjacent.size):
+            for z in range(adjacent.size):
+                if maxpoint[0]-adjacent[i] > (image.shape[0] - 1) or maxpoint[1]-adjacent[z] > (image.shape[1] - 1):
+                    continue
+                if int(image[maxpoint[0]-adjacent[i],maxpoint[1]-adjacent[z]]) < tmpmin:
+                    tmpmin = int(image[maxpoint[0]-adjacent[i],maxpoint[1]-adjacent[z]])
+                    minpoint = (maxpoint[0]-adjacent[i],maxpoint[1]-adjacent[z])
+
+        return minpoint
+
+
+    def drawHeatDisArrows(self, image):
+        color = (0, 255, 0)
+        thickness = 1
+
+        x = 0
+        for row in image:
+            y = 0
+            for cell in row:
+
+                if int(cell) > 174:
+                    #print(cell)
+                    tmp = 999999
+                    start = (y,x)
+
+                    adjacent = [-2, -1, 0, 1, 2]
+                    for i in range(5):
+                        for z in range(5):
+                            if int(image[x-adjacent[i],y-adjacent[z]]) < tmp:
+                                #print(image[x-i, y-z])
+                                end = (y-adjacent[z],x-adjacent[i])
+                                tmp = int(image[y-adjacent[z],x-adjacent[i]])
+                    print("Start: " + str(start) + "End: " + str(end))
+                    image = cv2.arrowedLine(image, start, end, color, thickness)
+                y = y + 1
+            x = x + 1
+        return image
+

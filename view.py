@@ -46,7 +46,7 @@ parser.add_argument(
 parser.add_argument(
     '--build',
     type=str,
-    default=False,
+    default=None,
     required=False,
     help='Name of build'
 )
