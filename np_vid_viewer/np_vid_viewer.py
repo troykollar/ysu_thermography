@@ -114,23 +114,26 @@ class NpVidTool:
 
         # Normalize the image to 8 bit color
         img = frame.copy()
-        maxpoint = self.findHottestPoint(img)
-        endpoint = self.findCoolestAdjacent(img, maxpoint)
-        points = draw_line.findline(img, maxpoint)
+        #maxpoint = self.findHottestPoint(img)
+        #endpoint = self.findCoolestAdjacent(img, maxpoint)
+        #points = draw_line.findline(img, maxpoint)
         #img = self.drawHeatDisArrows(img)
-        img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
-        img = cv2.circle(img, maxpoint, 1,(0,255,0),1)
-        img = draw_line.drawline(img, points)
+        #img = cv2.Laplacian(img,cv2.CV_64F)
+        self.heatFluxDraw(img)
+        img = cv2.imread("tmp.png")
+        #img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
+        #img = cv2.circle(img, maxpoint, 1,(0,255,0),1)
+        #img = draw_line.drawline(img, points)
         #img = cv2.arrowedLine(img, maxpoint, endpoint, (0,0,0),1)
         # Apply colormap to image
-        img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
+        #img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
 
         # Scale image according to scale_factor
-        width = int(img.shape[1] * self.scale_factor)
-        height = int(frame.shape[0] * self.scale_factor)
-        size = (width, height)
+        #width = int(img.shape[1] * self.scale_factor)
+        #height = int(frame.shape[0] * self.scale_factor)
+        #size = (width, height)
 
-        img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
+        #img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
 
         # Extend frame for mp_data
         if self.mp_data_on_vid:
@@ -184,7 +187,7 @@ class NpVidTool:
                 break
             elif key == ord(
                     "k") or key == 32:  # key == 32 means spacebar is pressed
-                self.heatFluxDraw(img)
+                #self.heatFluxDraw(img)
                 pause = not pause
             elif key == ord("l"):
                 if frame_num < self.num_frames - 11:
@@ -246,9 +249,8 @@ class NpVidTool:
                 frame_num = 0  #Start video over at end
 
 
+            
             #self.heatFluxDraw(img)
-            #img = cv2.imread("tmp.png")
-
             cv2.imshow(window_name, img)
             if self.building:
                 path = self.imgdir + "/" + str(frame_num) + ".png"
@@ -467,9 +469,9 @@ class NpVidTool:
 
     def heatFluxDraw(self, image):
 
-        print(image[125,150,:])
+        #print(image[125,150,:])
 
-        vertical_max, horizontal_max, colorValues = np.shape(image)
+        vertical_max, horizontal_max = np.shape(image)
 
         horizontal_min, horizontal_stepsize = 0, 1 #set bounds for plot
         vertical_min, vertical_stepsize = 0, 1
@@ -485,7 +487,7 @@ class NpVidTool:
 
         xv+=horizontal_stepsize/2.0 #Arrow placed in center of each pixel
         yv+=vertical_stepsize/2.0
-        result_matrix = np.asmatrix(image[:,:,0]) #convert data to np matrix
+        result_matrix = np.asmatrix(image) #convert data to np matrix
         yd, xd = np.gradient(result_matrix)
 
         skip = (slice(None, None, 2), slice(None, None, 2)) #sets amount of arrows shown
@@ -501,12 +503,15 @@ class NpVidTool:
 
 
 
-        sns.heatmap(image[:,:,0], fmt="d")
-        #plt.colorbar()
-        plt.axis("off")
-        fig.axes.get_xaxis().set_visible(False)
-        fig.axes.get_yaxis().set_visible(False)
-        plt.savefig("tmp.png", bbox='tight', pad_inches=0)
+        sns.heatmap(image, fmt="d")
+
+        plt.colorbar().remove()
+        #plt.axis("off")
+        #fig.axes.get_xaxis().set_visible(False)
+        #fig.axes.get_yaxis().set_visible(False)
+
+        #plt.savefig("tmp.png", bbox='tight', pad_inches=0)
+        plt.savefig("tmp.png")
         #plt.show()
 
 
