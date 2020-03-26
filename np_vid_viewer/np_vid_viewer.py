@@ -470,6 +470,7 @@ class NpVidTool:
     def heatFluxDraw(self, image):
 
         #print(image[125,150,:])
+        plt.clf()
 
         vertical_max, horizontal_max = np.shape(image)
 
