@@ -414,29 +414,6 @@ class NpVidTool:
             (column1_x, int(
                 (6 / 16) * img_height)), font, font_size, font_color)
 
-    def generate_threshold_image(self, threshold=800):
-        height = self.temp_data[0].shape[0] * self.scale_factor
-        width = self.temp_data[0].shape[1] * self.scale_factor
-        threshold_img = np.zeros((height, width), dtype=np.float32)
-
-        # Check each pixel, if pixel is over threshold, increment that pixel in theshold_img
-        for i, frame in enumerate(self.temp_data):
-            # Show progress
-            progress_bar.printProgressBar(
-                i, self.num_frames, prefix='Generating threshold image...')
-            over_thresh_array = np.where(frame > threshold)
-
-            if over_thresh_array[0].size > 0:
-                for x_index, y in enumerate(over_thresh_array[0]):
-                    x = over_thresh_array[1][x_index]
-                    threshold_img[y, x] += 1
-
-        temp_filename = self.temp_filename
-        filename = temp_filename[:temp_filename.rfind(
-            '/')] + "/threshold_img" + str(threshold) + ".png"
-        print("Saved image to: " + filename)
-        plt.imsave(filename, threshold_img, cmap='inferno')
-
     def save_partial_video(self,
                            start,
                            end,
