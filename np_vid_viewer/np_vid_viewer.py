@@ -1,5 +1,7 @@
 from tkinter.filedialog import asksaveasfilename
 import cv2
+import os
+import shutil
 import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
@@ -83,6 +85,28 @@ class NpVidTool:
 
         # Set frame delay for playing video
         self.frame_delay = frame_delay
+
+    def save_frame_range16(self, start, end):
+        build_folder = helper_functions.get_build_folder(self.temp_filename)
+        build_number = helper_functions.get_build_number(self.temp_filename)
+        frame_range_folder = build_folder + '/' + build_number + '_frames' + str(
+            start) + '-' + str(end)
+        if os.path.isdir(frame_range_folder):
+            shutil.rmtree(frame_range_folder)
+        os.mkdir(frame_range_folder)
+        total = end + 1 - start
+
+        progress = 0
+        for i in range(start, end + 1):
+            # Display completion percentage
+            progress_bar.printProgressBar(progress + 1,
+                                          total,
+                                          prefix='Saving frames ' +
+                                          str(start) + '-' + str(end))
+            self.save_frame16(i, frame_range_folder)
+            progress += 1
+
+        print('Saved frames ' + str(start) + '-' + str(end))
 
     def generate_frame(self, frame_num):
         frame = self.temp_data[frame_num].copy()
@@ -193,7 +217,9 @@ class NpVidTool:
                 else:
                     frame_num = 0
             elif key == ord('s'):
-                self.save_frame16(frame_num)
+                folder = helper_functions.get_build_folder(self.temp_filename)
+                self.save_frame16(frame_num, folder)
+                print('Saved frame: ' + folder + '/frame_' + str(frame_num))
             elif key == ord('f'):
                 pause = True
                 input_frame = -1
@@ -224,11 +250,8 @@ class NpVidTool:
 
         cv2.destroyAllWindows()
 
-    def save_frame16(self, frame):
-        temp_filename = self.temp_filename
-        filename = temp_filename[:temp_filename.rfind('/')] + "/frame_" + str(
-            frame + 1) + ".png"
-        print("Saved image to: " + filename)
+    def save_frame16(self, frame: int, folder: str):
+        filename = folder + "/frame_" + str(frame) + ".png"
         plt.imsave(filename, self.temp_data[frame], cmap='inferno')
 
     def save_video(self, playback_speed=15, realtime_framerate=4):
