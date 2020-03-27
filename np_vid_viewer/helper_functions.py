@@ -12,3 +12,15 @@ def min_scale_factor(data_frame):
         scale_factor += 1
 
     return scale_factor
+
+
+def get_build_folder(temp_filename: str):
+    build_folder = temp_filename[:temp_filename.rfind('/')]
+    return build_folder
+
+
+def get_build_number(temp_filename: str):
+    build_folder = get_build_folder(temp_filename)
+    build_number = build_folder[:build_folder.find('_')]
+    build_number = build_number[(build_number.rfind('/') + 1):]
+    return build_number
