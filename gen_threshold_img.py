@@ -1,13 +1,11 @@
-import np_vid_viewer
 import argparse
+import np_vid_viewer
+import np_vid_viewer.composite as composite
 
 parser = argparse.ArgumentParser(description='Analyze temperature data.')
 parser.add_argument('temp_data',
                     type=str,
                     help='the file location/name of the temperature data')
-parser.add_argument('merged_data',
-                    type=str,
-                    help='the file location/name of the merged data')
 parser.add_argument('threshold',
                     type=int,
                     help='temperature theshold of the image')
@@ -15,10 +13,6 @@ parser.add_argument('threshold',
 args = parser.parse_args()
 
 temp_data_file = args.temp_data
-merged_data_file = args.merged_data
 threshold = args.threshold
 
-VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
-                                 data_filename=merged_data_file)
-
-VIEWER.generate_threshold_image(threshold)
+composite.generate_threshold_image(temp_data_file, threshold=threshold)
