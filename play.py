@@ -1,6 +1,5 @@
-import np_vid_viewer
-
 import argparse
+import np_vid_viewer
 
 parser = argparse.ArgumentParser(description='Analyze temperature data.')
 parser.add_argument('temp_data',
