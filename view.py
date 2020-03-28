@@ -41,6 +41,13 @@ parser.add_argument(
     default=False,
     required=False,
     help='0 or 1 specifying wether or not to remove bottom reflections')
+parser.add_argument(
+    '-showmax',
+    type=int,
+    default=False,
+    required=False,
+    help=
+    '0 or 1 specifying whether or not to highlight the max temp of the frame')
 
 args = parser.parse_args()
 
@@ -50,6 +57,7 @@ scale_factor = args.scale
 frame_delay = args.delay
 top = bool(args.top)
 bot = bool(args.bot)
+show_max = bool(args.showmax)
 
 VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
                                  data_filename=merged_data_file,
@@ -57,6 +65,7 @@ VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
                                  frame_delay=frame_delay,
                                  mp_data_on_vid=args.mp,
                                  remove_top_reflection=top,
-                                 remove_bottom_reflection=bot)
+                                 remove_bottom_reflection=bot,
+                                 circle_max_temp=show_max)
 
 VIEWER.play_video()
