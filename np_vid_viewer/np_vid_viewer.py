@@ -43,7 +43,8 @@ class NpVidTool:
                  scale_factor=1,
                  frame_delay=1,
                  remove_top_reflection=False,
-                 remove_bottom_reflection=False):
+                 remove_bottom_reflection=False,
+                 circle_max_temp=False):
         """Create an NpVidTool Object.
 
         Parameters
@@ -56,6 +57,7 @@ class NpVidTool:
             Run remove_bottom_reflection if true.
         """
         self.video_array = None
+        self.highlight_max_temp = circle_max_temp
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
         self.mp_data_on_vid = mp_data_on_vid
@@ -132,6 +134,10 @@ class NpVidTool:
         size = (width, height)
 
         img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
+
+        # Circle max temperature if selected
+        if self.highlight_max_temp:
+            self.circle_max_temp(frame_num, img)
 
         # Extend frame for mp_data
         if self.mp_data_on_vid:
@@ -373,7 +379,16 @@ class NpVidTool:
             "| MP Area: " + str(self.mp_area(frame)),
         )
 
-    #TODO: Add Highlight max temp function
+    def circle_max_temp(self, frame_num: int, img: np.ndarray):
+        frame = self.temp_data[frame_num]
+        max_temp = np.amax(frame)
+        if max_temp is not None:
+            max_temp_x = np.where(frame == max_temp)[1][0] * self.scale_factor
+            max_temp_y = np.where(frame == max_temp)[0][0] * self.scale_factor
+            img = cv2.circle(img, (max_temp_x, max_temp_y),
+                             radius=3,
+                             color=(0, 0, 255),
+                             thickness=2)
 
     def add_mp_data_to_img(self, img, frame):
         """Add meltpool data to the image.
