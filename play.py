@@ -61,10 +61,9 @@ show_max = bool(args.showmax)
 VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
                                  data_filename=merged_data_file,
                                  scale_factor=scale_factor,
-                                 frame_delay=frame_delay,
                                  mp_data_on_vid=args.mp,
                                  remove_top_reflection=top,
                                  remove_bottom_reflection=bot,
                                  circle_max_temp=show_max)
 
-VIEWER.play_video()
+VIEWER.play_video(frame_delay)
