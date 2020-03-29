@@ -14,28 +14,6 @@ import matplotlib.pyplot as plt
 
 
 class NpVidTool:
-    """NpVidViewer
-    Stores information relating to a video to be able to easily display a video from a numpy array
-
-    Attributes
-    ----------
-    remove_top_reflection : bool
-        Attempt to remove the top reflection if true.
-    remove_bottom_reflection : bool
-        Attempt to remove the bottom reflection if true.
-    temp_data
-        Numpy array of thermal cam temps loaded from the file.
-    num_frames : int
-        Number of frames in the video
-    video_timestamps
-        Numpy array of the thermal camera timestamps.
-    meltpool_data
-        Numpy array of the melt pool data.
-    matched_array : list
-        List containing the relevant data video and meltpool data after matching
-    mp_data_on_vid : bool
-        Overlay meltpool data on the video if true.
-    """
     def __init__(self,
                  temp_filename: str,
                  data_filename: str,
@@ -45,17 +23,7 @@ class NpVidTool:
                  remove_top_reflection=False,
                  remove_bottom_reflection=False,
                  circle_max_temp=False):
-        """Create an NpVidTool Object.
 
-        Parameters
-        ----------
-        mp_data_on_vid : bool
-            Add meltpool data on top of the video if true.
-        remove_top_reflection : bool
-            Run remove_top_reflection if true.
-        remove_bottom_reflection : bool
-            Run remove_bottom_reflection if true.
-        """
         self.video_array = None
         self.highlight_max_temp = circle_max_temp
         self.remove_top_reflection = remove_top_reflection
@@ -156,14 +124,6 @@ class NpVidTool:
         return img
 
     def play_video(self):
-        """Create a window and play the video stored in video_array. 
-        generate_video will be run automatically if it has not been run.
-        
-        Parameters
-        -----------
-        waitKey : int, optional
-            Time (ms) delay between showing each frame.
-        """
         temp_filename = self.temp_filename
 
         window_name = temp_filename[(temp_filename.rfind('/') + 1):]
@@ -261,16 +221,6 @@ class NpVidTool:
         plt.imsave(filename, self.temp_data[frame], cmap='inferno')
 
     def save_video(self, playback_speed=15, realtime_framerate=4):
-        """Save the video as a .avi file.
-
-        Parameters
-        ----------
-        playback_speed : int, optional
-            Multiple of realtime speed to playback video at.
-        realtime_framerate : int, optional
-            Number of frames taken by the thermal camera in real time.
-        """
-
         # generate a test frame to save correct height and width for videowriter
         test_img = self.generate_frame(0)
         height = test_img.shape[0]
@@ -391,15 +341,6 @@ class NpVidTool:
                              thickness=2)
 
     def add_mp_data_to_img(self, img, frame):
-        """Add meltpool data to the image.
-        
-        Parameters
-        ----------
-        img
-            Image to add the meltpool data text to
-        frame : int
-            Frame number to grab meltpool data for
-        """
         img_height = img.shape[:1][0]
         img_width = img.shape[1]
         font = cv2.FONT_HERSHEY_DUPLEX
