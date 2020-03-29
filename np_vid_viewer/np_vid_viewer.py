@@ -19,12 +19,10 @@ class NpVidTool:
                  data_filename: str,
                  mp_data_on_vid=False,
                  scale_factor=1,
-                 frame_delay=1,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False,
                  circle_max_temp=False):
 
-        self.video_array = None
         self.highlight_max_temp = circle_max_temp
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
@@ -52,9 +50,6 @@ class NpVidTool:
         if self.scale_factor == 1:
             self.scale_factor = helper_functions.min_scale_factor(
                 self.temp_data[0])
-
-        # Set frame delay for playing video
-        self.frame_delay = frame_delay
 
     def save_frame_range16(self, start, end):
         build_folder = helper_functions.get_build_folder(self.temp_filename)
@@ -123,7 +118,7 @@ class NpVidTool:
 
         return img
 
-    def play_video(self):
+    def play_video(self, frame_delay: int):
         temp_filename = self.temp_filename
 
         window_name = temp_filename[(temp_filename.rfind('/') + 1):]
@@ -146,7 +141,7 @@ class NpVidTool:
             progress_bar.printProgressBar(frame_num,
                                           self.num_frames - 1,
                                           prefix='Playing Video: ')
-            key = cv2.waitKey(self.frame_delay)
+            key = cv2.waitKey(frame_delay)
             if key == ord("q"):
                 break
             elif key == ord(
