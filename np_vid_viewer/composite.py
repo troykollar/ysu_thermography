@@ -1,10 +1,23 @@
+"""Functions to generate composite images and videos for thermal data analysis"""
 import numpy as np
 import matplotlib.pyplot as plt
-import np_vid_viewer
 import np_vid_viewer.progress_bar as progress_bar
 
 
 def generate_threshold_image(temp_filename: str, threshold=800):
+    """Saves a 16 bit threshold image
+
+    Each pixel of the resulting image is incremented every time the temperature at that pixel is
+    above the temperature threshold.
+
+    Parameters
+    ----------
+    temp_filename : str
+        Filename including location of the thermal_cam_temps.npy file.
+    threshold : int
+        Temperature threshold which determines if a pixel will be incremented.
+
+    """
     # Get temp data info
     temp_data = np.load(temp_filename, mmap_mode="r", allow_pickle=True)
     build_folder = temp_filename[:temp_filename.rfind('/')]
@@ -28,9 +41,9 @@ def generate_threshold_image(temp_filename: str, threshold=800):
         over_thresh_array = np.where(frame > threshold)
 
         if over_thresh_array[0].size > 0:
-            for x_index, y in enumerate(over_thresh_array[0]):
-                x = over_thresh_array[1][x_index]
-                threshold_img[y, x] += 1
+            for x_index, y_location in enumerate(over_thresh_array[0]):
+                x_location = over_thresh_array[1][x_index]
+                threshold_img[y_location, x_location] += 1
 
     # Generate a filename based on build_number and threshold used
     filename = build_folder + '/' + build_number + '_threshold' + str(
