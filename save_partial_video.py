@@ -7,16 +7,11 @@ parser.add_argument('data_directory',
                     help='the location of the data')
 parser.add_argument('start', type=int, help='first frame of the video.')
 parser.add_argument('end', type=int, help='last frame of the video.')
-parser.add_argument('-speed',
+parser.add_argument('-framerate',
                     type=int,
-                    default=15,
+                    default=60,
                     required=False,
-                    help='Speed of video playback as it relates to real time')
-parser.add_argument('-real_fps',
-                    type=int,
-                    default=4,
-                    required=False,
-                    help='realtime framerate thermal video was captured in')
+                    help='Framerate of the video')
 parser.add_argument('-scale',
                     type=int,
                     default=1,
@@ -56,8 +51,7 @@ scale_factor = args.scale
 top = bool(args.top)
 bot = bool(args.bot)
 show_max = bool(args.showmax)
-speed = args.speed
-real_fps = args.real_fps
+FRAMERATE = args.framerate
 start = args.start
 end = args.end
 
@@ -68,7 +62,4 @@ VIEWER = np_vid_viewer.NpVidTool(data_directory=DATA_DIRECTORY,
                                  remove_bottom_reflection=bot,
                                  circle_max_temp=show_max)
 
-VIEWER.save_partial_video(start=start,
-                          end=end,
-                          playback_speed=speed,
-                          realtime_framerate=real_fps)
+VIEWER.save_partial_video(start=start, end=end, framerate=FRAMERATE)
