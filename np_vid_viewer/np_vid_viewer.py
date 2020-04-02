@@ -408,17 +408,13 @@ class NpVidTool:
                           (column1_x, int((9 / 32) * img_height)), font,
                           font_size, font_color)
 
-    def save_partial_video(self,
-                           start,
-                           end,
-                           playback_speed=15,
-                           realtime_framerate=4):
+    def save_partial_video(self, start, end, framerate=60):
         # generate a test frame to save correct height and width for videowriter
         test_img = self.generate_frame(0)
         height = test_img.shape[0]
         width = test_img.shape[1]
+        self.framerate = framerate
 
-        framerate = playback_speed * realtime_framerate
         size = (width, height)
 
         temp_filename = self.temp_filename
