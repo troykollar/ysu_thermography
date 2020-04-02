@@ -5,7 +5,7 @@ import numpy as np
 
 
 def remove_top(img,
-               distance=0,
+               distance=3,
                min_value=174,
                max_temp_threshold=1900,
                zero_level_threshold=176):
@@ -28,16 +28,13 @@ def remove_top(img,
     max_value = np.amax(img)
     max_value_location = np.where(img == max_value)
 
-    if max_value > max_temp_threshold:
-        remove_to = max_value_location[0][0]
-        while np.mean(img[remove_to - distance]) > zero_level_threshold:
-            if remove_to < 1:
-                print("Problem removing reflection.")
-                break
-            else:
-                remove_to = remove_to - 1
+    distance_from_max_val = distance
+    if max_value_location[0][0] > distance_from_max_val:
+        remove_to = max_value_location[0][0] - distance_from_max_val
+    else:
+        remove_to = 0
 
-        img[:remove_to] = min_value
+    img[:remove_to] = min_value
 
 
 def remove_bottom(img, lower_bounds, min_value=174):
