@@ -2,12 +2,9 @@ import argparse
 import np_vid_viewer
 
 parser = argparse.ArgumentParser(description='Analyze temperature data.')
-parser.add_argument('temp_data',
+parser.add_argument('data_directory',
                     type=str,
-                    help='the file location/name of the temperature data')
-parser.add_argument('merged_data',
-                    type=str,
-                    help='the file location/name of the merged data')
+                    help='the location of the data')
 parser.add_argument('start', type=int, help='first frame of the video.')
 parser.add_argument('end', type=int, help='last frame of the video.')
 parser.add_argument('-speed',
@@ -54,8 +51,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-temp_data_file = args.temp_data
-merged_data_file = args.merged_data
+DATA_DIRECTORY = args.data_directory
 scale_factor = args.scale
 top = bool(args.top)
 bot = bool(args.bot)
@@ -65,8 +61,7 @@ real_fps = args.real_fps
 start = args.start
 end = args.end
 
-VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
-                                 data_filename=merged_data_file,
+VIEWER = np_vid_viewer.NpVidTool(data_directory=DATA_DIRECTORY,
                                  scale_factor=scale_factor,
                                  mp_data_on_vid=args.mp,
                                  remove_top_reflection=top,
