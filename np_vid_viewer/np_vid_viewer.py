@@ -31,6 +31,7 @@ class NpVidTool:
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
         self.mp_data_on_vid = mp_data_on_vid
+        self.framerate = 0
 
         # Load temperature data
         temp_filename = 'thermal_cam_temps.npy'
@@ -111,7 +112,7 @@ class NpVidTool:
         # Extend frame for mp_data
         if self.mp_data_on_vid:
             img = cv2.copyMakeBorder(img,
-                                     int(height * (5 / 16)),
+                                     int(height * (7 / 16)),
                                      0,
                                      0,
                                      0,
@@ -221,15 +222,17 @@ class NpVidTool:
         filename = folder + "/frame_" + str(frame) + ".png"
         plt.imsave(filename, self.temp_data[frame], cmap='inferno')
 
-    def save_video(self, playback_speed=15, realtime_framerate=4):
+    def save_video(self, framerate=60):
         # generate a test frame to save correct height and width for videowriter
         test_img = self.generate_frame(0)
         height = test_img.shape[0]
         width = test_img.shape[1]
+        self.framerate = framerate
 
-        framerate = playback_speed * realtime_framerate
         size = (width, height)
-        filename = asksaveasfilename()
+        build_folder = helper_functions.get_build_folder(self.temp_filename)
+        build_number = helper_functions.get_build_number(self.temp_filename)
+        filename = build_folder + build_number + '_video.avi'
 
         video_writer = cv2.VideoWriter(
             filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
@@ -396,6 +399,9 @@ class NpVidTool:
         time_stamp = format_time(self.timestamp(frame))
         img = cv2.putText(img, 'Time: ' + str(time_stamp),
                           (column1_x, int((7 / 32) * img_height)), font,
+                          font_size, font_color)
+        img = cv2.putText(img, 'Framerate: ' + str(self.framerate),
+                          (column1_x, int((9 / 32) * img_height)), font,
                           font_size, font_color)
 
     def save_partial_video(self,
