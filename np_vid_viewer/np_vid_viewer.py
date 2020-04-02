@@ -2,6 +2,7 @@ from tkinter.filedialog import asksaveasfilename
 import cv2
 import os
 import shutil
+import time
 import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
@@ -143,6 +144,7 @@ class NpVidTool:
         frame_num = 0
         pause = False
         while True:
+            start_frame_time = time.time()
             #TODO:  Change progressbar to show timestamp (relative to video)
             #       instead of percentage
             progress_bar.printProgressBar(frame_num,
@@ -211,6 +213,8 @@ class NpVidTool:
                 frame_num = 0  #Start video over at end
 
             cv2.imshow(window_name, img)
+            render_time = time.time() - start_frame_time
+            self.framerate = int(1 / (render_time + (frame_delay * .001)))
 
         print(
             '\n'
