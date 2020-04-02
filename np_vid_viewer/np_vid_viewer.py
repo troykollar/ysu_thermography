@@ -255,15 +255,14 @@ class NpVidTool:
 
         video_writer.release()
 
-    def save_hotspot_video(self,
-                           playback_speed=15,
-                           realtime_framerate=4,
-                           save_img=False):
-        framerate = playback_speed * realtime_framerate
-        height = self.temp_data[0].shape[0] * self.scale_factor
-        width = self.temp_data[0].shape[1] * self.scale_factor
+    def save_hotspot_video(self, framerate=60, save_img=False):
+        self.framerate = framerate
+        height = self.temp_data[0].shape[0]
+        width = self.temp_data[0].shape[1]
         size = (width, height)
-        filename = asksaveasfilename()
+        build_folder = helper_functions.get_build_folder(self.temp_filename)
+        build_number = helper_functions.get_build_number(self.temp_filename)
+        filename = build_folder + '/' + build_number + '_hotspot.avi'
 
         video_writer = cv2.VideoWriter(
             filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
@@ -300,7 +299,8 @@ class NpVidTool:
         video_writer.release()
 
         if save_img:
-            cv2.imwrite('hotspot_img.png', hotspot_img_frame)
+            cv2.imwrite(build_folder + '/' + build_number + '_hotspot_img.png',
+                        hotspot_img_frame)
 
     def timestamp(self, frame):
         """Return the timestamp of the video based on the frame."""
