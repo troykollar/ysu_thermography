@@ -19,12 +19,9 @@ def validate_extension(argument_name: str, filename: str,
 
 
 PARSER = argparse.ArgumentParser(description='Analyze temperature data.')
-PARSER.add_argument('temp_data',
+PARSER.add_argument('data_directory',
                     type=str,
                     help='the file location/name of the temperature data')
-PARSER.add_argument('merged_data',
-                    type=str,
-                    help='the file location/name of the merged data')
 PARSER.add_argument('-scale',
                     type=int,
                     default=1,
@@ -69,14 +66,12 @@ ARGS = PARSER.parse_args()
 
 ARGUMENT_ERROR = False
 # Validate temp_data file input
-TEMP_DATA_FILE = ARGS.temp_data
-TEMP_DATA_ERROR = validate_extension('temp_data', TEMP_DATA_FILE, '.npy')
+DATA_DIRECTORY = ARGS.data_directory
 
-# Validate merged_data file input
-MERGED_DATA_FILE = ARGS.merged_data
-MERGED_DATA_ERROR = validate_extension('merged_data', TEMP_DATA_FILE, '.npy')
+#TODO: Validate directory
+DATA_DIRECTORY_ERROR = False
 
-ARGUMENT_ERROR = MERGED_DATA_ERROR or TEMP_DATA_ERROR
+ARGUMENT_ERROR = DATA_DIRECTORY_ERROR
 
 SCALE_FACTOR = ARGS.scale
 FRAME_DELAY = ARGS.delay
@@ -88,8 +83,7 @@ if ARGUMENT_ERROR:
     pass
 else:
     VIEWER = np_vid_viewer.NpVidTool(
-        temp_filename=TEMP_DATA_FILE,
-        data_filename=MERGED_DATA_FILE,
+        data_directory=DATA_DIRECTORY,
         scale_factor=SCALE_FACTOR,
         mp_data_on_vid=ARGS.mp,
         remove_top_reflection=REMOVE_TOP_REFLECTION,
