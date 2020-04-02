@@ -15,8 +15,7 @@ import matplotlib.pyplot as plt
 
 class NpVidTool:
     def __init__(self,
-                 temp_filename: str,
-                 data_filename: str,
+                 data_directory: str,
                  mp_data_on_vid=False,
                  scale_factor=1,
                  remove_top_reflection=False,
@@ -29,13 +28,15 @@ class NpVidTool:
         self.mp_data_on_vid = mp_data_on_vid
 
         # Load temperature data
-        self.temp_filename = temp_filename
-        self.temp_data = np.load(temp_filename,
+        temp_filename = 'thermal_cam_temps.npy'
+        self.temp_filename = data_directory + '/' + temp_filename
+        self.temp_data = np.load(self.temp_filename,
                                  mmap_mode="r",
                                  allow_pickle=True)
         self.num_frames = self.temp_data.shape[0]  # Save number of frames
 
         # Load merged data
+        data_filename = data_directory + '/' + 'merged_data.npy'
         self.merged_data = np.load(data_filename, allow_pickle=True)
 
         # Find lower bounds of piece if remove_lower reflection is selected
