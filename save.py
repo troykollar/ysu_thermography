@@ -5,16 +5,11 @@ parser = argparse.ArgumentParser(description='Analyze temperature data.')
 parser.add_argument('data_directory',
                     type=str,
                     help='the location of the data')
-parser.add_argument('-speed',
+parser.add_argument('-framerate',
                     type=int,
-                    default=15,
+                    default=60,
                     required=False,
-                    help='Speed of video playback as it relates to real time')
-parser.add_argument('-real_fps',
-                    type=int,
-                    default=4,
-                    required=False,
-                    help='realtime framerate thermal video was captured in')
+                    help='Framerate of the video to be saved.')
 parser.add_argument('-scale',
                     type=int,
                     default=1,
@@ -54,8 +49,7 @@ scale_factor = args.scale
 top = bool(args.top)
 bot = bool(args.bot)
 show_max = bool(args.showmax)
-speed = args.speed
-real_fps = args.real_fps
+FRAMERATE = args.framerate
 
 VIEWER = np_vid_viewer.NpVidTool(data_directory=DATA_DIRECTORY,
                                  scale_factor=scale_factor,
@@ -64,4 +58,4 @@ VIEWER = np_vid_viewer.NpVidTool(data_directory=DATA_DIRECTORY,
                                  remove_bottom_reflection=bot,
                                  circle_max_temp=show_max)
 
-VIEWER.save_video(playback_speed=speed, realtime_framerate=real_fps)
+VIEWER.save_video(framerate=FRAMERATE)
