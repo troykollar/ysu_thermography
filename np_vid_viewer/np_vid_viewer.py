@@ -13,6 +13,11 @@ import matplotlib.pyplot as plt
 # Random test comment
 
 
+def format_time(t):
+    s = t.strftime('%Y-%m-%d %H:%M:%S.%f')
+    return s[:-3]
+
+
 class NpVidTool:
     def __init__(self,
                  data_directory: str,
@@ -106,7 +111,7 @@ class NpVidTool:
         # Extend frame for mp_data
         if self.mp_data_on_vid:
             img = cv2.copyMakeBorder(img,
-                                     int(height * (11 / 16)),
+                                     int(height * (5 / 16)),
                                      0,
                                      0,
                                      0,
@@ -124,7 +129,7 @@ class NpVidTool:
 
         window_name = temp_filename[(temp_filename.rfind('/') + 1):]
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(window_name, 640, 480)
+        cv2.resizeWindow(window_name, 1280, 720)
 
         print(
             "'K'/'Space' - Play/Pause\n" +
@@ -340,14 +345,14 @@ class NpVidTool:
         img_height = img.shape[:1][0]
         img_width = img.shape[1]
         font = cv2.FONT_HERSHEY_DUPLEX
-        font_size = img_height / 480
+        font_size = img_height / 860
         font_color = (0, 0, 0)
-        column1_x = 25
-        column2_x = int(img_width * .5)
+        column1_x = 5
+        column2_x = int(img_width * .4)
         img = cv2.putText(
             img,
             "X: " + str(self.mp_x(frame)),
-            (column1_x, int((1 / 16) * img_height)),
+            (column1_x, int((1 / 32) * img_height)),
             font,
             font_size,
             font_color,
@@ -355,7 +360,7 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Y: " + str(self.mp_y(frame)),
-            (column1_x, int((2 / 16) * img_height)),
+            (column1_x, int((3 / 32) * img_height)),
             font,
             font_size,
             font_color,
@@ -363,7 +368,7 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Z: " + str(self.mp_z(frame)),
-            (column1_x, int((3 / 16) * img_height)),
+            (column1_x, int((5 / 32) * img_height)),
             font,
             font_size,
             font_color,
@@ -371,7 +376,7 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Area: " + str(self.mp_area(frame)),
-            (column1_x, int((4 / 16) * img_height)),
+            (column2_x, int((1 / 32) * img_height)),
             font,
             font_size,
             font_color,
@@ -379,15 +384,19 @@ class NpVidTool:
         img = cv2.putText(
             img,
             "Max Temp: " + str(self.max_temp(frame)),
-            (column1_x, int((5 / 16) * img_height)),
+            (column2_x, int((3 / 32) * img_height)),
             font,
             font_size,
             font_color,
         )
-        img = cv2.putText(
-            img, "Frame: " + str(frame + 1) + "/" + str(self.num_frames),
-            (column1_x, int(
-                (6 / 16) * img_height)), font, font_size, font_color)
+        img = cv2.putText(img,
+                          "Frame: " + str(frame) + "/" + str(self.num_frames),
+                          (column2_x, int((5 / 32) * img_height)), font,
+                          font_size, font_color)
+        time_stamp = format_time(self.timestamp(frame))
+        img = cv2.putText(img, 'Time: ' + str(time_stamp),
+                          (column1_x, int((7 / 32) * img_height)), font,
+                          font_size, font_color)
 
     def save_partial_video(self,
                            start,
