@@ -1,4 +1,3 @@
-from tkinter.filedialog import asksaveasfilename
 import cv2
 import os
 import shutil
@@ -10,9 +9,6 @@ import np_vid_viewer.helper_functions as helper_functions
 import matplotlib.pyplot as plt
 
 #TODO: Update documenation
-
-# Random test comment
-
 
 def format_time(t):
     s = t.strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -26,8 +22,10 @@ class NpVidTool:
                  scale_factor=1,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False,
+                 follow_meltpool=False,
                  circle_max_temp=False):
 
+        self.follow_meltpool = follow_meltpool
         self.highlight_max_temp = circle_max_temp
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
