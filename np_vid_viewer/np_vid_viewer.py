@@ -436,6 +436,9 @@ class NpVidTool:
         img = cv2.putText(img, 'Framerate: ' + str(self.framerate),
                           (column1_x, int((9 / 32) * img_height)), font,
                           font_size, font_color)
+        img = cv2.putText(img, 'Build: ' + str(helper_functions.get_build_number(self.temp_filename)),
+                          (column2_x, int((9 / 32) * img_height)), font,
+                          font_size, font_color)
 
     def save_partial_video(self, start, end, framerate=60):
         # generate a test frame to save correct height and width for videowriter
