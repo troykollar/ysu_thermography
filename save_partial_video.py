@@ -7,6 +7,9 @@ parser.add_argument('data_directory',
                     help='the location of the data')
 parser.add_argument('start', type=int, help='first frame of the video.')
 parser.add_argument('end', type=int, help='last frame of the video.')
+parser.add_argument(
+    '-follow', type=int, default=False, required=False, help='0 or 1 specifying wether or not to follow the meltpool in the video'
+)
 parser.add_argument('-framerate',
                     type=int,
                     default=60,
@@ -52,6 +55,7 @@ top = bool(args.top)
 bot = bool(args.bot)
 show_max = bool(args.showmax)
 FRAMERATE = args.framerate
+FOLLOW = bool(args.follow)
 start = args.start
 end = args.end
 
@@ -60,6 +64,7 @@ VIEWER = np_vid_viewer.NpVidTool(data_directory=DATA_DIRECTORY,
                                  mp_data_on_vid=args.mp,
                                  remove_top_reflection=top,
                                  remove_bottom_reflection=bot,
-                                 circle_max_temp=show_max)
+                                 circle_max_temp=show_max,
+                                 follow_meltpool=FOLLOW)
 
 VIEWER.save_partial_video(start=start, end=end, framerate=FRAMERATE)
