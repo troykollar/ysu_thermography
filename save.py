@@ -10,6 +10,9 @@ parser.add_argument('-framerate',
                     default=60,
                     required=False,
                     help='Framerate of the video to be saved.')
+parser.add_argument(
+    '-follow', type=int, default=False, required=False, help='0 or 1 specifying wether or not to follow the meltpool in the video'
+)
 parser.add_argument('-scale',
                     type=int,
                     default=1,
@@ -50,12 +53,14 @@ top = bool(args.top)
 bot = bool(args.bot)
 show_max = bool(args.showmax)
 FRAMERATE = args.framerate
+FOLLOW = bool(args.follow)
 
 VIEWER = np_vid_viewer.NpVidTool(data_directory=DATA_DIRECTORY,
                                  scale_factor=scale_factor,
                                  mp_data_on_vid=args.mp,
                                  remove_top_reflection=top,
                                  remove_bottom_reflection=bot,
-                                 circle_max_temp=show_max)
+                                 circle_max_temp=show_max,
+                                 follow_meltpool=FOLLOW)
 
 VIEWER.save_video(framerate=FRAMERATE)
