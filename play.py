@@ -36,6 +36,9 @@ PARSER.add_argument(
     'int specifying millisecond delay between showing each frame in play_video()'
 )
 PARSER.add_argument(
+    '-follow', type=int, default=False, required=False, help='0 or 1 specifying wether or not to follow the meltpool in the video'
+)
+PARSER.add_argument(
     '-mp',
     type=int,
     default=False,
@@ -78,6 +81,7 @@ FRAME_DELAY = ARGS.delay
 REMOVE_TOP_REFLECTION = bool(ARGS.top)
 REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
 SHOW_MAX = bool(ARGS.showmax)
+FOLOW = bool(ARGS.follow)
 
 if ARGUMENT_ERROR:
     pass
@@ -88,6 +92,7 @@ else:
         mp_data_on_vid=ARGS.mp,
         remove_top_reflection=REMOVE_TOP_REFLECTION,
         remove_bottom_reflection=REMOVE_BOTTOM_REFLECTION,
-        circle_max_temp=SHOW_MAX)
+        circle_max_temp=SHOW_MAX,
+        follow_meltpool=FOLOW)
 
     VIEWER.play_video(FRAME_DELAY)

@@ -82,10 +82,12 @@ class NpVidTool:
     def generate_frame(self, frame_num):
         frame = self.temp_data[frame_num].copy()
 
+        # Remove the top reflection of specified
         if self.remove_top_reflection:
             np_vid_viewer.reflection_remover.remove_top(
                 frame, zero_level_threshold=180, max_temp_threshold=700)
 
+        # Remove the bottom reflection if specififed
         if self.remove_bottom_reflection:
             np_vid_viewer.reflection_remover.remove_bottom(
                 frame, self.lower_bounds)
@@ -97,9 +99,40 @@ class NpVidTool:
         # Apply colormap to image
         img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
 
+        # Focus on meltpool if specified
+        if self.follow_meltpool:
+            follow_size = 20
+            max_temp = np.amax(frame)
+            max_temp_y = np.where(frame == max_temp)[0][0]
+            max_temp_x = np.where(frame == max_temp)[1][0]
+
+            if max_temp_x < follow_size:
+                left_x = 0
+            else:
+                left_x = max_temp_x - follow_size
+
+            if max_temp_x > frame.shape[1] - follow_size:
+                right_x = frame.shape[1]
+            else:
+                right_x = max_temp_x + follow_size
+
+            if max_temp_y < follow_size:
+                top_y = 0
+            else:
+                top_y = max_temp_y - follow_size
+
+            if max_temp_y > img.shape[0] - follow_size:
+                bottom_y = img.shape[0] - follow_size
+            else:
+                bottom_y = max_temp_y + follow_size
+
+            print(top_y, bottom_y, left_x, right_x)
+
+            img = img[top_y:bottom_y, left_x:right_x]
+
         # Scale image according to scale_factor
         width = int(img.shape[1] * self.scale_factor)
-        height = int(frame.shape[0] * self.scale_factor)
+        height = int(img.shape[0] * self.scale_factor)
         size = (width, height)
 
         img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
