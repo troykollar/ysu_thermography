@@ -108,25 +108,23 @@ class NpVidTool:
 
             if max_temp_x < follow_size:
                 left_x = 0
+                right_x = follow_size * 2
+            elif max_temp_x > frame.shape[1] - follow_size:
+                right_x = frame.shape[1]
+                left_x = right_x - (follow_size * 2)
             else:
                 left_x = max_temp_x - follow_size
-
-            if max_temp_x > frame.shape[1] - follow_size:
-                right_x = frame.shape[1]
-            else:
                 right_x = max_temp_x + follow_size
 
             if max_temp_y < follow_size:
                 top_y = 0
+                bottom_y = follow_size * 2
+            elif max_temp_y > img.shape[0] - follow_size:
+                bottom_y = img.shape[0]
+                top_y = img.shape[0] - (follow_size * 2)
             else:
                 top_y = max_temp_y - follow_size
-
-            if max_temp_y > img.shape[0] - follow_size:
-                bottom_y = img.shape[0] - follow_size
-            else:
                 bottom_y = max_temp_y + follow_size
-
-            print(top_y, bottom_y, left_x, right_x)
 
             img = img[top_y:bottom_y, left_x:right_x]
 
