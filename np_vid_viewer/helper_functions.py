@@ -24,3 +24,12 @@ def get_build_number(temp_filename: str):
     build_number = build_folder[:build_folder.find('_')]
     build_number = build_number[(build_number.rfind('/') + 1):]
     return build_number
+
+
+def get_build_folder_name(temp_filename: str):
+    build_folder = get_build_folder(temp_filename)
+    build_folder_name = build_folder[:build_folder.rfind('/')]
+    build_folder_name = build_folder_name[build_folder_name.rfind('/') + 1:]
+    print('Build_folder: ' + str(build_folder))
+    print('Build_folder_name: ' + str(build_folder_name))
+    return build_folder_name

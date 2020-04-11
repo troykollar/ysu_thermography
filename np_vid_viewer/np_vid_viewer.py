@@ -1,14 +1,16 @@
-import cv2
 import os
 import shutil
 import time
+import cv2
+import matplotlib.pyplot as plt
 import numpy as np
+
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
 import np_vid_viewer.helper_functions as helper_functions
-import matplotlib.pyplot as plt
 
 #TODO: Update documenation
+
 
 def format_time(t):
     s = t.strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -436,9 +438,11 @@ class NpVidTool:
         img = cv2.putText(img, 'Framerate: ' + str(self.framerate),
                           (column1_x, int((9 / 32) * img_height)), font,
                           font_size, font_color)
-        img = cv2.putText(img, 'Build: ' + str(helper_functions.get_build_number(self.temp_filename)),
-                          (column2_x, int((9 / 32) * img_height)), font,
-                          font_size, font_color)
+        img = cv2.putText(
+            img, 'Build: ' +
+            str(helper_functions.get_build_folder_name(self.temp_filename)),
+            (column2_x, int(
+                (9 / 32) * img_height)), font, font_size, font_color)
 
     def save_partial_video(self, start, end, framerate=60):
         # generate a test frame to save correct height and width for videowriter
