@@ -1,3 +1,7 @@
 #Ignore pycache
 *__pycache__
+<<<<<<< HEAD
 .vscode/*
+=======
+*.vscode
+>>>>>>> 9e3dd06c50bea99b6917fe09e70d850251c72b69
