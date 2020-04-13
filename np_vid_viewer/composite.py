@@ -1,4 +1,5 @@
 """Functions to generate composite images and videos for thermal data analysis"""
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import np_vid_viewer.progress_bar as progress_bar
@@ -38,12 +39,9 @@ def generate_threshold_image(temp_filename: str, threshold=800):
         progress_bar.printProgressBar(i,
                                       num_frames,
                                       prefix='Generating threshold image...')
-        over_thresh_array = np.where(frame > threshold)
+        over_thresh_array = cv2.inRange(frame, threshold, int(np.amax(frame)))
 
-        if over_thresh_array[0].size > 0:
-            for x_index, y_location in enumerate(over_thresh_array[0]):
-                x_location = over_thresh_array[1][x_index]
-                threshold_img[y_location, x_location] += 1
+        threshold_img += over_thresh_array
 
     # Generate a filename based on build_number and threshold used
     filename = build_folder + '/' + build_number + '_threshold' + str(
