@@ -100,7 +100,7 @@ class NpVidTool:
 
         # Focus on meltpool if specified
         if self.follow_meltpool:
-            follow_size = 20
+            follow_size = 20 * self.scale_factor
             max_temp = np.amax(frame)
             max_temp_y = np.where(frame == max_temp)[0][0]
             max_temp_x = np.where(frame == max_temp)[1][0]
