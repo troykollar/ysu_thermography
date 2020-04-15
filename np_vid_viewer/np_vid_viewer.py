@@ -84,6 +84,13 @@ class NpVidTool:
     def generate_frame(self, frame_num):
         frame = self.temp_data[frame_num].copy()
 
+        # Scale frame data according to scale_factor
+        width = int(frame.shape[1] * self.scale_factor)
+        height = int(frame.shape[0] * self.scale_factor)
+        size = (width, height)
+
+        frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
+
         # Remove the top reflection of specified
         if self.remove_top_reflection:
             np_vid_viewer.reflection_remover.remove_top(
@@ -129,13 +136,6 @@ class NpVidTool:
                 bottom_y = max_temp_y + follow_size
 
             img = img[top_y:bottom_y, left_x:right_x]
-
-        # Scale image according to scale_factor
-        width = int(img.shape[1] * self.scale_factor)
-        height = int(img.shape[0] * self.scale_factor)
-        size = (width, height)
-
-        img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
 
         # Circle max temperature if selected
         if self.highlight_max_temp:
