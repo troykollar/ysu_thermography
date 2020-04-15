@@ -46,13 +46,6 @@ class NpVidTool:
         data_filename = data_directory + '/' + 'merged_data.npy'
         self.merged_data = np.load(data_filename, allow_pickle=True)
 
-        # Find lower bounds of piece if remove_lower reflection is selected
-        if self.remove_bottom_reflection:
-            self.lower_bounds = np_vid_viewer.reflection_remover.find_lower_bounds(
-                self.temp_data)
-        else:
-            self.lower_bounds = None
-
         # Set scale factor for resizing frames of video
         self.scale_factor = scale_factor
         if self.scale_factor == None:
@@ -92,13 +85,11 @@ class NpVidTool:
 
         # Remove the top reflection of specified
         if self.remove_top_reflection:
-            np_vid_viewer.reflection_remover.remove_top(
-                frame, zero_level_threshold=180, max_temp_threshold=700)
+            np_vid_viewer.reflection_remover.remove_top(frame)
 
         # Remove the bottom reflection if specififed
         if self.remove_bottom_reflection:
-            np_vid_viewer.reflection_remover.remove_bottom(
-                frame, self.lower_bounds)
+            np_vid_viewer.reflection_remover.remove_bottom(frame)
 
         # Normalize the image to 8 bit color
         img = frame.copy()
