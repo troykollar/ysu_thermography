@@ -55,7 +55,7 @@ class NpVidTool:
 
         # Set scale factor for resizing frames of video
         self.scale_factor = scale_factor
-        if self.scale_factor == 1:
+        if self.scale_factor == None:
             self.scale_factor = helper_functions.min_scale_factor(
                 self.temp_data[0])
 
@@ -89,7 +89,7 @@ class NpVidTool:
         height = int(frame.shape[0] * self.scale_factor)
         size = (width, height)
 
-        frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
+        frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
 
         # Remove the top reflection of specified
         if self.remove_top_reflection:
