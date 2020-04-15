@@ -25,7 +25,8 @@ class NpVidTool:
                  remove_top_reflection=False,
                  remove_bottom_reflection=False,
                  follow_meltpool=False,
-                 circle_max_temp=False):
+                 circle_max_temp=False,
+                 contour_threshold=None):
 
         self.follow_meltpool = follow_meltpool
         self.highlight_max_temp = circle_max_temp
@@ -33,6 +34,7 @@ class NpVidTool:
         self.remove_bottom_reflection = remove_bottom_reflection
         self.mp_data_on_vid = mp_data_on_vid
         self.framerate = 0
+        self.contour_threshold = contour_threshold
 
         # Load temperature data
         temp_filename = 'thermal_cam_temps.npy'
@@ -90,6 +92,8 @@ class NpVidTool:
         # Remove the bottom reflection if specififed
         if self.remove_bottom_reflection:
             np_vid_viewer.reflection_remover.remove_bottom(frame)
+
+        # Create contours if specified
 
         # Focus on meltpool if specified
         if self.follow_meltpool:
