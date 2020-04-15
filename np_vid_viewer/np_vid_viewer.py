@@ -88,7 +88,6 @@ class NpVidTool:
         width = int(frame.shape[1] * self.scale_factor)
         height = int(frame.shape[0] * self.scale_factor)
         size = (width, height)
-
         frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
 
         # Remove the top reflection of specified
