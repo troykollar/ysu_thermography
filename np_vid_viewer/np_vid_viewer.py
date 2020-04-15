@@ -243,9 +243,9 @@ class NpVidTool:
 
         cv2.destroyAllWindows()
 
-    def save_frame16(self, frame: int, folder: str):
-        filename = folder + "/frame_" + str(frame) + ".png"
-        plt.imsave(filename, self.temp_data[frame], cmap='inferno')
+    def save_frame16(self, frame_num: int, folder: str):
+        filename = folder + "/frame_" + str(frame_num) + ".png"
+        plt.imsave(filename, self.temp_data[frame_num], cmap='inferno')
 
     def save_video(self, framerate=60):
         # generate a test frame to save correct height and width for videowriter
