@@ -1,5 +1,6 @@
 """Utility to remove the heat reflection from an image"""
 import numpy as np
+import cv2
 
 #TODO: Remove side reflections
 
@@ -12,14 +13,19 @@ def remove_top(frame,
 
     max_value = np.amax(frame)
     max_value_location = np.where(frame == max_value)
+    max_value_y = max_value_location[0][0]
 
-    distance_from_max_val = distance
-    if max_value_location[0][0] > distance_from_max_val:
-        remove_to = max_value_location[0][0] - distance_from_max_val
-    else:
-        remove_to = 0
+    mean = np.mean(frame[max_value_y])
+    y = max_value_y
+    while mean > min_value + 20:
+        if y == 0:
+            break
+        else:
+            y -= 1
+        mean = np.mean(frame[y])
 
-    frame[:remove_to] = min_value
+    frame[:y] = min_value
+    cv2.line(frame, (0, y), (frame.shape[1], y), int(np.amax(frame)), 1)
 
 
 def remove_bottom(img, lower_bounds, min_value=174):
