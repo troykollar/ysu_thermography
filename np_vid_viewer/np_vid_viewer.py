@@ -91,41 +91,20 @@ class NpVidTool:
         if self.remove_bottom_reflection:
             np_vid_viewer.reflection_remover.remove_bottom(frame)
 
+        # Focus on meltpool if specified
+        if self.follow_meltpool:
+            follow_size = 20 * self.scale_factor
+            top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+                frame, follow_size)
+
+            frame = frame[top_y:bottom_y, left_x:right_x]
+
         # Normalize the image to 8 bit color
         img = frame.copy()
         img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
 
         # Apply colormap to image
         img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
-
-        # Focus on meltpool if specified
-        if self.follow_meltpool:
-            follow_size = 20 * self.scale_factor
-            max_temp = np.amax(frame)
-            max_temp_y = np.where(frame == max_temp)[0][0]
-            max_temp_x = np.where(frame == max_temp)[1][0]
-
-            if max_temp_x < follow_size:
-                left_x = 0
-                right_x = follow_size * 2
-            elif max_temp_x > frame.shape[1] - follow_size:
-                right_x = frame.shape[1]
-                left_x = right_x - (follow_size * 2)
-            else:
-                left_x = max_temp_x - follow_size
-                right_x = max_temp_x + follow_size
-
-            if max_temp_y < follow_size:
-                top_y = 0
-                bottom_y = follow_size * 2
-            elif max_temp_y > img.shape[0] - follow_size:
-                bottom_y = img.shape[0]
-                top_y = img.shape[0] - (follow_size * 2)
-            else:
-                top_y = max_temp_y - follow_size
-                bottom_y = max_temp_y + follow_size
-
-            img = img[top_y:bottom_y, left_x:right_x]
 
         # Circle max temperature if selected
         if self.highlight_max_temp:
