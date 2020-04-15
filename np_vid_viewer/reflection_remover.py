@@ -48,10 +48,10 @@ def remove_bottom(frame, min_value=174):
             prev_temp = temp
             y += 1
 
-    #frame[y:] = min_value
+    frame[y:] = min_value
 
     # Draw a line at bottom of piece (for debugging)
-    cv2.line(frame, (0, y), (frame.shape[1], y), int(np.amax(frame)), 1)
+    #cv2.line(frame, (0, y), (frame.shape[1], y), int(np.amax(frame)), 1)
 
 
 def find_lower_bounds(temp_data):
