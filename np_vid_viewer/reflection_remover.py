@@ -25,7 +25,9 @@ def remove_top(frame,
         mean = np.mean(frame[y])
 
     frame[:y] = min_value
-    cv2.line(frame, (0, y), (frame.shape[1], y), int(np.amax(frame)), 1)
+
+    # Draw a line at top of piece (for debugging)
+    #cv2.line(frame, (0, y), (frame.shape[1], y), int(np.amax(frame)), 1)
 
 
 def remove_bottom(img, lower_bounds, min_value=174):
