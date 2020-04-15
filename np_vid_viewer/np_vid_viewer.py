@@ -93,8 +93,6 @@ class NpVidTool:
         if self.remove_bottom_reflection:
             np_vid_viewer.reflection_remover.remove_bottom(frame)
 
-        # Create contours if specified
-
         # Focus on meltpool if specified
         if self.follow_meltpool:
             follow_size = 20 * self.scale_factor
@@ -109,6 +107,17 @@ class NpVidTool:
 
         # Apply colormap to image
         img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
+
+        # Create contours if specified
+        # TODO: change contour threshold to be settable when invoking program
+        self.contour_threshold = 600
+        if self.contour_threshold is not None:
+            thresh = self.contour_threshold
+            thresh_img = cv2.inRange(frame, thresh, int(np.amax(frame)))
+            contours, contour_img = cv2.findContours(
+                thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
+
+            img = cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
 
         # Circle max temperature if selected
         if self.highlight_max_temp:

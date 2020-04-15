@@ -49,7 +49,6 @@ def get_follow_meltpool_cords(frame, follow_size):
         right_x = max_temp_x + follow_size
 
     if max_temp_y < follow_size:
-        print(follow_size - max_temp_y)
         top_y = 0
         bottom_y = follow_size * 2
     elif max_temp_y > frame.shape[0] - follow_size:
