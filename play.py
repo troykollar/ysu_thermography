@@ -1,6 +1,7 @@
 """Uses NpVidTool to generate and play a video with cv2.imshow()"""
 import argparse
 import np_vid_viewer
+import np_vid_viewer.dataset as dset
 
 
 def get_extension(filename: str):
@@ -36,8 +37,11 @@ PARSER.add_argument(
     'int specifying millisecond delay between showing each frame in play_video()'
 )
 PARSER.add_argument(
-    '-follow', type=int, default=False, required=False, help='0 or 1 specifying wether or not to follow the meltpool in the video'
-)
+    '-follow',
+    type=int,
+    default=False,
+    required=False,
+    help='0 or 1 specifying wether or not to follow the meltpool in the video')
 PARSER.add_argument(
     '-mp',
     type=int,
@@ -83,16 +87,11 @@ REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
 SHOW_MAX = bool(ARGS.showmax)
 FOLOW = bool(ARGS.follow)
 
+DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
+
 if ARGUMENT_ERROR:
     pass
 else:
-    VIEWER = np_vid_viewer.NpVidTool(
-        data_directory=DATA_DIRECTORY,
-        scale_factor=SCALE_FACTOR,
-        mp_data_on_vid=ARGS.mp,
-        remove_top_reflection=REMOVE_TOP_REFLECTION,
-        remove_bottom_reflection=REMOVE_BOTTOM_REFLECTION,
-        circle_max_temp=SHOW_MAX,
-        follow_meltpool=FOLOW)
+    VIEWER = np_vid_viewer.data_video(DATASET, ARGS.mp)
 
-    VIEWER.play_video(FRAME_DELAY)
+    VIEWER.play_video(SCALE_FACTOR, FRAME_DELAY)
