@@ -237,35 +237,6 @@ class data_video:
         filename = folder + "/frame_" + str(frame_num) + ".png"
         plt.imsave(filename, self.temp_data[frame_num], cmap='inferno')
 
-    def save_video(self, framerate=60):
-        # generate a test frame to save correct height and width for videowriter
-        test_img = self.generate_frame(0)
-        height = test_img.shape[0]
-        width = test_img.shape[1]
-        self.framerate = framerate
-
-        size = (width, height)
-        build_folder = helper_functions.get_build_folder(self.temp_filename)
-        build_number = helper_functions.get_build_number(self.temp_filename)
-        filename = build_folder + build_number + '_video.avi'
-
-        video_writer = cv2.VideoWriter(
-            filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
-            size)
-
-        for i, frame in enumerate(self.temp_data):
-            # Display completion percentage
-            progress_bar.printProgressBar(i,
-                                          self.num_frames,
-                                          prefix='Saving Video...')
-
-            img = self.generate_frame(i)
-
-            video_writer.write(img)
-        print('\n')  #print a newline to get rid of progress bar
-
-        video_writer.release()
-
     def save_hotspot_video(self, framerate=60, save_img=False):
         self.framerate = framerate
         height = self.temp_data[0].shape[0]
@@ -312,18 +283,6 @@ class data_video:
         if save_img:
             cv2.imwrite(build_folder + '/' + build_number + '_hotspot_img.png',
                         hotspot_img_frame)
-
-    def print_info(self, frame):
-        """Print the information about the current frame to console"""
-        print(
-            "Frame: " + str(frame),
-            "| Timestamps: " +
-            str(self.timestamp(frame).replace(microsecond=0)),
-            "| MP X: " + str(self.mp_x(frame)),
-            "| MP Y: " + str(self.mp_y(frame)),
-            "| MP Z: " + str(self.mp_z(frame)),
-            "| MP Area: " + str(self.mp_area(frame)),
-        )
 
     """
     def circle_max_temp(self, frame_num: int, img: np.ndarray):
@@ -420,37 +379,45 @@ class data_video:
 
         return img
 
-    def save_partial_video(self, start, end, framerate=60):
-        # generate a test frame to save correct height and width for videowriter
-        test_img = self.generate_frame(0)
-        height = test_img.shape[0]
-        width = test_img.shape[1]
-        self.framerate = framerate
+    def save_video(self, scale_factor=1, framerate=60, start=0, end=0):
+        filename = self.dataset.data_directory + str(self.dataset.build_number)
 
-        size = (width, height)
+        if start < 0 or start > self.dataset.final_frame:
+            start = 0
 
-        temp_filename = self.temp_filename
-        filename = temp_filename[:temp_filename.rfind(
-            '/')] + "/partial_" + str(start) + "-" + str(end) + ".avi"
+        if end <= 0 or end > self.dataset.final_frame:
+            end = self.dataset.final_frame
 
-        video_writer = cv2.VideoWriter(
-            filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
-            size)
+        if start != 0 or end != self.dataset.final_frame:
+            filename += '_frames' + str(start) + '-' + str(end)
+        filename += '.avi'
 
-        progress = 0
-        total = end - start
-        for i in range(start, end):
-            # Display completion percentage
-            progress_bar.printProgressBar(progress,
-                                          total,
-                                          prefix='Saving Video...')
+        if start >= end:
+            print('Invalid start and end frames.')
+        else:
+            # Generate a test img to get size of video
+            test_img = self.generate_img(0, scale_factor)
+            height = test_img.shape[0]
+            width = test_img.shape[1]
+            size = (width, height)
 
-            img = self.generate_frame(i)
+            # Create VideoWriter Object
+            video_writer = cv2.VideoWriter(
+                filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'),
+                framerate, size)
 
-            video_writer.write(img)
-            progress += 1
+            progress = 0
+            total = end - start
+            for i in range(start, end):
+                # Display completion percentage
+                progress_bar.printProgressBar(progress,
+                                              total,
+                                              prefix='Saving Video...')
 
-        print("Partial video saved as: '" + str(filename) +
-              "'")  #print a newline to get rid of progress bar
+                img = self.generate_img(i, scale_factor)
 
-        video_writer.release()
+                video_writer.write(img)
+                progress += 1
+
+            print('Video saved to : ' + filename)
+            video_writer.release()
