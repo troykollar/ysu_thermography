@@ -84,14 +84,13 @@ SCALE_FACTOR = ARGS.scale
 FRAME_DELAY = ARGS.delay
 REMOVE_TOP_REFLECTION = bool(ARGS.top)
 REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
-SHOW_MAX = bool(ARGS.showmax)
-FOLOW = bool(ARGS.follow)
+FOLOW = ARGS.follow
 
 DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
 
 if ARGUMENT_ERROR:
     pass
 else:
-    VIEWER = np_vid_viewer.data_video(DATASET, ARGS.mp)
+    VIEWER = np_vid_viewer.data_video(DATASET, ARGS.mp, follow_max_temp=FOLOW)
 
     VIEWER.play_video(SCALE_FACTOR, FRAME_DELAY)
