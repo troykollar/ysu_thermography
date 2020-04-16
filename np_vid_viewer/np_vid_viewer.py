@@ -58,6 +58,20 @@ class data_video:
                                            cv2.CHAIN_APPROX_TC89_KCOS)
             img = cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
 
+            for contour in contours:
+                x, y, w, h = cv2.boundingRect(contour)
+                area = float(cv2.contourArea(contour))
+                M = cv2.moments(contour)
+                if M['m00'] != 0:
+                    cx = int(M['m10'] / M['m00'])  # center of gravity x
+                    cy = int(M['m01'] / M['m00'])  # center of gravity y
+                    print(cx)
+                    print(cy)
+                print('x : ' + str(x))
+                print('y : ' + str(y))
+                print('w : ' + str(w))
+                print('h : ' + str(h))
+
         # Add meltpool data onto the image
         if self.mp_data_on_vid:
             img = self.add_mp_data_to_img(img, frame_num)
@@ -214,6 +228,9 @@ class data_video:
         )  # Print blank line to remove progressbar if video was quit before ending
 
         cv2.destroyAllWindows()
+
+    def add_contour_data_to_img():
+        pass
 
     def save_hotspot_video(self, framerate=60, save_img=False):
         self.framerate = framerate
