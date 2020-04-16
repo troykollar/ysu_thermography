@@ -37,13 +37,19 @@ PARSER.add_argument(
     'int specifying millisecond delay between showing each frame in play_video()'
 )
 PARSER.add_argument(
-    '-follow',
+    '-fmax',
     type=int,
     default=False,
     required=False,
     help=
     'integer specifying the number of pixels around the max temperature to focus the image on'
 )
+PARSER.add_argument(
+    '-cthresh',
+    type=int,
+    default=0,
+    required=False,
+    help='Integer specifying the threshold to draw contours from')
 PARSER.add_argument(
     '-mp',
     type=int,
@@ -79,13 +85,17 @@ SCALE_FACTOR = ARGS.scale
 FRAME_DELAY = ARGS.delay
 REMOVE_TOP_REFLECTION = bool(ARGS.top)
 REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
-FOLOW = ARGS.follow
+FOLLOW_MAX = ARGS.fmax
+CONTOUR_THRESHOLD = ARGS.cthresh
 
 DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
 
 if ARGUMENT_ERROR:
     pass
 else:
-    VIEWER = np_vid_viewer.data_video(DATASET, ARGS.mp, follow_max_temp=FOLOW)
+    VIEWER = np_vid_viewer.data_video(DATASET,
+                                      ARGS.mp,
+                                      follow_max_temp=FOLLOW_MAX,
+                                      contour_threshold=CONTOUR_THRESHOLD)
 
     VIEWER.play_video(SCALE_FACTOR, FRAME_DELAY)
