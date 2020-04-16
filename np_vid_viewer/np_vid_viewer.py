@@ -8,8 +8,7 @@ import numpy as np
 import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
 import np_vid_viewer.helper_functions as helper_functions
-
-#TODO: Update documenation
+import np_vid_viewer.dataset as dataset
 
 
 def format_time(t):
@@ -17,42 +16,40 @@ def format_time(t):
     return s[:-3]
 
 
-class NpVidTool:
+class data_video:
     def __init__(self,
-                 data_directory: str,
+                 temp_dataset: dataset,
                  mp_data_on_vid=False,
-                 scale_factor=1,
-                 remove_top_reflection=False,
-                 remove_bottom_reflection=False,
-                 follow_meltpool=False,
-                 circle_max_temp=False,
-                 contour_threshold=None):
+                 follow_max_temp=0):
 
-        self.follow_meltpool = follow_meltpool
-        self.highlight_max_temp = circle_max_temp
-        self.remove_top_reflection = remove_top_reflection
-        self.remove_bottom_reflection = remove_bottom_reflection
+        self.dataset = temp_dataset
         self.mp_data_on_vid = mp_data_on_vid
-        self.framerate = 0
-        self.contour_threshold = contour_threshold
+        self.follow_max_temp = follow_max_temp
 
-        # Load temperature data
-        temp_filename = 'thermal_cam_temps.npy'
-        self.temp_filename = data_directory + '/' + temp_filename
-        self.temp_data = np.load(self.temp_filename,
-                                 mmap_mode="r",
-                                 allow_pickle=True)
-        self.num_frames = self.temp_data.shape[0]  # Save number of frames
+    def generate_img(self, frame_num, scale_factor=1):
+        frame, unscaled_frame, original_frame = self.dataset.get_frame(
+            frame_num, scale_factor)
 
-        # Load merged data
-        data_filename = data_directory + '/' + 'merged_data.npy'
-        self.merged_data = np.load(data_filename, allow_pickle=True)
+        if self.follow_max_temp != 0:
+            follow_size = self.follow_max_temp * scale_factor
+            top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+                frame, follow_size)
 
-        # Set scale factor for resizing frames of video
-        self.scale_factor = scale_factor
-        if self.scale_factor == None:
-            self.scale_factor = helper_functions.min_scale_factor(
-                self.temp_data[0])
+            img = frame[top_y:bottom_y, left_x:right_x]
+        else:
+            img = frame.copy()
+
+        # Normalize the image to 8 bit color
+        img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
+
+        # Apply colormap to image
+        img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
+
+        # Add meltpool data onto the image
+        if self.mp_data_on_vid:
+            img = self.add_mp_data_to_img(img, frame_num)
+
+        return img
 
     def save_frame_range16(self, start, end):
         build_folder = helper_functions.get_build_folder(self.temp_filename)
@@ -139,10 +136,9 @@ class NpVidTool:
 
         return img
 
-    def play_video(self, frame_delay: int):
-        temp_filename = self.temp_filename
+    def play_video(self, scale_factor=1, frame_delay=1):
 
-        window_name = temp_filename[(temp_filename.rfind('/') + 1):]
+        window_name = 'Build ' + str(self.dataset.build_number)
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(window_name, 1280, 720)
 
@@ -157,11 +153,11 @@ class NpVidTool:
         frame_num = 0
         pause = False
         while True:
-            start_frame_time = time.time()
+            #start_frame_time = time.time()
             #TODO:  Change progressbar to show timestamp (relative to video)
             #       instead of percentage
             progress_bar.printProgressBar(frame_num,
-                                          self.num_frames - 1,
+                                          self.dataset.final_frame,
                                           prefix='Playing Video: ')
             key = cv2.waitKey(frame_delay)
             if key == ord("q"):
@@ -170,30 +166,30 @@ class NpVidTool:
                     "k") or key == 32:  # key == 32 means spacebar is pressed
                 pause = not pause
             elif key == ord("l"):
-                if frame_num < self.num_frames - 11:
+                if frame_num < self.dataset.final_frame - 10:
                     frame_num += 10
                 else:
-                    frame_num = self.num_frames - 1
+                    frame_num = self.dataset.final_frame
             elif key == ord("j"):
                 if frame_num > 10:
                     frame_num -= 10
                 else:
                     frame_num = 0
             elif key == ord('m'):
-                if frame_num < self.num_frames - 2:
+                if frame_num < self.dataset.final_frame:
                     frame_num += 1
                 else:
-                    frame_num = self.num_frames - 1
+                    frame_num = self.dataset.final_frame
             elif key == ord('n'):
                 if frame_num > 0:
                     frame_num -= 1
                 else:
                     frame_num = 0
             elif key == ord('o'):
-                if frame_num < self.num_frames - 101:
+                if frame_num < self.dataset.final_frame - 100:
                     frame_num += 100
                 else:
-                    frame_num = self.num_frames - 1
+                    frame_num = self.dataset.final_frame
             elif key == ord('i'):
                 if frame_num > 100:
                     frame_num -= 100
@@ -220,14 +216,16 @@ class NpVidTool:
             else:
                 pass
 
-            img = self.generate_frame(frame_num)
+            img = self.generate_img(frame_num, scale_factor)
 
-            if frame_num == self.num_frames - 1:
+            if frame_num == self.dataset.final_frame:
                 frame_num = 0  #Start video over at end
 
             cv2.imshow(window_name, img)
+            """
             render_time = time.time() - start_frame_time
             self.framerate = int(1 / (render_time + (frame_delay * .001)))
+            """
 
         print(
             '\n'
@@ -315,29 +313,6 @@ class NpVidTool:
             cv2.imwrite(build_folder + '/' + build_number + '_hotspot_img.png',
                         hotspot_img_frame)
 
-    def timestamp(self, frame):
-        """Return the timestamp of the video based on the frame."""
-        return self.merged_data[frame][0]
-
-    def mp_x(self, frame):
-        """Return the meltpool x value based on the frame"""
-        return self.merged_data[frame][1]
-
-    def mp_y(self, frame):
-        """Return the meltpool y value based on the frame"""
-        return self.merged_data[frame][2]
-
-    def mp_z(self, frame):
-        """Return the meltpool z value based on the frame"""
-        return self.merged_data[frame][3]
-
-    def mp_area(self, frame):
-        """Return the meltpool area value based on the frame"""
-        return self.merged_data[frame][4]
-
-    def max_temp(self, frame):
-        return np.amax(self.temp_data[frame])
-
     def print_info(self, frame):
         """Print the information about the current frame to console"""
         print(
@@ -350,6 +325,7 @@ class NpVidTool:
             "| MP Area: " + str(self.mp_area(frame)),
         )
 
+    """
     def circle_max_temp(self, frame_num: int, img: np.ndarray):
         frame = self.temp_data[frame_num]
         max_temp = np.amax(frame)
@@ -360,18 +336,33 @@ class NpVidTool:
                              radius=3,
                              color=(0, 0, 255),
                              thickness=2)
+    """
 
-    def add_mp_data_to_img(self, img, frame):
-        img_height = img.shape[:1][0]
+    def add_mp_data_to_img(self, img, frame_num):
+        img_height = img.shape[0]
         img_width = img.shape[1]
         font = cv2.FONT_HERSHEY_DUPLEX
         font_size = img_height / 860
         font_color = (0, 0, 0)
+
+        # Add white border on top of img
+        img = cv2.copyMakeBorder(img,
+                                 int(img_height * (7 / 16)),
+                                 0,
+                                 0,
+                                 0,
+                                 cv2.BORDER_CONSTANT,
+                                 value=(255, 255, 255))
+
+        time_stamp, x, y, z, area = self.dataset.get_meltpool_data(frame_num)
+        time_stamp = format_time(time_stamp)
+        max_temp, max_x, max_y = self.dataset.get_max_temp_data(frame_num)
+
         column1_x = 5
         column2_x = int(img_width * .4)
         img = cv2.putText(
             img,
-            "X: " + str(self.mp_x(frame)),
+            'X: ' + str(x),
             (column1_x, int((1 / 32) * img_height)),
             font,
             font_size,
@@ -379,7 +370,7 @@ class NpVidTool:
         )
         img = cv2.putText(
             img,
-            "Y: " + str(self.mp_y(frame)),
+            'Y: ' + str(y),
             (column1_x, int((3 / 32) * img_height)),
             font,
             font_size,
@@ -387,7 +378,7 @@ class NpVidTool:
         )
         img = cv2.putText(
             img,
-            "Z: " + str(self.mp_z(frame)),
+            'Z: ' + str(z),
             (column1_x, int((5 / 32) * img_height)),
             font,
             font_size,
@@ -395,7 +386,7 @@ class NpVidTool:
         )
         img = cv2.putText(
             img,
-            "Area: " + str(self.mp_area(frame)),
+            "Area: " + str(area),
             (column2_x, int((1 / 32) * img_height)),
             font,
             font_size,
@@ -403,28 +394,31 @@ class NpVidTool:
         )
         img = cv2.putText(
             img,
-            "Max Temp: " + str(self.max_temp(frame)),
+            "Max Temp: " + str(max_temp),
             (column2_x, int((3 / 32) * img_height)),
             font,
             font_size,
             font_color,
         )
-        img = cv2.putText(img,
-                          "Frame: " + str(frame) + "/" + str(self.num_frames),
-                          (column2_x, int((5 / 32) * img_height)), font,
-                          font_size, font_color)
-        time_stamp = format_time(self.timestamp(frame))
+        img = cv2.putText(
+            img,
+            "Frame: " + str(frame_num) + "/" + str(self.dataset.final_frame),
+            (column2_x, int(
+                (5 / 32) * img_height)), font, font_size, font_color)
         img = cv2.putText(img, 'Time: ' + str(time_stamp),
                           (column1_x, int((7 / 32) * img_height)), font,
                           font_size, font_color)
+        #TODO: Add FPS display
+        """
         img = cv2.putText(img, 'Framerate: ' + str(self.framerate),
                           (column1_x, int((9 / 32) * img_height)), font,
                           font_size, font_color)
-        img = cv2.putText(
-            img, 'Build: ' +
-            str(helper_functions.get_build_folder_name(self.temp_filename)),
-            (column2_x, int(
-                (9 / 32) * img_height)), font, font_size, font_color)
+        """
+        img = cv2.putText(img, 'Build: ' + str(self.dataset.build_number),
+                          (column2_x, int((9 / 32) * img_height)), font,
+                          font_size, font_color)
+
+        return img
 
     def save_partial_video(self, start, end, framerate=60):
         # generate a test frame to save correct height and width for videowriter
