@@ -5,7 +5,6 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-import np_vid_viewer.reflection_remover
 import np_vid_viewer.progress_bar as progress_bar
 import np_vid_viewer.helper_functions as helper_functions
 import np_vid_viewer.dataset as dataset
@@ -20,12 +19,14 @@ class data_video:
     def __init__(self,
                  temp_dataset: dataset,
                  mp_data_on_vid=False,
-                 follow_max_temp=0):
+                 follow_max_temp=0,
+                 contour_threshold=0):
 
         self.dataset = temp_dataset
         self.mp_data_on_vid = mp_data_on_vid
         self.follow_max_temp = follow_max_temp
         self.framerate = None
+        self.contour_threshold = contour_threshold
 
     def generate_img(self, frame_num, scale_factor=1):
         frame, unscaled_frame, original_frame = self.dataset.get_frame(
@@ -36,10 +37,12 @@ class data_video:
             top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
                 frame, follow_size)
 
-            img = frame.copy()
-            img = img[top_y:bottom_y, left_x:right_x]
+            frame = frame.copy()
+            frame = frame[top_y:bottom_y, left_x:right_x]
         else:
             img = frame.copy()
+
+        img = frame.copy()
 
         # Normalize the image to 8 bit color
         img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
@@ -47,33 +50,63 @@ class data_video:
         # Apply colormap to image
         img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
 
+        # Find and draw contours if specified
+        if self.contour_threshold != 0:
+            thresh_img = cv2.inRange(frame, self.contour_threshold,
+                                     int(np.amax(frame)))
+            contours, _ = cv2.findContours(thresh_img, cv2.RETR_TREE,
+                                           cv2.CHAIN_APPROX_TC89_KCOS)
+            img = cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
+
         # Add meltpool data onto the image
         if self.mp_data_on_vid:
             img = self.add_mp_data_to_img(img, frame_num)
 
         return img
 
-    def save_frame_range16(self, start, end):
-        build_folder = helper_functions.get_build_folder(self.temp_filename)
-        build_number = helper_functions.get_build_number(self.temp_filename)
-        frame_range_folder = build_folder + '/' + build_number + '_frames' + str(
-            start) + '-' + str(end)
-        if os.path.isdir(frame_range_folder):
-            shutil.rmtree(frame_range_folder)
-        os.mkdir(frame_range_folder)
-        total = end + 1 - start
+    def save_frame16(self, start: int, end=0, scale_factor=1):
+        build_folder = self.dataset.data_directory
+        build_number = self.dataset.build_number
+        if end != 0:
+            frame_range_folder = build_folder + build_number + '_frames' + str(
+                start) + '-' + str(end)
+            if os.path.isdir(frame_range_folder):
+                shutil.rmtree(frame_range_folder)
+            os.mkdir(frame_range_folder)
 
-        progress = 0
-        for i in range(start, end + 1):
-            # Display completion percentage
-            progress_bar.printProgressBar(progress + 1,
-                                          total,
-                                          prefix='Saving frames ' +
-                                          str(start) + '-' + str(end))
-            self.save_frame16(i, frame_range_folder)
-            progress += 1
+            total = end - start
+            progress = 0
+            for i in range(start, end):
+                # Display completion percentage
+                progress_bar.printProgressBar(progress + 1,
+                                              total,
+                                              prefix='Saving frames ' +
+                                              str(start) + '-' + str(end))
+                frame_fname = frame_range_folder + '/frame_' + str(i) + '.png'
+                unscaled_fname = frame_range_folder + '/frame_' + str(
+                    i) + '_unscaled.png'
+                original_fname = frame_range_folder + '/frame_' + str(
+                    i) + '_original.png'
+                frame, unscaled, original = self.dataset.get_frame(
+                    i, scale_factor)
+                plt.imsave(frame_fname, frame, cmap='inferno')
+                plt.imsave(unscaled_fname, unscaled, cmap='inferno')
+                plt.imsave(original_fname, original, cmap='inferno')
 
-        print('Saved frames ' + str(start) + '-' + str(end))
+                progress += 1
+            print('Saved frames ' + str(start) + '-' + str(end))
+        else:
+            frame_fname = build_folder + 'frame_' + str(start) + '.png'
+            unscaled_fname = build_folder + 'frame_' + str(
+                start) + '_unscaled.png'
+            original_fname = build_folder + 'frame_' + str(
+                start) + '_original.png'
+            frame, unscaled, original = self.dataset.get_frame(
+                start, scale_factor)
+            plt.imsave(frame_fname, frame, cmap='inferno')
+            plt.imsave(unscaled_fname, unscaled, cmap='inferno')
+            plt.imsave(original_fname, original, cmap='inferno')
+            print('Saved frame ' + str(start))
 
     def play_video(self, scale_factor=1, frame_delay=1):
 
@@ -142,9 +175,8 @@ class data_video:
                 else:
                     frame_num = 0
             elif key == ord('s'):
-                folder = helper_functions.get_build_folder(self.temp_filename)
-                self.save_frame16(frame_num, folder)
-                print('Saved frame: ' + folder + '/frame_' + str(frame_num))
+                self.save_frame16(frame_num, scale_factor=scale_factor)
+                print('Saved frame: ' + str(frame_num))
             elif key == ord('f'):
                 pause = True
                 input_frame = -1
@@ -182,10 +214,6 @@ class data_video:
         )  # Print blank line to remove progressbar if video was quit before ending
 
         cv2.destroyAllWindows()
-
-    def save_frame16(self, frame_num: int, folder: str):
-        filename = folder + "/frame_" + str(frame_num) + ".png"
-        plt.imsave(filename, self.temp_data[frame_num], cmap='inferno')
 
     def save_hotspot_video(self, framerate=60, save_img=False):
         self.framerate = framerate
@@ -317,7 +345,7 @@ class data_video:
         img = cv2.putText(img, 'Time: ' + str(time_stamp),
                           (column1_x, int((7 / 32) * img_height)), font,
                           font_size, font_color)
-        #TODO: Add FPS display
+
         if self.framerate is not None:
             img = cv2.putText(img, 'FPS: ' + str(self.framerate),
                               (column1_x, int((9 / 32) * img_height)), font,
