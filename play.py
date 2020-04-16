@@ -41,7 +41,9 @@ PARSER.add_argument(
     type=int,
     default=False,
     required=False,
-    help='0 or 1 specifying wether or not to follow the meltpool in the video')
+    help=
+    'integer specifying the number of pixels around the max temperature to focus the image on'
+)
 PARSER.add_argument(
     '-mp',
     type=int,
@@ -61,13 +63,6 @@ PARSER.add_argument(
     default=False,
     required=False,
     help='0 or 1 specifying wether or not to remove bottom reflections')
-PARSER.add_argument(
-    '-showmax',
-    type=int,
-    default=False,
-    required=False,
-    help=
-    '0 or 1 specifying whether or not to highlight the max temp of the frame')
 
 ARGS = PARSER.parse_args()
 
