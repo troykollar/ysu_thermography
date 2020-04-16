@@ -25,6 +25,7 @@ class data_video:
         self.dataset = temp_dataset
         self.mp_data_on_vid = mp_data_on_vid
         self.follow_max_temp = follow_max_temp
+        self.framerate = None
 
     def generate_img(self, frame_num, scale_factor=1):
         frame, unscaled_frame, original_frame = self.dataset.get_frame(
@@ -35,7 +36,8 @@ class data_video:
             top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
                 frame, follow_size)
 
-            img = frame[top_y:bottom_y, left_x:right_x]
+            img = frame.copy()
+            img = img[top_y:bottom_y, left_x:right_x]
         else:
             img = frame.copy()
 
@@ -75,6 +77,11 @@ class data_video:
 
     def play_video(self, scale_factor=1, frame_delay=1):
 
+        # Keep track of frame render times for framerate adjustment
+        frame_start_time = None
+        frame_end_time = None
+        frame_render_time = None
+
         window_name = 'Build ' + str(self.dataset.build_number)
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(window_name, 1280, 720)
@@ -90,7 +97,9 @@ class data_video:
         frame_num = 0
         pause = False
         while True:
-            #start_frame_time = time.time()
+            # Get frame start time for FPS calculation
+            frame_start_time = time.time()
+
             #TODO:  Change progressbar to show timestamp (relative to video)
             #       instead of percentage
             progress_bar.printProgressBar(frame_num,
@@ -159,10 +168,14 @@ class data_video:
                 frame_num = 0  #Start video over at end
 
             cv2.imshow(window_name, img)
-            """
-            render_time = time.time() - start_frame_time
-            self.framerate = int(1 / (render_time + (frame_delay * .001)))
-            """
+
+            # FPS calculation
+            frame_end_time = time.time()
+            # frame render time in seconds
+            frame_render_time = frame_end_time - frame_start_time
+
+            self.framerate = int(1 / (frame_render_time +
+                                      (frame_delay * .001)))
 
         print(
             '\n'
@@ -305,11 +318,11 @@ class data_video:
                           (column1_x, int((7 / 32) * img_height)), font,
                           font_size, font_color)
         #TODO: Add FPS display
-        """
-        img = cv2.putText(img, 'Framerate: ' + str(self.framerate),
-                          (column1_x, int((9 / 32) * img_height)), font,
-                          font_size, font_color)
-        """
+        if self.framerate is not None:
+            img = cv2.putText(img, 'FPS: ' + str(self.framerate),
+                              (column1_x, int((9 / 32) * img_height)), font,
+                              font_size, font_color)
+
         img = cv2.putText(img, 'Build: ' + str(self.dataset.build_number),
                           (column2_x, int((9 / 32) * img_height)), font,
                           font_size, font_color)
