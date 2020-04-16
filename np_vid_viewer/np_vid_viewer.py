@@ -73,69 +73,6 @@ class data_video:
 
         print('Saved frames ' + str(start) + '-' + str(end))
 
-    def generate_frame(self, frame_num):
-        frame = self.temp_data[frame_num].copy()
-
-        # Scale frame data according to scale_factor
-        width = int(frame.shape[1] * self.scale_factor)
-        height = int(frame.shape[0] * self.scale_factor)
-        size = (width, height)
-        frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
-
-        # Remove the top reflection of specified
-        if self.remove_top_reflection:
-            np_vid_viewer.reflection_remover.remove_top(frame)
-
-        # Remove the bottom reflection if specififed
-        if self.remove_bottom_reflection:
-            np_vid_viewer.reflection_remover.remove_bottom(frame)
-
-        # Focus on meltpool if specified
-        if self.follow_meltpool:
-            follow_size = 20 * self.scale_factor
-            top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
-                frame, follow_size)
-
-            frame = frame[top_y:bottom_y, left_x:right_x]
-
-        # Normalize the image to 8 bit color
-        img = frame.copy()
-        img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
-
-        # Apply colormap to image
-        img = cv2.applyColorMap(img, cv2.COLORMAP_INFERNO)
-
-        # Create contours if specified
-        # TODO: change contour threshold to be settable when invoking program
-        self.contour_threshold = 600
-        if self.contour_threshold is not None:
-            thresh = self.contour_threshold
-            thresh_img = cv2.inRange(frame, thresh, int(np.amax(frame)))
-            contours, contour_img = cv2.findContours(
-                thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
-
-            img = cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
-
-        # Circle max temperature if selected
-        if self.highlight_max_temp:
-            self.circle_max_temp(frame_num, img)
-
-        # Extend frame for mp_data
-        if self.mp_data_on_vid:
-            img = cv2.copyMakeBorder(img,
-                                     int(height * (7 / 16)),
-                                     0,
-                                     0,
-                                     0,
-                                     cv2.BORDER_CONSTANT,
-                                     value=(255, 255, 255))
-
-        # Add meltpool data onto the image
-        if self.mp_data_on_vid:
-            self.add_mp_data_to_img(img, frame_num)
-
-        return img
-
     def play_video(self, scale_factor=1, frame_delay=1):
 
         window_name = 'Build ' + str(self.dataset.build_number)
