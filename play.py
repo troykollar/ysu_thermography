@@ -51,6 +51,14 @@ PARSER.add_argument(
     required=False,
     help='Integer specifying the threshold to draw contours from')
 PARSER.add_argument(
+    '-fcontour',
+    type=int,
+    default=False,
+    required=False,
+    help=
+    'integer specifying the number of pixels around the contour center of gravity to focus the image on'
+)
+PARSER.add_argument(
     '-mp',
     type=int,
     default=False,
@@ -86,6 +94,7 @@ FRAME_DELAY = ARGS.delay
 REMOVE_TOP_REFLECTION = bool(ARGS.top)
 REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
 FOLLOW_MAX = ARGS.fmax
+FOLLOW_CONTOUR = ARGS.fcontour
 CONTOUR_THRESHOLD = ARGS.cthresh
 
 DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
@@ -96,6 +105,7 @@ else:
     VIEWER = np_vid_viewer.data_video(DATASET,
                                       ARGS.mp,
                                       follow_max_temp=FOLLOW_MAX,
-                                      contour_threshold=CONTOUR_THRESHOLD)
+                                      contour_threshold=CONTOUR_THRESHOLD,
+                                      follow_contour=FOLLOW_CONTOUR)
 
     VIEWER.play_video(SCALE_FACTOR, FRAME_DELAY)
