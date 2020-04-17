@@ -20,13 +20,16 @@ class data_video:
                  temp_dataset: dataset,
                  mp_data_on_vid=False,
                  follow_max_temp=0,
-                 contour_threshold=0):
+                 contour_threshold=0,
+                 follow_contour=0):
 
         self.dataset = temp_dataset
         self.mp_data_on_vid = mp_data_on_vid
         self.follow_max_temp = follow_max_temp
         self.framerate = None
         self.contour_threshold = contour_threshold
+        self.follow_contour = 20
+        #self.follow_contour = follow_contour
 
     def generate_img(self, frame_num, scale_factor=1):
         frame, unscaled_frame, original_frame = self.dataset.get_frame(
@@ -48,19 +51,30 @@ class data_video:
                                            cv2.CHAIN_APPROX_TC89_KCOS)
             img = cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
 
+            cog_x = None
+            cog_y = None
             for contour in contours:
-                x, y, w, h = cv2.boundingRect(contour)
-                area = float(cv2.contourArea(contour))
+                contour_x, contour_y, contour_w, contour_h = cv2.boundingRect(
+                    contour)
+                contour_area = float(cv2.contourArea(contour))
                 M = cv2.moments(contour)
                 if M['m00'] != 0:
-                    cx = int(M['m10'] / M['m00'])  # center of gravity x
-                    cy = int(M['m01'] / M['m00'])  # center of gravity y
-                    print(cx)
-                    print(cy)
-                print('x : ' + str(x))
-                print('y : ' + str(y))
-                print('w : ' + str(w))
-                print('h : ' + str(h))
+                    cog_x = int(M['m10'] / M['m00'])  # center of gravity x
+                    cog_y = int(M['m01'] / M['m00'])  # center of gravity y
+
+            if self.follow_contour != 0:
+                follow_size = self.follow_contour * scale_factor
+                if cog_x is not None and cog_y is not None:
+                    top_y, bottom_y, left_x, right_x = helper_functions.get_follow_contour_cords(
+                        frame, follow_size, cog_x, cog_y)
+                else:
+                    top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+                        frame, follow_size)
+
+                img = img[top_y:bottom_y, left_x:right_x]
+
+        if self.follow_max_temp != 0 and self.follow_contour != 0:
+            self.follow_max_temp = 0
 
         if self.follow_max_temp != 0:
             follow_size = self.follow_max_temp * scale_factor
