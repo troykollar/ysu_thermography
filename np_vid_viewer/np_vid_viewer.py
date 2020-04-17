@@ -28,8 +28,7 @@ class data_video:
         self.follow_max_temp = follow_max_temp
         self.framerate = None
         self.contour_threshold = contour_threshold
-        self.follow_contour = 20
-        #self.follow_contour = follow_contour
+        self.follow_contour = follow_contour
 
     def generate_img(self, frame_num, scale_factor=1):
         frame, unscaled_frame, original_frame = self.dataset.get_frame(
