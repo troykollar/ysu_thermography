@@ -21,7 +21,8 @@ class data_video:
                  mp_data_on_vid=False,
                  follow_max_temp=0,
                  contour_threshold=0,
-                 follow_contour=0):
+                 follow_contour=0,
+                 contour_data_on_img=False):
 
         self.dataset = temp_dataset
         self.mp_data_on_vid = mp_data_on_vid
@@ -29,6 +30,7 @@ class data_video:
         self.framerate = None
         self.contour_threshold = contour_threshold
         self.follow_contour = follow_contour
+        self.contour_data_on_img = contour_data_on_img
 
     def generate_img(self, frame_num, scale_factor=1):
         frame, unscaled_frame, original_frame = self.dataset.get_frame(
@@ -73,7 +75,9 @@ class data_video:
                 img = img[top_y:bottom_y, left_x:right_x]
 
             if self.contour_data_on_img:
-                img = self.add_contour_data_to_img()
+                img = self.add_contour_data_to_img(img, contour_x, contour_y,
+                                                   contour_w, contour_h, cog_x,
+                                                   cog_y)
 
         if self.follow_max_temp != 0 and self.follow_contour != 0:
             self.follow_max_temp = 0
@@ -242,7 +246,8 @@ class data_video:
 
         cv2.destroyAllWindows()
 
-    def add_contour_data_to_img():
+    def add_contour_data_to_img(self, img, contour_x, contour_y, contour_w,
+                                contour_h, cog_x, cog_y):
         pass
 
     def save_hotspot_video(self, framerate=60, save_img=False):
