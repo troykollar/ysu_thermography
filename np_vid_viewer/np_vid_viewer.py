@@ -72,6 +72,9 @@ class data_video:
 
                 img = img[top_y:bottom_y, left_x:right_x]
 
+            if self.contour_data_on_img:
+                img = self.add_contour_data_to_img()
+
         if self.follow_max_temp != 0 and self.follow_contour != 0:
             self.follow_max_temp = 0
 
