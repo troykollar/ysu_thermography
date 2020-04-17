@@ -32,16 +32,6 @@ class data_video:
         frame, unscaled_frame, original_frame = self.dataset.get_frame(
             frame_num, scale_factor)
 
-        if self.follow_max_temp != 0:
-            follow_size = self.follow_max_temp * scale_factor
-            top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
-                frame, follow_size)
-
-            frame = frame.copy()
-            frame = frame[top_y:bottom_y, left_x:right_x]
-        else:
-            img = frame.copy()
-
         img = frame.copy()
 
         # Normalize the image to 8 bit color
@@ -71,6 +61,13 @@ class data_video:
                 print('y : ' + str(y))
                 print('w : ' + str(w))
                 print('h : ' + str(h))
+
+        if self.follow_max_temp != 0:
+            follow_size = self.follow_max_temp * scale_factor
+            top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+                frame, follow_size)
+
+            img = img[top_y:bottom_y, left_x:right_x]
 
         # Add meltpool data onto the image
         if self.mp_data_on_vid:
