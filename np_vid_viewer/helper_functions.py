@@ -1,5 +1,6 @@
-import np_vid_viewer
+import cv2
 import numpy as np
+import np_vid_viewer
 
 
 def min_scale_factor(data_frame):
@@ -59,6 +60,20 @@ def get_follow_meltpool_cords(frame, follow_size):
         bottom_y = max_temp_y + follow_size
 
     return top_y, bottom_y, left_x, right_x
+
+
+def add_white_border_on_img(img):
+    img_height = img.shape[0]
+
+    # Add white border on top of img
+    img = cv2.copyMakeBorder(img,
+                             int(img_height * (7 / 16)),
+                             0,
+                             0,
+                             0,
+                             cv2.BORDER_CONSTANT,
+                             value=(255, 255, 255))
+    return img
 
 
 def get_follow_contour_cords(frame, follow_size, cog_x, cog_y):
