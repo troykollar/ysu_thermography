@@ -61,6 +61,12 @@ PARSER.add_argument(
     default=False,
     required=False,
     help='0 or 1 specifying wether or not to remove bottom reflections')
+PARSER.add_argument(
+    '-cData',
+    type=int,
+    default=False,
+    required=False,
+    help='0 or 1 specifying wether or not to add contour data onto the video')
 
 ARGS = PARSER.parse_args()
 
@@ -72,12 +78,14 @@ REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
 FOLLOW_MAX = ARGS.fmax
 FOLLOW_CONTOUR = ARGS.fcontour
 CONTOUR_THRESHOLD = ARGS.cthresh
+CDATA = bool(ARGS.cData)
 
 DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
 VIEWER = np_vid_viewer.data_video(DATASET,
                                   ARGS.mp,
                                   follow_max_temp=FOLLOW_MAX,
                                   contour_threshold=CONTOUR_THRESHOLD,
-                                  follow_contour=FOLLOW_CONTOUR)
+                                  follow_contour=FOLLOW_CONTOUR,
+                                  contour_data_on_img=CDATA)
 
 VIEWER.save_video(SCALE_FACTOR, FPS)
