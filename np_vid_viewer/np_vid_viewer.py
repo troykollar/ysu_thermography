@@ -54,6 +54,10 @@ class data_video:
 
             cog_x = None
             cog_y = None
+            contour_x = None
+            contour_y = None
+            contour_w = None
+            contour_h = None
             for contour in contours:
                 contour_x, contour_y, contour_w, contour_h = cv2.boundingRect(
                     contour)
@@ -75,9 +79,11 @@ class data_video:
                 img = img[top_y:bottom_y, left_x:right_x]
 
             if self.contour_data_on_img:
-                img = self.add_contour_data_to_img(img, contour_x, contour_y,
-                                                   contour_w, contour_h, cog_x,
-                                                   cog_y)
+                img = helper_functions.add_white_border_on_img(img)
+                if contour_x is not None:
+                    img = self.add_contour_data_to_img(img, contour_x,
+                                                       contour_y, contour_w,
+                                                       contour_h, cog_x, cog_y)
 
         if self.follow_max_temp != 0 and self.follow_contour != 0:
             self.follow_max_temp = 0
@@ -248,7 +254,56 @@ class data_video:
 
     def add_contour_data_to_img(self, img, contour_x, contour_y, contour_w,
                                 contour_h, cog_x, cog_y):
-        pass
+        img_height = img.shape[0]
+        img_width = img.shape[1]
+        font = cv2.FONT_HERSHEY_DUPLEX
+        font_size = img_height / 860
+        font_color = (0, 0, 0)
+
+        column1_x = 5
+        column2_x = int(img_width * .4)
+        if contour_x is not None:
+            img = cv2.putText(
+                img,
+                'X: ' + str(contour_x),
+                (column1_x, int((1 / 32) * img_height)),
+                font,
+                font_size,
+                font_color,
+            )
+            img = cv2.putText(
+                img,
+                'Y: ' + str(contour_y),
+                (column1_x, int((3 / 32) * img_height)),
+                font,
+                font_size,
+                font_color,
+            )
+            img = cv2.putText(
+                img,
+                'Width: ' + str(contour_w),
+                (column1_x, int((5 / 32) * img_height)),
+                font,
+                font_size,
+                font_color,
+            )
+            img = cv2.putText(
+                img,
+                'Height: ' + str(contour_h),
+                (column1_x, int((7 / 32) * img_height)),
+                font,
+                font_size,
+                font_color,
+            )
+            img = cv2.putText(
+                img,
+                'Center of Gravity: (' + str(cog_x) + ',' + str(cog_y) + ')',
+                (column1_x, int((9 / 32) * img_height)),
+                font,
+                font_size,
+                font_color,
+            )
+        return img
 
     def save_hotspot_video(self, framerate=60, save_img=False):
         self.framerate = framerate
