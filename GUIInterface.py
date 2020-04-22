@@ -14,24 +14,51 @@ def submit():
                                      remove_top_reflection=False,
                                      remove_bottom_reflection=False)
 
-
     VIEWER.play_video()
 
 
-#Create GUI and frames to sort options
-optionPanel = Tk()
+# Create GUI
+root = Tk()
+root.title("YSU Thermography")
+# root.iconbitmap("images/YSU_Logo")
 
-generateImgFrame = LabelFrame(optionPanel, text="Generate image Options")
-saveFrameFrame = LabelFrame(optionPanel, text="Save Frame Options")
-playVideoFrame = LabelFrame(optionPanel, text="Play Video Options")
-saveVideoFrame = LabelFrame(optionPanel, text ="Save Video Options")
-genThresholdImgFrame = LabelFrame(optionPanel, text="Threshold Image Options")
+# Creating Frame Sections
+filePanel = Frame(root).pack(side=TOP, fill=X)
+optionsPanel = Frame(root).pack(fill=X)
+buttonPanel = Frame(root).pack(side=BOTTOM, fill=X)
 
+# Creating frame to select functions
+functionsFrame = LabelFrame(optionsPanel, text="Functions").pack(fill=X)
 
+# Creating Frames to store options for each function
+generateImgFrame = LabelFrame(optionsPanel, text="Generate image Options").pack(fill=X)
+saveFrameFrame = LabelFrame(optionsPanel, text="Save Frame Options").pack(fill=X)
+playVideoFrame = LabelFrame(optionsPanel, text="Play Video Options").pack(fill=X)
+saveVideoFrame = LabelFrame(optionsPanel, text="Save Video Options").pack(fill=X)
+genThresholdImgFrame = LabelFrame(optionsPanel, text="Threshold Image Options").pack(fill=X)
+dataSetFrame = LabelFrame(optionsPanel, text="Dataset Options").pack(fill=X)
 
-optionPanel.title("YSU Thermography")
-#optionPanel.iconbitmap("images/YSU_Logo")
+# General Function buttons
+submit_button = Button(buttonPanel, text="Submit", command=submit).pack(fill=X)
+close_button = Button(buttonPanel, text="close", command=root.quit).pack(fill=X)
 
+# Creating variables for checkboxes to change
+generateImg = BooleanVar()
+saveFrame = BooleanVar()
+playVideo = BooleanVar()
+saveVideo = BooleanVar()
+genThresholdImg = BooleanVar()
+dataSet = BooleanVar()
+
+# Placing function checkboxes in function selection frame
+generateImgCheckbox = Checkbutton(functionsFrame, variable=generateImg).pack(side=LEFT)
+saveFrameCheckbox = Checkbutton(functionsFrame, variable=saveFrame).pack(side=LEFT)
+playVideoCheckbox = Checkbutton(functionsFrame, variable=playVideo).pack(side=LEFT)
+saveVideoCheckbox = Checkbutton(functionsFrame, variable=saveVideo).pack(side=LEFT)
+genThresholdImgCheckbox = Checkbutton(functionsFrame, variable=genThresholdImg).pack(side=LEFT)
+dataSetCheckbox = Checkbutton(functionsFrame, variable=dataSet).pack(side=LEFT)
+
+'''
 temp_data_label = Label(optionPanel, text="Path to temperature data")
 temp_data_file = Entry(optionPanel)
 
@@ -50,9 +77,7 @@ remove_top_reflection = Checkbutton(optionPanel)
 play_vid_label = Label(optionPanel, text="play video")
 play_vid = Checkbutton(optionPanel)
 
-submit_button = Button(optionPanel, text="Submit", command=submit)
 
-close_button = Button(optionPanel, text="close", command=optionPanel.quit)
 
 merged_data_label.grid(row=1, column=0)
 merged_data_file.grid(row=1, column=1, columnspan=7)
@@ -71,11 +96,7 @@ remove_top_reflection.grid(row=4, column=2)
 
 play_vid_label.grid(row=5, column=0)
 play_vid.grid(row=6, column=0)
-
-submit_button.grid(row=5, column=5)
-close_button.grid(row=6, column=6)
-
-optionPanel.mainloop()
+'''
 
 
-
+root.mainloop()
