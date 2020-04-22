@@ -305,6 +305,7 @@ class data_video:
             )
         return img
 
+    """
     def save_hotspot_video(self, framerate=60, save_img=False):
         self.framerate = framerate
         height = self.temp_data[0].shape[0]
@@ -351,7 +352,7 @@ class data_video:
         if save_img:
             cv2.imwrite(build_folder + '/' + build_number + '_hotspot_img.png',
                         hotspot_img_frame)
-
+    """
     """
     def circle_max_temp(self, frame_num: int, img: np.ndarray):
         frame = self.temp_data[frame_num]
