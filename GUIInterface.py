@@ -16,6 +16,8 @@ def submit():
 
     VIEWER.play_video()
 
+# To quickly create check buttons with the labels on top
+
 
 # Create GUI
 root = Tk()
@@ -23,24 +25,43 @@ root.title("YSU Thermography")
 # root.iconbitmap("images/YSU_Logo")
 
 # Creating Frame Sections
-filePanel = Frame(root).pack(side=TOP, fill=X)
-optionsPanel = Frame(root).pack(fill=X)
-buttonPanel = Frame(root).pack(side=BOTTOM, fill=X)
-
-# Creating frame to select functions
-functionsFrame = LabelFrame(optionsPanel, text="Functions").pack(fill=X)
+filePanel = Frame(root)
+filePanel.pack(side=TOP, fill=X)
+optionsPanel = Frame(root)
+optionsPanel.pack(fill=X)
+buttonPanel = Frame(root)
+buttonPanel.pack(side=BOTTOM, fill=X)
 
 # Creating Frames to store options for each function
-generateImgFrame = LabelFrame(optionsPanel, text="Generate image Options").pack(fill=X)
-saveFrameFrame = LabelFrame(optionsPanel, text="Save Frame Options").pack(fill=X)
-playVideoFrame = LabelFrame(optionsPanel, text="Play Video Options").pack(fill=X)
-saveVideoFrame = LabelFrame(optionsPanel, text="Save Video Options").pack(fill=X)
-genThresholdImgFrame = LabelFrame(optionsPanel, text="Threshold Image Options").pack(fill=X)
-dataSetFrame = LabelFrame(optionsPanel, text="Dataset Options").pack(fill=X)
 
-# General Function buttons
-submit_button = Button(buttonPanel, text="Submit", command=submit).pack(fill=X)
-close_button = Button(buttonPanel, text="close", command=root.quit).pack(fill=X)
+
+saveVideoFrame = LabelFrame(optionsPanel, text="Save Video Options")
+saveVideoFrame.pack(fill=X)
+
+genThresholdImgFrame = LabelFrame(optionsPanel, text="Threshold Image Options")
+genThresholdImgFrame.pack(fill=X)
+
+dataSetFrame = LabelFrame(optionsPanel, text="Dataset Options")
+dataSetFrame.pack(fill=X)
+
+
+'''FILE FRAME'''
+tempDataLabel = Label(filePanel, text="File Path to Temperature Data:")
+tempDataLabel.grid(row=0, column=0)
+tempDataEntry = Entry(filePanel)
+tempDataEntry.grid(row=0, column=1)
+
+mergedDataLabel = Label(filePanel, text="File Path to Merged Data:")
+mergedDataLabel.grid(row=1, column=0)
+mergedDataEntry = Entry(filePanel)
+mergedDataEntry.grid(row=1, column=1)
+'''END OF FILE FRAME'''
+
+
+'''FUNCTION FRAMES'''
+# Creating frame to select functions
+functionsFrame = LabelFrame(optionsPanel, text="Functions")
+functionsFrame.pack(fill=X)
 
 # Creating variables for checkboxes to change
 generateImg = BooleanVar()
@@ -51,12 +72,106 @@ genThresholdImg = BooleanVar()
 dataSet = BooleanVar()
 
 # Placing function checkboxes in function selection frame
-generateImgCheckbox = Checkbutton(functionsFrame, variable=generateImg).pack(side=LEFT)
-saveFrameCheckbox = Checkbutton(functionsFrame, variable=saveFrame).pack(side=LEFT)
-playVideoCheckbox = Checkbutton(functionsFrame, variable=playVideo).pack(side=LEFT)
-saveVideoCheckbox = Checkbutton(functionsFrame, variable=saveVideo).pack(side=LEFT)
-genThresholdImgCheckbox = Checkbutton(functionsFrame, variable=genThresholdImg).pack(side=LEFT)
-dataSetCheckbox = Checkbutton(functionsFrame, variable=dataSet).pack(side=LEFT)
+generateImgLabel = LabelFrame(functionsFrame, text="Generate Image")
+generateImgLabel.pack(side=LEFT, expand=1)
+generateImgCheckbox = Checkbutton(generateImgLabel, variable=generateImg)
+generateImgCheckbox.pack()
+
+
+saveFrameLabel = LabelFrame(functionsFrame, text="Save Frame")
+saveFrameLabel.pack(side=LEFT, expand=1)
+saveFrameCheckbox = Checkbutton(saveFrameLabel, variable=saveFrame)
+saveFrameCheckbox.pack()
+
+
+playVideoLabel = LabelFrame(functionsFrame, text="Play Video")
+playVideoLabel.pack(side=LEFT, expand=1)
+playVideoCheckbox = Checkbutton(playVideoLabel, variable=playVideo)
+playVideoCheckbox.pack()
+
+
+saveVideoLabel = LabelFrame(functionsFrame, text="Save Video")
+saveVideoLabel.pack(side=LEFT, expand=1)
+saveVideoCheckbox = Checkbutton(saveVideoLabel, variable=saveVideo)
+saveVideoCheckbox.pack()
+
+
+genThresholdImgLabel = LabelFrame(functionsFrame, text="Gen Threshold Img")
+genThresholdImgLabel.pack(side=LEFT, expand=1)
+genThresholdImgCheckbox = Checkbutton(genThresholdImgLabel, variable=genThresholdImg)
+genThresholdImgCheckbox.pack()
+
+
+dataSetLabel = LabelFrame(functionsFrame, text="Dataset")
+dataSetLabel.pack(side=LEFT, expand=1)
+dataSetCheckbox = Checkbutton(dataSetLabel, variable=dataSet)
+dataSetCheckbox.pack()
+'''END OF FUNCTION FRAME'''
+
+
+'''GENERATE IMAGE FRAME'''
+generateImgFrame = LabelFrame(optionsPanel, text="Generate image Options")
+generateImgFrame.pack(fill=X)
+
+frameNumberFrame = LabelFrame(generateImgFrame, text="Frame Number")
+frameNumberFrame.pack(side=LEFT, expand=1)
+frameNumberInput = Entry(frameNumberFrame)
+frameNumberInput.pack()
+
+scaleFactorFrame = LabelFrame(generateImgFrame, text="Scale Factor")
+scaleFactorFrame.pack(side=LEFT, expand=1)
+scaleFactorInput = Entry(scaleFactorFrame)
+scaleFactorInput.pack()
+'''END OF GENERATE IMAGE FRAME'''
+
+
+'''SAVE IMAGE FRAME'''
+saveFrameFrame = LabelFrame(optionsPanel, text="Save Frame Options")
+saveFrameFrame.pack(fill=X)
+
+startFrameFrame = LabelFrame(saveFrameFrame, text="Start Frame")
+startFrameFrame.pack(side=LEFT, expand=1)
+startFrameInput = Entry(startFrameFrame)
+startFrameInput.pack()
+
+endFrameFrame = LabelFrame(saveFrameFrame, text="End Frame")
+endFrameFrame.pack(side=LEFT, expand=1)
+endFrameInput = Entry(endFrameFrame)
+endFrameInput.pack()
+
+scaleFactorFrame = LabelFrame(saveFrameFrame, text="Scale Factor")
+scaleFactorFrame.pack(side=LEFT, expand=1)
+scaleFactorInput = Entry(scaleFactorFrame)
+scaleFactorInput.pack()
+'''END OF SAVE IMAGE FRAME'''
+
+
+'''PLAY VIDEO FRAME'''
+playVideoFrame = LabelFrame(optionsPanel, text="Play Video Options")
+playVideoFrame.pack(fill=X)
+
+scaleFactorFrame = LabelFrame(playVideoFrame, text="Scale Factor")
+scaleFactorFrame.pack(side=LEFT, expand=1)
+scaleFactorInput = Entry(scaleFactorFrame)
+scaleFactorInput.pack()
+
+frameDelayFrame = LabelFrame(playVideoFrame, text="Scale Factor")
+frameDelayFrame.pack(side=LEFT, expand=1)
+frameDelayInput = Entry(frameDelayFrame)
+frameDelayInput.pack()
+'''END OF PLAY VIDEO FRAME'''
+
+
+'''BUTTON FRAME'''
+closeButton = Button(buttonPanel, text="Close", command=root.quit)
+closeButton.pack(side=LEFT)
+
+submitButton = Button(buttonPanel, text="Submit", command=submit)
+submitButton.pack(side=RIGHT)
+'''END OF BUTTON FRAME'''
+
+
+
 
 '''
 temp_data_label = Label(optionPanel, text="Path to temperature data")
