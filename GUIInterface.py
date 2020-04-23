@@ -18,30 +18,30 @@ def submit():
             int(genthreshold_thresholdInput.get()))
 
     if playVideo.get():
-        VIEWER = NpVidTool(tempDataEntry.get(),
-                           int(play_top_ref.get()),
-                           int(play_bot_ref.get()),
-                           int(play_disp_mp.get()),
-                           int(play_fmaxInput.get()),
+        VIEWER = NpVidTool(data_directory=tempDataEntry.get(),
+                           r_top_refl=int(play_top_ref.get()),
+                           r_bot_refl=int(play_bot_ref.get()),
+                           mp_data_on_vid=int(play_disp_mp.get()),
+                           follow_max_temp=int(play_fmaxInput.get()),
                            contour_threshold=int(play_cthreshInput.get()),
                            follow_contour=int(play_fcontourInput.get()),
                            contour_data_on_img=int(False))
 
-        VIEWER.play_video(int(play_scaleFactorInput.get()),
-                          int(play_frameDelayInput.get()))
+        VIEWER.play_video(scale_factor=int(play_scaleFactorInput.get()),
+                          frame_delay=int(play_frameDelayInput.get()))
 
     if saveVideo.get():
-        VIEWER = NpVidTool(tempDataEntry.get(),
-                           int(save_top_ref.get()),
-                           int(save_bot_ref.get()),
-                           int(save_disp_mp.get()),
+        VIEWER = NpVidTool(data_directory=tempDataEntry.get(),
+                           r_top_refl=int(save_top_ref.get()),
+                           r_bot_refl=int(save_bot_ref.get()),
+                           mp_data_on_vid=int(save_disp_mp.get()),
                            follow_max_temp=int(save_fmaxInput.get()),
                            contour_threshold=int(save_cthreshInput.get()),
                            follow_contour=int(save_fcontourInput.get()))
 
         #TODO: Add start and end frame options
-        VIEWER.save_video(int(save_scaleFactorInput.get()),
-                          int(save_fpsInput.get()))
+        VIEWER.save_video(scale_factor=int(save_scaleFactorInput.get()),
+                          framerate=int(save_fpsInput.get()))
 
     if saveFrame.get():
         VIEWER = np_vid_viewer.NpVidTool(data_directory=tempDataEntry.get())
