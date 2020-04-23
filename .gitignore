@@ -1,3 +1,4 @@
 #Ignore pycache
 *__pycache__
 np_vid_viewer/*__pycache__
+.vscode
