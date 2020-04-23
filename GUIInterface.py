@@ -8,12 +8,13 @@ from tkinter import *
 from tkinter import filedialog
 import np_vid_viewer.dataset as dset
 from np_vid_viewer import NpVidTool
+from np_vid_viewer.composite import generate_threshold_image
 
 
 def submit():
 
     if genThresholdImg.get():
-        composite.generate_threshold_image(
+        generate_threshold_image(
             tempDataEntry.get() + "/thermal_cam_temps.npy",
             int(genthreshold_thresholdInput.get()))
 
