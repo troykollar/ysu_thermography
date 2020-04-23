@@ -32,10 +32,21 @@ def plotHistogram(temp_file, pixel, threshold=200, binCount=5, spacing=1):
                 pixel_grad_dir.append((180 / math.pi) * math.atan(gradienty[pixel] / gradientx[pixel]))
 
     n, bins, patches = plt.hist(pixel_grad_dir, binCount, facecolor='blue', alpha=.5)
-    plt.xlabel('Gradient Magnitude')
+    plt.xlabel('Gradient Angle')
     plt.ylabel('Frequency')
     plt.show()
 
+
+def plotLine(temp_file, pixel, startFrame: int, endFrame: int):
+    temp_data = np.load(temp_file, allow_pickle=True)
+    if endFrame is -1:
+        endFrame = temp_data.shape[0]
+
+    frame = np.arange(int(startFrame), int(endFrame))
+    pixelTempHistory = temp_data[frame, int(pixel[0]), int(pixel[1])]
+
+    plt.plot(frame, pixelTempHistory)
+    plt.show()
 
 
 
