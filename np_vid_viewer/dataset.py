@@ -4,7 +4,7 @@ import np_vid_viewer
 import np_vid_viewer.helper_functions as helpers
 
 
-class dataset:
+class DataSet:
     def __init__(self,
                  data_directory: str,
                  remove_top_reflection=False,

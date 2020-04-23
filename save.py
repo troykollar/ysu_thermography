@@ -1,6 +1,5 @@
 import argparse
-import np_vid_viewer
-import np_vid_viewer.dataset as dset
+from np_vid_viewer import NpVidTool
 
 parser = argparse.ArgumentParser(description='Analyze temperature data.')
 parser.add_argument('data_directory',
@@ -61,6 +60,25 @@ PARSER.add_argument(
     default=False,
     required=False,
     help='0 or 1 specifying wether or not to remove bottom reflections')
+<<<<<<< HEAD
+=======
+PARSER.add_argument(
+    '-cData',
+    type=int,
+    default=False,
+    required=False,
+    help='0 or 1 specifying wether or not to remove bottom reflections')
+PARSER.add_argument('-start',
+                    type=int,
+                    default=0,
+                    required=False,
+                    help='First frame of the video if saving a partial video')
+PARSER.add_argument('-end',
+                    type=int,
+                    default=0,
+                    required=False,
+                    help='Final frame of the video if saving a partial video')
+>>>>>>> rjBranch
 
 ARGS = PARSER.parse_args()
 
@@ -72,6 +90,7 @@ REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
 FOLLOW_MAX = ARGS.fmax
 FOLLOW_CONTOUR = ARGS.fcontour
 CONTOUR_THRESHOLD = ARGS.cthresh
+<<<<<<< HEAD
 
 DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
 VIEWER = np_vid_viewer.data_video(DATASET,
@@ -81,3 +100,14 @@ VIEWER = np_vid_viewer.data_video(DATASET,
                                   follow_contour=FOLLOW_CONTOUR)
 
 VIEWER.save_video(SCALE_FACTOR, FPS)
+=======
+CDATA = bool(ARGS.cData)
+START_FRAME = ARGS.start
+END_FRAME = ARGS.end
+
+VIEWER = NpVidTool(DATA_DIRECTORY, REMOVE_TOP_REFLECTION,
+                   REMOVE_BOTTOM_REFLECTION, ARGS.mp, FOLLOW_MAX,
+                   CONTOUR_THRESHOLD, FOLLOW_CONTOUR, CDATA)
+
+VIEWER.save_video(SCALE_FACTOR, FPS, START_FRAME, END_FRAME)
+>>>>>>> rjBranch
