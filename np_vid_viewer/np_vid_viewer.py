@@ -5,9 +5,9 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from progress_bar import printProgressBar
-from helper_functions import *
-from dataset import DataSet
+from np_vid_viewer.progress_bar import printProgressBar
+from np_vid_viewer.helper_functions import *
+from np_vid_viewer.dataset import DataSet
 
 
 def format_time(t):
