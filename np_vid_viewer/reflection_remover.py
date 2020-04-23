@@ -56,7 +56,6 @@ def remove_bottom(frame, min_value=174):
 
 def find_lower_bounds(temp_data):
     """Find the lower bounds of the piece.
-
         Returns
         -------
         max_locations

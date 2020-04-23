@@ -1,3 +1,4 @@
+
 """Functions to generate composite images and videos for thermal data analysis"""
 import cv2
 import numpy as np
@@ -7,17 +8,14 @@ import np_vid_viewer.progress_bar as progress_bar
 
 def generate_threshold_image(temp_filename: str, threshold=800):
     """Saves a 16 bit threshold image
-
     Each pixel of the resulting image is incremented every time the temperature at that pixel is
     above the temperature threshold.
-
     Parameters
     ----------
     temp_filename : str
         Filename including location of the thermal_cam_temps.npy file.
     threshold : int
         Temperature threshold which determines if a pixel will be incremented.
-
     """
     # Get temp data info
     temp_data = np.load(temp_filename, mmap_mode="r", allow_pickle=True)

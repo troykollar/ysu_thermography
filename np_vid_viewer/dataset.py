@@ -4,7 +4,7 @@ import np_vid_viewer
 import np_vid_viewer.helper_functions as helpers
 
 
-class dataset:
+class DataSet:
     def __init__(self,
                  data_directory: str,
                  remove_top_reflection=False,
@@ -34,7 +34,6 @@ class dataset:
 
     def get_frame(self, frame_num: int, scale_factor=1):
         """Remove reflections if neccesary and scale temperature frame data, then return frame.
-
         Returns
         -------
         frame : np.ndarray
@@ -63,7 +62,6 @@ class dataset:
 
     def get_meltpool_data(self, frame_num: int):
         """Return the data related to the meltpool for the given frame.
-
         Returns
         -------
         timestamp
@@ -87,7 +85,6 @@ class dataset:
 
     def get_max_temp_data(self, frame_num: int):
         """Return data related to the max temperature of the given frame
-
         Returns
         -------
         max_temp

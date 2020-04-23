@@ -1,44 +1,55 @@
-# import   np_vid_viewer
-
-# temp_data_file = "/media/troy/TroyUSB/thermography/4-8_part_merged_data/4-8_part_merged_data/thermal_cam_temps.npy"
-# merged_data_file = "/media/troy/TroyUSB/thermography/4-8_part_merged_data/4-8_part_merged_data/merged_data.npy"
-
 import np_vid_viewer
 from tkinter import *
 from tkinter import filedialog
 import np_vid_viewer.dataset as dset
-import np_vid_viewer.composite as composite
+from np_vid_viewer import NpVidTool
+from np_vid_viewer.composite import generate_threshold_image
+import gradient_histogram
+
 
 
 def submit():
 
     if genThresholdImg.get():
-        composite.generate_threshold_image(tempDataEntry.get() + "/thermal_cam_temps.npy", int(genthreshold_thresholdInput.get()))
+        generate_threshold_image(tempDataEntry.get() + "/thermal_cam_temps.npy", int(genthreshold_thresholdInput.get()))
 
     if playVideo.get():
-        DATASET = dset(tempDataEntry.get(), int(play_top_ref.get()), int(play_bot_ref.get()))
-        VIEWER = np_vid_viewer.data_video(DATASET,
-                                          int(play_disp_mp.get()),
-                                          follow_max_temp=int(play_fmaxInput.get()),
-                                          contour_threshold=int(play_cthreshInput.get()),
-                                          follow_contour=int(play_fcontourInput.get()),
-                                          contour_data_on_img=int(False))
+        VIEWER = NpVidTool(data_directory=tempDataEntry.get(),
+                           r_top_refl=int(play_top_ref.get()),
+                           r_bot_refl=int(play_bot_ref.get()),
+                           mp_data_on_vid=int(play_disp_mp.get()),
+                           follow_max_temp=int(play_fmaxInput.get()),
+                           contour_threshold=int(play_cthreshInput.get()),
+                           follow_contour=int(play_fcontourInput.get()),
+                           contour_data_on_img=int(False))
 
-        VIEWER.play_video(int(play_scaleFactorInput.get()), int(play_frameDelayInput.get()))
+        VIEWER.play_video(scale_factor=int(play_scaleFactorInput.get()),
+                          frame_delay=int(play_frameDelayInput.get()))
 
     if saveVideo.get():
-        DATASET = dset(tempDataEntry.get(), int(save_top_ref.get()), int(save_bot_ref.get()))
-        VIEWER = np_vid_viewer.data_video(DATASET,
-                                          int(save_disp_mp.get()),
-                                          follow_max_temp=int(save_fmaxInput.get()),
-                                          contour_threshold=int(save_cthreshInput.get()),
-                                          follow_contour=int(save_fcontourInput.get()))
+        VIEWER = NpVidTool(data_directory=tempDataEntry.get(),
+                           r_top_refl=int(save_top_ref.get()),
+                           r_bot_refl=int(save_bot_ref.get()),
+                           mp_data_on_vid=int(save_disp_mp.get()),
+                           follow_max_temp=int(save_fmaxInput.get()),
+                           contour_threshold=int(save_cthreshInput.get()),
+                           follow_contour=int(save_fcontourInput.get()))
 
-        VIEWER.play_video(int(save_scaleFactorInput.get()), int(save_fpsInput.get()))
+        # TODO: Add start and end frame options
+        VIEWER.save_video(scale_factor=int(save_scaleFactorInput.get()),
+                          framerate=int(save_fpsInput.get()))
 
     if saveFrame.get():
-        VIEWER = np_vid_viewer.NpVidTool(data_directory=tempDataEntry.get())
+        VIEWER = NpVidTool(data_directory=tempDataEntry.get())
         VIEWER.save_frame16(int(frameInput.get()), destDataEntry.get())
+
+    if gradientHistogram.get():
+        gradient_histogram.plotHistogram(temp_file=tempDataEntry.get() + "/thermal_cam_temps.npy",
+                                         pixel=(int(pixelXLocationInput.get()), int(pixelYLocationInput.get())),
+                                         threshold=int(histthreshInput.get()),
+                                         binCount=int(histBinInput.get()),
+                                         spacing=int(histGradSpacingInput.get()))
+
 
 
 
@@ -88,6 +99,8 @@ playVideo = BooleanVar()
 saveVideo = BooleanVar()
 genThresholdImg = BooleanVar()
 dataSet = BooleanVar()
+gradientHistogram = BooleanVar()
+#scatterPlot = BooleanVar()
 
 # Placing function checkboxes in function selection frame
 genThresholdImgLabel = LabelFrame(functionsFrame, text="Gen Threshold Img")
@@ -95,12 +108,12 @@ genThresholdImgLabel.pack(side=LEFT, expand=1)
 genThresholdImgCheckbox = Checkbutton(genThresholdImgLabel, variable=genThresholdImg)
 genThresholdImgCheckbox.pack()
 
-'''
+
 saveFrameLabel = LabelFrame(functionsFrame, text="Save Frame")
 saveFrameLabel.pack(side=LEFT, expand=1)
 saveFrameCheckbox = Checkbutton(saveFrameLabel, variable=saveFrame)
 saveFrameCheckbox.pack()
-'''
+
 
 playVideoLabel = LabelFrame(functionsFrame, text="Play Video")
 playVideoLabel.pack(side=LEFT, expand=1)
@@ -119,6 +132,18 @@ dataSetLabel.pack(side=LEFT, expand=1)
 dataSetCheckbox = Checkbutton(dataSetLabel, variable=dataSet)
 dataSetCheckbox.pack()
 '''
+
+gradientHistogramLabel = LabelFrame(functionsFrame, text="Gradient Histogram")
+gradientHistogramLabel.pack(side=LEFT, expand=1)
+gradientHistogramCheckbox = Checkbutton(gradientHistogramLabel, variable=gradientHistogram)
+gradientHistogramCheckbox.pack()
+
+'''
+scatterPlotLabel = LabelFrame(functionsFrame, text="Scatter Plot")
+scatterPlotLabel.pack(side=LEFT, expand=1)
+scatterPlotCheckbox = Checkbutton(scatterPlotLabel, variable=scatterPlot)
+scatterPlotCheckbox.pack()
+'''
 '''END OF FUNCTION FRAME'''
 
 
@@ -133,7 +158,7 @@ genthreshold_thresholdInput.pack()
 '''END OF GENERATE THRESHOLD IMAGE FRAME'''
 
 
-"""
+
 '''SAVE IMAGE FRAME'''
 saveFrameFrame = LabelFrame(optionsPanel, text="Save Frame Options")
 saveFrameFrame.pack(fill=X)
@@ -143,15 +168,14 @@ frameFrame.pack(side=LEFT, expand=1)
 frameInput = Entry(frameFrame)
 frameInput.pack()
 
-destDataLabel = Label(saveFrameFrame, text="DestinationPath: ")
+destDataLabel = Label(saveFrameFrame, text="Image Number: ")
 destDataLabel.pack(side=LEFT)
-destDataEntry = Entry(saveFrameFrame, width=100)
+destDataEntry = Entry(saveFrameFrame, width=3)
+destDataEntry.insert(END, 1)
 destDataEntry.pack(side=LEFT, fill=X)
 
-destDataBrowse = Button(saveFrameFrame, text="Browse", command=lambda: browseFiles(frameInput))
-destDataBrowse.pack(side=LEFT)
 '''END OF SAVE IMAGE FRAME'''
-"""
+
 
 '''PLAY VIDEO FRAME'''
 play_disp_mp = BooleanVar()
@@ -272,10 +296,39 @@ save_botrefInput.pack()
 '''DATASET FRAME'''
 functionsFrame = LabelFrame(optionsPanel, text="Functions")
 functionsFrame.pack(fill=X)
-
-
 '''END OF DATASET FRAME'''
 
+'''HISTOGRAM FRAME'''
+histogramOptionsFrame = LabelFrame(optionsPanel, text="Histogram options")
+histogramOptionsFrame.pack(fill=X)
+
+pixelLocationFrame = LabelFrame(histogramOptionsFrame, text="Pixel Location")
+pixelLocationFrame.pack(side=LEFT, expand=1)
+pixelXLocationInput = Entry(pixelLocationFrame, width=3)
+pixelXLocationInput.pack(side=LEFT)
+comma = Label(pixelLocationFrame, text=",")
+comma.pack(side=LEFT)
+pixelYLocationInput = Entry(pixelLocationFrame, width=3)
+pixelYLocationInput.pack(side=LEFT)
+
+histthreshFrame = LabelFrame(histogramOptionsFrame, text="Temperature Threshold")
+histthreshFrame.pack(side=LEFT, expand=1)
+histthreshInput = Entry(histthreshFrame, width=3)
+histthreshInput.insert(END, 200)
+histthreshInput.pack()
+
+histBinFrame = LabelFrame(histogramOptionsFrame, text="Bin Count")
+histBinFrame.pack(side=LEFT, expand=1)
+histBinInput = Entry(histBinFrame, width=2)
+histBinInput.insert(END, 5)
+histBinInput.pack()
+
+histGradSpacingFrame = LabelFrame(histogramOptionsFrame, text="Gradient Spacing")
+histGradSpacingFrame.pack(side=LEFT, expand=1)
+histGradSpacingInput = Entry(histGradSpacingFrame, width=2)
+histGradSpacingInput.insert(END, 1)
+histGradSpacingInput.pack()
+'''END OF HISTOGRAM FRAME'''
 
 '''BUTTON FRAME'''
 closeButton = Button(buttonPanel, text="Close", command=root.quit)
