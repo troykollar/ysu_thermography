@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import np_vid_viewer.progress_bar as progress_bar
 
 
-def generate_threshold_image(temp_filename: str, threshold=800):
+def generate_threshold_image(temp_filename: str,
+                             threshold=800,
+                             start=0,
+                             end=0):
     """Saves a 16 bit threshold image
 
     Each pixel of the resulting image is incremented every time the temperature at that pixel is
@@ -30,11 +33,14 @@ def generate_threshold_image(temp_filename: str, threshold=800):
     height = temp_data[0].shape[0]
     width = temp_data[0].shape[1]
 
+    if end == 0:
+        end = num_frames - 1
+
     # Make blank image to increment
     threshold_img = np.zeros((height, width), dtype=np.float32)
 
     # Check each pixel, if pixel is over threshold, increment that pixel in theshold_img
-    for i, frame in enumerate(temp_data):
+    for i, frame in enumerate(temp_data[start:end]):
         # Show progress
         progress_bar.printProgressBar(i,
                                       num_frames,
