@@ -7,46 +7,52 @@ import np_vid_viewer
 from tkinter import *
 from tkinter import filedialog
 import np_vid_viewer.dataset as dset
-import np_vid_viewer.composite as composite
+from np_vid_viewer import NpVidTool
 
 
 def submit():
 
     if genThresholdImg.get():
-        composite.generate_threshold_image(tempDataEntry.get() + "/thermal_cam_temps.npy", int(genthreshold_thresholdInput.get()))
+        composite.generate_threshold_image(
+            tempDataEntry.get() + "/thermal_cam_temps.npy",
+            int(genthreshold_thresholdInput.get()))
 
     if playVideo.get():
-        DATASET = dset(tempDataEntry.get(), int(play_top_ref.get()), int(play_bot_ref.get()))
-        VIEWER = np_vid_viewer.data_video(DATASET,
-                                          int(play_disp_mp.get()),
-                                          follow_max_temp=int(play_fmaxInput.get()),
-                                          contour_threshold=int(play_cthreshInput.get()),
-                                          follow_contour=int(play_fcontourInput.get()),
-                                          contour_data_on_img=int(False))
+        VIEWER = NpVidTool(tempDataEntry.get(),
+                           int(play_top_ref.get()),
+                           int(play_bot_ref.get()),
+                           int(play_disp_mp.get()),
+                           int(play_fmaxInput.get()),
+                           contour_threshold=int(play_cthreshInput.get()),
+                           follow_contour=int(play_fcontourInput.get()),
+                           contour_data_on_img=int(False))
 
-        VIEWER.play_video(int(play_scaleFactorInput.get()), int(play_frameDelayInput.get()))
+        VIEWER.play_video(int(play_scaleFactorInput.get()),
+                          int(play_frameDelayInput.get()))
 
     if saveVideo.get():
-        DATASET = dset(tempDataEntry.get(), int(save_top_ref.get()), int(save_bot_ref.get()))
-        VIEWER = np_vid_viewer.data_video(DATASET,
-                                          int(save_disp_mp.get()),
-                                          follow_max_temp=int(save_fmaxInput.get()),
-                                          contour_threshold=int(save_cthreshInput.get()),
-                                          follow_contour=int(save_fcontourInput.get()))
+        VIEWER = NpVidTool(tempDataEntry.get(),
+                           int(save_top_ref.get()),
+                           int(save_bot_ref.get()),
+                           int(save_disp_mp.get()),
+                           follow_max_temp=int(save_fmaxInput.get()),
+                           contour_threshold=int(save_cthreshInput.get()),
+                           follow_contour=int(save_fcontourInput.get()))
 
-        VIEWER.play_video(int(save_scaleFactorInput.get()), int(save_fpsInput.get()))
+        #TODO: Add start and end frame options
+        VIEWER.save_video(int(save_scaleFactorInput.get()),
+                          int(save_fpsInput.get()))
 
     if saveFrame.get():
         VIEWER = np_vid_viewer.NpVidTool(data_directory=tempDataEntry.get())
         VIEWER.save_frame16(int(frameInput.get()), destDataEntry.get())
 
 
-
-
 def browseFiles(entry):
     entry.delete(0, END)
     root.filepath = filedialog.askdirectory(initialdir="~Documents")
     entry.insert(0, root.filepath)
+
 
 # Create GUI
 root = Tk()
@@ -64,19 +70,17 @@ buttonPanel.pack(side=BOTTOM, fill=X)
 # Creating Frames to store options for each function
 dataSetFrame = LabelFrame(optionsPanel, text="Dataset Options")
 dataSetFrame.pack(fill=X)
-
-
 '''FILE FRAME'''
 tempDataLabel = Label(filePanel, text="File Path Build Data Folder: ")
 tempDataLabel.pack(side=LEFT)
 tempDataEntry = Entry(filePanel, width=100)
 tempDataEntry.pack(side=LEFT, fill=X)
 
-tempDataBrowse = Button(filePanel, text="Browse", command=lambda: browseFiles(tempDataEntry))
+tempDataBrowse = Button(filePanel,
+                        text="Browse",
+                        command=lambda: browseFiles(tempDataEntry))
 tempDataBrowse.pack(side=LEFT)
 '''END OF FILE FRAME'''
-
-
 '''FUNCTION FRAMES'''
 functionsFrame = LabelFrame(optionsPanel, text="Functions")
 functionsFrame.pack(fill=X)
@@ -92,9 +96,9 @@ dataSet = BooleanVar()
 # Placing function checkboxes in function selection frame
 genThresholdImgLabel = LabelFrame(functionsFrame, text="Gen Threshold Img")
 genThresholdImgLabel.pack(side=LEFT, expand=1)
-genThresholdImgCheckbox = Checkbutton(genThresholdImgLabel, variable=genThresholdImg)
+genThresholdImgCheckbox = Checkbutton(genThresholdImgLabel,
+                                      variable=genThresholdImg)
 genThresholdImgCheckbox.pack()
-
 '''
 saveFrameLabel = LabelFrame(functionsFrame, text="Save Frame")
 saveFrameLabel.pack(side=LEFT, expand=1)
@@ -107,12 +111,10 @@ playVideoLabel.pack(side=LEFT, expand=1)
 playVideoCheckbox = Checkbutton(playVideoLabel, variable=playVideo)
 playVideoCheckbox.pack()
 
-
 saveVideoLabel = LabelFrame(functionsFrame, text="Save Video")
 saveVideoLabel.pack(side=LEFT, expand=1)
 saveVideoCheckbox = Checkbutton(saveVideoLabel, variable=saveVideo)
 saveVideoCheckbox.pack()
-
 '''
 dataSetLabel = LabelFrame(functionsFrame, text="Dataset")
 dataSetLabel.pack(side=LEFT, expand=1)
@@ -120,8 +122,6 @@ dataSetCheckbox = Checkbutton(dataSetLabel, variable=dataSet)
 dataSetCheckbox.pack()
 '''
 '''END OF FUNCTION FRAME'''
-
-
 '''GENERATE THRESHOLD IMAGE FRAME'''
 genThresholdImgFrame = LabelFrame(optionsPanel, text="Threshold Image Options")
 genThresholdImgFrame.pack(fill=X)
@@ -131,8 +131,6 @@ thresholdFrame.pack(side=LEFT, expand=1)
 genthreshold_thresholdInput = Entry(thresholdFrame, width=3)
 genthreshold_thresholdInput.pack()
 '''END OF GENERATE THRESHOLD IMAGE FRAME'''
-
-
 """
 '''SAVE IMAGE FRAME'''
 saveFrameFrame = LabelFrame(optionsPanel, text="Save Frame Options")
@@ -152,7 +150,6 @@ destDataBrowse = Button(saveFrameFrame, text="Browse", command=lambda: browseFil
 destDataBrowse.pack(side=LEFT)
 '''END OF SAVE IMAGE FRAME'''
 """
-
 '''PLAY VIDEO FRAME'''
 play_disp_mp = BooleanVar()
 play_top_ref = BooleanVar()
@@ -206,8 +203,6 @@ botrefFrame.pack(side=LEFT, expand=1)
 play_botrefInput = Checkbutton(botrefFrame, variable=play_bot_ref)
 play_botrefInput.pack()
 '''END OF PLAY VIDEO FRAME'''
-
-
 '''SAVE VIDEO FRAME'''
 save_disp_mp = BooleanVar()
 save_top_ref = BooleanVar()
@@ -267,16 +262,10 @@ botrefFrame.pack(side=LEFT, expand=1)
 save_botrefInput = Checkbutton(botrefFrame, variable=save_bot_ref)
 save_botrefInput.pack()
 '''END OF SAVE VIDEO FRAME'''
-
-
 '''DATASET FRAME'''
 functionsFrame = LabelFrame(optionsPanel, text="Functions")
 functionsFrame.pack(fill=X)
-
-
 '''END OF DATASET FRAME'''
-
-
 '''BUTTON FRAME'''
 closeButton = Button(buttonPanel, text="Close", command=root.quit)
 closeButton.pack(side=LEFT)
@@ -284,10 +273,6 @@ closeButton.pack(side=LEFT)
 submitButton = Button(buttonPanel, text="Submit", command=submit)
 submitButton.pack(side=RIGHT)
 '''END OF BUTTON FRAME'''
-
-
-
-
 '''
 temp_data_label = Label(optionPanel, text="Path to temperature data")
 temp_data_file = Entry(optionPanel)
@@ -327,6 +312,5 @@ remove_top_reflection.grid(row=4, column=2)
 play_vid_label.grid(row=5, column=0)
 play_vid.grid(row=6, column=0)
 '''
-
 
 root.mainloop()
