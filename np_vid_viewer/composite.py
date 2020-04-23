@@ -52,5 +52,13 @@ def generate_threshold_image(temp_filename: str,
     # Generate a filename based on build_number and threshold used
     filename = build_folder + '/' + build_number + '_threshold' + str(
         threshold) + '.png'
-    plt.imsave(filename, threshold_img, cmap='inferno')
+    fig, ax = plt.subplots()
+    fig.suptitle('Build: ' + str(build_number) + ' Threshold: ' +
+                 str(threshold))
+    im = ax.imshow(threshold_img, cmap='inferno')
+    cbar = ax.figure.colorbar(im,
+                              ax=ax,
+                              label='Number of frames above ' + str(threshold))
+
+    plt.savefig(filename)
     print('Threshold img saved as: ' + filename)
