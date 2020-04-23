@@ -60,8 +60,6 @@ PARSER.add_argument(
     default=False,
     required=False,
     help='0 or 1 specifying wether or not to remove bottom reflections')
-<<<<<<< HEAD
-=======
 PARSER.add_argument(
     '-cData',
     type=int,
@@ -78,7 +76,6 @@ PARSER.add_argument('-end',
                     default=0,
                     required=False,
                     help='Final frame of the video if saving a partial video')
->>>>>>> rjBranch
 
 ARGS = PARSER.parse_args()
 
@@ -90,17 +87,6 @@ REMOVE_BOTTOM_REFLECTION = bool(ARGS.bot)
 FOLLOW_MAX = ARGS.fmax
 FOLLOW_CONTOUR = ARGS.fcontour
 CONTOUR_THRESHOLD = ARGS.cthresh
-<<<<<<< HEAD
-
-DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
-VIEWER = np_vid_viewer.data_video(DATASET,
-                                  ARGS.mp,
-                                  follow_max_temp=FOLLOW_MAX,
-                                  contour_threshold=CONTOUR_THRESHOLD,
-                                  follow_contour=FOLLOW_CONTOUR)
-
-VIEWER.save_video(SCALE_FACTOR, FPS)
-=======
 CDATA = bool(ARGS.cData)
 START_FRAME = ARGS.start
 END_FRAME = ARGS.end
@@ -110,4 +96,3 @@ VIEWER = NpVidTool(DATA_DIRECTORY, REMOVE_TOP_REFLECTION,
                    CONTOUR_THRESHOLD, FOLLOW_CONTOUR, CDATA)
 
 VIEWER.save_video(SCALE_FACTOR, FPS, START_FRAME, END_FRAME)
->>>>>>> rjBranch

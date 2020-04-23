@@ -1,11 +1,6 @@
 """Uses NpVidTool to generate and play a video with cv2.imshow()"""
 import argparse
-<<<<<<< HEAD
-import np_vid_viewer
-import np_vid_viewer.dataset as dset
-=======
 from np_vid_viewer import NpVidTool
->>>>>>> rjBranch
 
 
 def get_extension(filename: str):
@@ -108,25 +103,11 @@ FOLLOW_CONTOUR = ARGS.fcontour
 CONTOUR_THRESHOLD = ARGS.cthresh
 CDATA = bool(ARGS.cData)
 
-<<<<<<< HEAD
-DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
-
-if ARGUMENT_ERROR:
-    pass
-else:
-    VIEWER = np_vid_viewer.data_video(DATASET,
-                                      ARGS.mp,
-                                      follow_max_temp=FOLLOW_MAX,
-                                      contour_threshold=CONTOUR_THRESHOLD,
-                                      follow_contour=FOLLOW_CONTOUR,
-                                      contour_data_on_img=CDATA)
-=======
 if ARGUMENT_ERROR:
     pass
 else:
     VIEWER = NpVidTool(DATA_DIRECTORY, REMOVE_TOP_REFLECTION,
                        REMOVE_BOTTOM_REFLECTION, ARGS.mp, FOLLOW_MAX,
                        CONTOUR_THRESHOLD, FOLLOW_CONTOUR, CDATA)
->>>>>>> rjBranch
 
     VIEWER.play_video(SCALE_FACTOR, FRAME_DELAY)
