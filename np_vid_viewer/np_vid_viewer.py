@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from progress_bar import printProgressBar
-import helper_functions
+from helper_functions import *
 from dataset import DataSet
 
 
@@ -72,16 +72,16 @@ class NpVidTool:
             if self.follow_contour != 0:
                 follow_size = self.follow_contour * scale_factor
                 if cog_x is not None and cog_y is not None:
-                    top_y, bottom_y, left_x, right_x = helper_functions.get_follow_contour_cords(
+                    top_y, bottom_y, left_x, right_x = get_follow_contour_cords(
                         frame, follow_size, cog_x, cog_y)
                 else:
-                    top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+                    top_y, bottom_y, left_x, right_x = get_follow_meltpool_cords(
                         frame, follow_size)
 
                 img = img[top_y:bottom_y, left_x:right_x]
 
             if self.contour_data_on_img:
-                img = helper_functions.add_white_border_on_img(img)
+                img = add_white_border_on_img(img)
                 if contour_x is not None:
                     img = self.add_contour_data_to_img(img, contour_x,
                                                        contour_y, contour_w,
@@ -92,7 +92,7 @@ class NpVidTool:
 
         if self.follow_max_temp != 0:
             follow_size = self.follow_max_temp * scale_factor
-            top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+            top_y, bottom_y, left_x, right_x = get_follow_meltpool_cords(
                 frame, follow_size)
 
             img = img[top_y:bottom_y, left_x:right_x]
@@ -312,8 +312,8 @@ class NpVidTool:
         height = self.temp_data[0].shape[0]
         width = self.temp_data[0].shape[1]
         size = (width, height)
-        build_folder = helper_functions.get_build_folder(self.temp_filename)
-        build_number = helper_functions.get_build_number(self.temp_filename)
+        build_folder = get_build_folder(self.temp_filename)
+        build_number = get_build_number(self.temp_filename)
         filename = build_folder + '/' + build_number + '_hotspot.avi'
 
         video_writer = cv2.VideoWriter(
