@@ -44,7 +44,7 @@ def submit():
                           framerate=int(save_fpsInput.get()))
 
     if saveFrame.get():
-        VIEWER = np_vid_viewer.NpVidTool(data_directory=tempDataEntry.get())
+        VIEWER = NpVidTool(data_directory=tempDataEntry.get())
         VIEWER.save_frame16(int(frameInput.get()), destDataEntry.get())
 
 
