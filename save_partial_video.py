@@ -33,6 +33,7 @@ parser.add_argument(
     default=False,
     required=False,
     help='0 or 1 specifying wether or not to remove top reflections')
+
 parser.add_argument(
     '-bot',
     type=int,
@@ -47,9 +48,23 @@ parser.add_argument(
     help=
     '0 or 1 specifying whether or not to highlight the max temp of the frame')
 
+parser.add_argument(
+    '--build',
+    type=str,
+    default=None,
+    required=False,
+    help='Name of build'
+)
+
 args = parser.parse_args()
 
+<<<<<<< HEAD:save_partial_video.py
 DATA_DIRECTORY = args.data_directory
+=======
+build = args.build
+temp_data_file = args.temp_data
+merged_data_file = args.merged_data
+>>>>>>> rjBranch:view.py
 scale_factor = args.scale
 top = bool(args.top)
 bot = bool(args.bot)
@@ -59,7 +74,13 @@ FOLLOW = bool(args.follow)
 start = args.start
 end = args.end
 
+<<<<<<< HEAD:save_partial_video.py
 VIEWER = np_vid_viewer.NpVidTool(data_directory=DATA_DIRECTORY,
+=======
+VIEWER = np_vid_viewer.NpVidTool(build=build,
+                                temp_filename=temp_data_file,
+                                 data_filename=merged_data_file,
+>>>>>>> rjBranch:view.py
                                  scale_factor=scale_factor,
                                  mp_data_on_vid=args.mp,
                                  remove_top_reflection=top,

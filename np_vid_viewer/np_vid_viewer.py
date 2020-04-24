@@ -5,9 +5,9 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-import np_vid_viewer.progress_bar as progress_bar
-import np_vid_viewer.helper_functions as helper_functions
-import np_vid_viewer.dataset as dataset
+from np_vid_viewer.progress_bar import printProgressBar
+from np_vid_viewer.helper_functions import *
+from np_vid_viewer.dataset import DataSet
 
 
 def format_time(t):
@@ -15,16 +15,18 @@ def format_time(t):
     return s[:-3]
 
 
-class data_video:
+class NpVidTool:
     def __init__(self,
-                 temp_dataset: dataset,
+                 data_directory,
+                 r_top_refl=False,
+                 r_bot_refl=False,
                  mp_data_on_vid=False,
                  follow_max_temp=0,
                  contour_threshold=0,
                  follow_contour=0,
                  contour_data_on_img=False):
 
-        self.dataset = temp_dataset
+        self.dataset = DataSet(data_directory, r_top_refl, r_bot_refl)
         self.mp_data_on_vid = mp_data_on_vid
         self.follow_max_temp = follow_max_temp
         self.framerate = None
@@ -70,16 +72,16 @@ class data_video:
             if self.follow_contour != 0:
                 follow_size = self.follow_contour * scale_factor
                 if cog_x is not None and cog_y is not None:
-                    top_y, bottom_y, left_x, right_x = helper_functions.get_follow_contour_cords(
+                    top_y, bottom_y, left_x, right_x = get_follow_contour_cords(
                         frame, follow_size, cog_x, cog_y)
                 else:
-                    top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+                    top_y, bottom_y, left_x, right_x = get_follow_meltpool_cords(
                         frame, follow_size)
 
                 img = img[top_y:bottom_y, left_x:right_x]
 
             if self.contour_data_on_img:
-                img = helper_functions.add_white_border_on_img(img)
+                img = add_white_border_on_img(img)
                 if contour_x is not None:
                     img = self.add_contour_data_to_img(img, contour_x,
                                                        contour_y, contour_w,
@@ -90,7 +92,7 @@ class data_video:
 
         if self.follow_max_temp != 0:
             follow_size = self.follow_max_temp * scale_factor
-            top_y, bottom_y, left_x, right_x = helper_functions.get_follow_meltpool_cords(
+            top_y, bottom_y, left_x, right_x = get_follow_meltpool_cords(
                 frame, follow_size)
 
             img = img[top_y:bottom_y, left_x:right_x]
@@ -115,10 +117,10 @@ class data_video:
             progress = 0
             for i in range(start, end):
                 # Display completion percentage
-                progress_bar.printProgressBar(progress + 1,
-                                              total,
-                                              prefix='Saving frames ' +
-                                              str(start) + '-' + str(end))
+                printProgressBar(progress + 1,
+                                 total,
+                                 prefix='Saving frames ' + str(start) + '-' +
+                                 str(end))
                 frame_fname = frame_range_folder + '/frame_' + str(i) + '.png'
                 unscaled_fname = frame_range_folder + '/frame_' + str(
                     i) + '_unscaled.png'
@@ -172,9 +174,9 @@ class data_video:
 
             #TODO:  Change progressbar to show timestamp (relative to video)
             #       instead of percentage
-            progress_bar.printProgressBar(frame_num,
-                                          self.dataset.final_frame,
-                                          prefix='Playing Video: ')
+            printProgressBar(frame_num,
+                             self.dataset.final_frame,
+                             prefix='Playing Video: ')
             key = cv2.waitKey(frame_delay)
             if key == ord("q"):
                 break
@@ -310,8 +312,8 @@ class data_video:
         height = self.temp_data[0].shape[0]
         width = self.temp_data[0].shape[1]
         size = (width, height)
-        build_folder = helper_functions.get_build_folder(self.temp_filename)
-        build_number = helper_functions.get_build_number(self.temp_filename)
+        build_folder = get_build_folder(self.temp_filename)
+        build_number = get_build_number(self.temp_filename)
         filename = build_folder + '/' + build_number + '_hotspot.avi'
 
         video_writer = cv2.VideoWriter(
@@ -322,7 +324,7 @@ class data_video:
 
         for i, frame in enumerate(self.temp_data, 0):
             # Display completion percentage
-            progress_bar.printProgressBar(
+            printProgressBar(
                 i,
                 self.num_frames,
                 prefix='Saving Hotspot Video...',
@@ -478,9 +480,7 @@ class data_video:
             total = end - start
             for i in range(start, end):
                 # Display completion percentage
-                progress_bar.printProgressBar(progress,
-                                              total,
-                                              prefix='Saving Video...')
+                printProgressBar(progress, total, prefix='Saving Video...')
 
                 img = self.generate_img(i, scale_factor)
 
