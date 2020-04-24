@@ -5,7 +5,9 @@ import GUIHandler as handler
 class GUI:
 
     def __init__(self):
-        self.BACKGROUND = '#F3F3F3'
+        self.BACKGROUND = '#FFFFFF'
+        self.BUTTONBACKGROUND = 'deep sky blue'
+        self.FRAMEBORDER = 'light sky blue'
 
         self.root = Tk()
         self.root.title("YSU Thermography")
@@ -48,54 +50,63 @@ class GUI:
     def buildFileFrame(self):
         tempDataLabel = Label(self.filePanel, text="File Path Build Data Folder: ")
         tempDataLabel.pack(side=LEFT)
-        tempDataEntry = Entry(self.filePanel, width=100)
+        tempDataEntry = Entry(self.filePanel, width=100,
+                              relief=FLAT)
         tempDataEntry.pack(side=LEFT)
 
-        tempDataBrowse = Button(self.filePanel, text="Browse", command=lambda: handler.browseFiles(self, tempDataEntry))
+        tempDataBrowse = Button(self.filePanel, text="Browse", command=lambda: handler.browseFiles(self, tempDataEntry),
+                                bd=2, bg=self.BUTTONBACKGROUND, relief=FLAT)
         tempDataBrowse.pack(side=LEFT)
 
     def buildFunctionFrame(self):
         # Main Frame
-        functionsFrame = LabelFrame(self.optionsPanel, text="Functions", bg=self.BACKGROUND)
+        functionsFrame = LabelFrame(self.optionsPanel, text="Functions", bg=self.BACKGROUND,
+                                    bd=1)
         functionsFrame.pack(fill=X, ipady=5, pady=10)
 
         # Frame to hold checkbox to create a threshold image
         genThresholdImgLabel = LabelFrame(functionsFrame, text="Gen Threshold Img",
                                           bd=0, highlightthickness=0, bg=self.BACKGROUND)
         genThresholdImgLabel.pack(side=LEFT, expand=1)
-        genThresholdImgCheckbox = Checkbutton(genThresholdImgLabel, variable=self.genThresholdImg)
+        genThresholdImgCheckbox = Checkbutton(genThresholdImgLabel, variable=self.genThresholdImg,
+                                              bg=self.BACKGROUND)
         genThresholdImgCheckbox.pack()
 
         # Frame to hold checkbox to save a frame
         saveFrameLabel = LabelFrame(functionsFrame, text="Save Frame",
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND)
         saveFrameLabel.pack(side=LEFT, expand=1)
-        saveFrameCheckbox = Checkbutton(saveFrameLabel, variable=self.saveFrame)
+        saveFrameCheckbox = Checkbutton(saveFrameLabel, variable=self.saveFrame,
+                                        bg=self.BACKGROUND)
         saveFrameCheckbox.pack()
 
         # Frame to hold checkbox to play video
         playVideoLabel = LabelFrame(functionsFrame, text="Play Video",
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND)
         playVideoLabel.pack(side=LEFT, expand=1)
-        playVideoCheckbox = Checkbutton(playVideoLabel, variable=self.playVideo)
+        playVideoCheckbox = Checkbutton(playVideoLabel, variable=self.playVideo,
+                                        bg=self.BACKGROUND)
         playVideoCheckbox.pack()
 
         saveVideoLabel = LabelFrame(functionsFrame, text="Save Video",
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND)
         saveVideoLabel.pack(side=LEFT, expand=1)
-        saveVideoCheckbox = Checkbutton(saveVideoLabel, variable=self.saveVideo)
+        saveVideoCheckbox = Checkbutton(saveVideoLabel, variable=self.saveVideo,
+                                        bg=self.BACKGROUND)
         saveVideoCheckbox.pack()
 
         gradientHistogramLabel = LabelFrame(functionsFrame, text="Gradient Histogram",
                                             bd=0, highlightthickness=0, bg=self.BACKGROUND)
         gradientHistogramLabel.pack(side=LEFT, expand=1)
-        gradientHistogramCheckbox = Checkbutton(gradientHistogramLabel, variable=self.gradientHistogram)
+        gradientHistogramCheckbox = Checkbutton(gradientHistogramLabel, variable=self.gradientHistogram,
+                                                bg=self.BACKGROUND)
         gradientHistogramCheckbox.pack()
 
         pixelTempRangeLabel = LabelFrame(functionsFrame, text="Pixel Temp Line Plot",
                                          bd=0, highlightthickness=0, bg=self.BACKGROUND)
         pixelTempRangeLabel.pack(side=LEFT, expand=1)
-        pixelTempRangeCheckbox = Checkbutton(pixelTempRangeLabel, variable=self.pixelTempRange)
+        pixelTempRangeCheckbox = Checkbutton(pixelTempRangeLabel, variable=self.pixelTempRange,
+                                             bg=self.BACKGROUND)
         pixelTempRangeCheckbox.pack()
 
     def buildThresholdImageFrame(self):
@@ -232,9 +243,11 @@ class GUI:
         plotEndFrameInput.pack()
 
     def buildButtonFrame(self):
-        closeButton = Button(self.buttonPanel, text="Close", command=self.root.quit)
+        closeButton = Button(self.buttonPanel, text="Close", command=self.root.quit,
+                             bg=self.BUTTONBACKGROUND, relief=FLAT)
         closeButton.pack(side=LEFT)
 
-        submitButton = Button(self.buttonPanel, text="Submit", command=lambda: handler.submit(self=self))
+        submitButton = Button(self.buttonPanel, text="Submit", command=lambda: handler.submit(self=self),
+                              bg=self.BUTTONBACKGROUND, relief=FLAT)
         submitButton.pack(side=RIGHT)
 

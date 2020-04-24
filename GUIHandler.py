@@ -1,4 +1,6 @@
 from np_vid_viewer import *
+from tkinter import *
+from tkinter import filedialog
 import graphing
 
 
@@ -52,6 +54,6 @@ def submit(self):
 
 
 def browseFiles(self, entry):
-    entry.delete(0, self.END)
-    self.root.filepath = self.filedialog.askdirectory(initialdir="/home/rjyarwood/Documents/Research/ResearchData")
+    entry.delete(0, END)
+    self.root.filepath = filedialog.askdirectory(initialdir="/home/rjyarwood/Documents/Research/ResearchData")
     entry.insert(0, self.root.filepath)
