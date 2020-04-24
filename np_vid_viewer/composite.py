@@ -6,6 +6,7 @@ import np_vid_viewer.progress_bar as progress_bar
 
 
 def generate_threshold_image(temp_filename: str,
+                             dst_folder=None,
                              threshold=800,
                              start=0,
                              end=0):
@@ -49,8 +50,11 @@ def generate_threshold_image(temp_filename: str,
 
         threshold_img += over_thresh_array
 
+    if dst_folder is None:
+        dst_folder = build_folder
+
     # Generate a filename based on build_number and threshold used
-    filename = build_folder + '/' + build_number + '_threshold' + str(
+    filename = dst_folder + '/' + build_number + '_threshold' + str(
         threshold) + '.png'
     fig, ax = plt.subplots()
     fig.suptitle('Build: ' + str(build_number) + ' Threshold: ' +
@@ -60,5 +64,7 @@ def generate_threshold_image(temp_filename: str,
                               ax=ax,
                               label='Number of frames above ' + str(threshold))
 
+    print(filename)
     plt.savefig(filename)
+    plt.close()
     print('Threshold img saved as: ' + filename)
