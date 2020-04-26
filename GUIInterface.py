@@ -23,9 +23,34 @@ class GUI:
         self.dataSet = BooleanVar()
         self.gradientHistogram = BooleanVar()
         self.pixelTempRange = BooleanVar()
-        self.play_disp_mp = BooleanVar()
-        self.play_top_ref = BooleanVar()
-        self.play_bot_ref = BooleanVar()
+
+        self.tempData = StringVar()
+
+        self.genthreshold_threshold = StringVar()
+
+        self.saveFrameNumber = StringVar()
+        self.saveImageNumber = StringVar()
+
+        self.scaleFactor = StringVar()
+        self.frameDelay = StringVar()
+        self.pixelAroundMax = StringVar()
+        self.contourTempThresh = StringVar()
+        self.contourPixelRange = StringVar()
+        self.frameRate = StringVar()
+        self.removeTopReflection = BooleanVar()
+        self.removeBottomReflection = BooleanVar()
+        self.displayMeltPool = BooleanVar()
+        self.saveStartFrame = StringVar()
+        self.saveEndFrame = StringVar()
+        self.displayContour = BooleanVar()
+
+        self.plotPixelLocX = StringVar()
+        self.plotPixelLocY = StringVar()
+        self.plotTempThresh = StringVar()
+        self.plotBinCount = StringVar()
+        self.plotGradSpacing = StringVar()
+        self.plotStartFrame = StringVar()
+        self.plotEndFrame = StringVar()
 
         # Creating Frame Sections
         self.filePanel = Frame(self.root, bg=self.BACKGROUND)
@@ -61,8 +86,8 @@ class GUI:
         tempDataLabel = Label(self.filePanel, text="File Path Build Data Folder: ",
                               padx=0, pady=0, bg=self.BACKGROUND)
         tempDataLabel.pack(side=LEFT)
-        tempDataEntry = Entry(self.filePanel, width=75,
-                              relief=FLAT)
+        tempDataEntry = Entry(self.filePanel, width=75, textvariable=self.tempData,
+                                   relief=FLAT)
         tempDataEntry.pack(side=LEFT)
 
         tempDataBrowse = Button(self.filePanel, text="Browse", command=lambda: handler.browseFiles(self, tempDataEntry),
@@ -157,7 +182,8 @@ class GUI:
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                     labelanchor=N, padx=5, relief=FLAT)
         thresholdFrame.pack(side=LEFT, expand=1)
-        genthreshold_thresholdInput = Entry(thresholdFrame, width=3, justify=CENTER, relief=FLAT)
+        genthreshold_thresholdInput = Entry(thresholdFrame, width=3, justify=CENTER, relief=FLAT,
+                                            textvariable=self.genthreshold_threshold)
         genthreshold_thresholdInput.pack()
 
     def buildSaveImageFrame(self):
@@ -170,14 +196,14 @@ class GUI:
                                 bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                 labelanchor=N, padx=5, relief=FLAT)
         frameFrame.pack(side=LEFT, expand=1)
-        frameInput = Entry(frameFrame, justify=CENTER, relief=FLAT)
+        frameInput = Entry(frameFrame, justify=CENTER, relief=FLAT, textvariable=self.saveFrameNumber)
         frameInput.pack()
 
         destDataLabel = LabelFrame(saveFrameFrame, text="Image Number",
                                    bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                    padx=5, relief=FLAT)
         destDataLabel.pack(side=LEFT, expand=1)
-        destDataEntry = Entry(destDataLabel, width=3, justify=CENTER, relief=FLAT)
+        destDataEntry = Entry(destDataLabel, width=3, justify=CENTER, relief=FLAT, textvariable=self.saveImageNumber)
         destDataEntry.insert(END, 1)
         destDataEntry.pack()
 
@@ -194,12 +220,14 @@ class GUI:
         playVideoFrame.rowconfigure(0, weight=1)
         playVideoFrame.rowconfigure(1, weight=1)
         playVideoFrame.rowconfigure(2, weight=1)
+        playVideoFrame.rowconfigure(3, weight=1)
 
         scaleFactorFrame = LabelFrame(playVideoFrame, text="Scale Factor",
                                       bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                       labelanchor=N, padx=5)
         scaleFactorFrame.grid(row=0, column=0, sticky=W+E+N+S)
-        play_scaleFactorInput = Entry(scaleFactorFrame, width=2, justify=CENTER, relief=FLAT)
+        play_scaleFactorInput = Entry(scaleFactorFrame, width=2, justify=CENTER, relief=FLAT,
+                                      textvariable=self.scaleFactor)
         play_scaleFactorInput.insert(END, 1)
         play_scaleFactorInput.pack()
 
@@ -207,7 +235,8 @@ class GUI:
                                      bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                      labelanchor=N, padx=5)
         frameDelayFrame.grid(row=0, column=1, sticky=W+E+N+S)
-        play_frameDelayInput = Entry(frameDelayFrame, width=2, justify=CENTER, relief=FLAT)
+        play_frameDelayInput = Entry(frameDelayFrame, width=2, justify=CENTER, relief=FLAT,
+                                     textvariable=self.frameDelay)
         play_frameDelayInput.insert(END, 1)
         play_frameDelayInput.pack()
 
@@ -215,7 +244,7 @@ class GUI:
                                bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                labelanchor=N, padx=5)
         fmaxFrame.grid(row=0, column=2, sticky=W+E+N+S)
-        play_fmaxInput = Entry(fmaxFrame, width=3, justify=CENTER, relief=FLAT)
+        play_fmaxInput = Entry(fmaxFrame, width=3, justify=CENTER, relief=FLAT, textvariable=self.pixelAroundMax)
         play_fmaxInput.insert(END, False)
         play_fmaxInput.pack()
 
@@ -223,7 +252,8 @@ class GUI:
                                   bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                   labelanchor=N, padx=5)
         cthreshFrame.grid(row=1, column=0, sticky=W+E+N+S)
-        play_cthreshInput = Entry(cthreshFrame, width=3, justify=CENTER, relief=FLAT)
+        play_cthreshInput = Entry(cthreshFrame, width=3, justify=CENTER, relief=FLAT,
+                                  textvariable=self.contourTempThresh)
         play_cthreshInput.insert(END, 0)
         play_cthreshInput.pack()
 
@@ -231,7 +261,8 @@ class GUI:
                                    bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                    labelanchor=N, padx=5)
         fcontourFrame.grid(row=1, column=1, sticky=W+E+N+S)
-        play_fcontourInput = Entry(fcontourFrame, width=3, justify=CENTER, relief=FLAT)
+        play_fcontourInput = Entry(fcontourFrame, width=3, justify=CENTER, relief=FLAT,
+                                   textvariable=self.contourPixelRange)
         play_fcontourInput.insert(END, False)
         play_fcontourInput.pack()
 
@@ -239,7 +270,7 @@ class GUI:
                               bd=0, highlightthickness=0, bg=self.BACKGROUND,
                               labelanchor=N, padx=5)
         fpsFrame.grid(row=1, column=2, sticky=W + E + N + S)
-        save_fpsInput = Entry(fpsFrame, width=3, justify=CENTER, relief=FLAT)
+        save_fpsInput = Entry(fpsFrame, width=3, justify=CENTER, relief=FLAT, textvariable=self.frameRate)
         save_fpsInput.insert(END, 60)
         save_fpsInput.pack()
 
@@ -247,7 +278,7 @@ class GUI:
                                  bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                  labelanchor=N, padx=5)
         toprefFrame.grid(row=2, column=0, sticky=W+E+N+S)
-        play_toprefInput = Checkbutton(toprefFrame, variable=self.play_top_ref,
+        play_toprefInput = Checkbutton(toprefFrame, variable=self.removeTopReflection,
                                        bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
                                        activeforeground=self.FRAMEBORDER, selectcolor=self.FRAMEBORDER,
                                        relief=FLAT, highlightcolor=self.BACKGROUND)
@@ -257,7 +288,7 @@ class GUI:
                                  bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                  labelanchor=N, padx=5)
         botrefFrame.grid(row=2, column=1, sticky=W+E+N+S)
-        play_botrefInput = Checkbutton(botrefFrame, variable=self.play_bot_ref,
+        play_botrefInput = Checkbutton(botrefFrame, variable=self.removeBottomReflection,
                                        bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
                                        activeforeground=self.FRAMEBORDER, selectcolor=self.FRAMEBORDER,
                                        relief=FLAT, highlightcolor=self.BACKGROUND)
@@ -267,11 +298,40 @@ class GUI:
                              bd=0, highlightthickness=0, bg=self.BACKGROUND,
                              labelanchor=N, padx=5)
         mpFrame.grid(row=2, column=2, sticky=W + E + N + S)
-        play_mpInput = Checkbutton(mpFrame, variable=self.play_disp_mp,
+        play_mpInput = Checkbutton(mpFrame, variable=self.displayMeltPool,
                                    bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
                                    activeforeground=self.FRAMEBORDER, selectcolor=self.FRAMEBORDER,
                                    relief=FLAT, highlightcolor=self.BACKGROUND)
         play_mpInput.pack()
+
+
+        frameRangeFrame = LabelFrame(playVideoFrame, text="Frame Range (Save Video)",
+                                     bd=0, highlightthickness=0, bg=self.BACKGROUND,
+                                     labelanchor=N, padx=5)
+        frameRangeFrame.grid(row=3, column=1, sticky=W + E + N + S)
+
+        frameRangeFrame.columnconfigure(0, weight=1)
+        frameRangeFrame.columnconfigure(1, weight=1)
+        frameRangeFrame.rowconfigure(0, weight=1)
+
+        saveStartFrameInput = Entry(frameRangeFrame, width=5, justify=CENTER, relief=FLAT,
+                                    textvariable=self.saveStartFrame)
+        saveStartFrameInput.insert(END, 0)
+        saveStartFrameInput.grid(row=0, column=0)
+
+        saveEndFrameInput = Entry(frameRangeFrame, width=5, justify=CENTER, relief=FLAT, textvariable=self.saveEndFrame)
+        saveEndFrameInput.insert(END, -1)
+        saveEndFrameInput.grid(row=0, column=1)
+
+        contourOnImgFrame = LabelFrame(playVideoFrame, text="Display Contour Info",
+                                       bd=0, highlightthickness=0, bg=self.BACKGROUND,
+                                       labelanchor=N, padx=5)
+        contourOnImgFrame.grid(row=3, column=2, sticky=W + E + N + S)
+        contourOnImgInput = Checkbutton(contourOnImgFrame, variable=self.displayContour,
+                                        bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
+                                        activeforeground=self.FRAMEBORDER, selectcolor=self.FRAMEBORDER,
+                                        relief=FLAT, highlightcolor=self.BACKGROUND)
+        contourOnImgInput.pack()
 
     def buildPlotOptionsFrame(self):
         plotOptionsFrame = LabelFrame(self.optionsPanel, text="Plot options",
@@ -297,19 +357,21 @@ class GUI:
         pixelLocationFrame.columnconfigure(2, weight=1)
         pixelLocationFrame.rowconfigure(0, weight=1)
 
-        pixelXLocationInput = Entry(pixelLocationFrame, width=4, justify=CENTER, relief=FLAT)
+        pixelXLocationInput = Entry(pixelLocationFrame, width=4, justify=CENTER, relief=FLAT,
+                                    textvariable=self.plotPixelLocX)
         pixelXLocationInput.grid(row=0, column=0, sticky=W+E+N+S)
         comma = Label(pixelLocationFrame, text=",",
                       bd=0, highlightthickness=0, bg=self.BACKGROUND)
         comma.grid(row=0, column=1, sticky=W+E+N+S)
-        pixelYLocationInput = Entry(pixelLocationFrame, width=4, justify=CENTER, relief=FLAT)
+        pixelYLocationInput = Entry(pixelLocationFrame, width=4, justify=CENTER, relief=FLAT,
+                                    textvariable=self.plotPixelLocY)
         pixelYLocationInput.grid(row=0, column=2, sticky=W + E + N + S)
 
         histthreshFrame = LabelFrame(plotOptionsFrame, text="Temperature Threshold (histogram)",
                                      bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                      labelanchor=N, padx=5)
         histthreshFrame.grid(row=1, column=0, sticky=W+E+N+S)
-        histthreshInput = Entry(histthreshFrame, width=4, justify=CENTER, relief=FLAT)
+        histthreshInput = Entry(histthreshFrame, width=4, justify=CENTER, relief=FLAT, textvariable=self.plotTempThresh)
         histthreshInput.insert(END, 200)
         histthreshInput.pack()
 
@@ -317,7 +379,7 @@ class GUI:
                                   bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                   labelanchor=N, padx=5)
         histBinFrame.grid(row=1, column=1, sticky=W+E+N+S)
-        histBinInput = Entry(histBinFrame, width=3, justify=CENTER, relief=FLAT)
+        histBinInput = Entry(histBinFrame, width=3, justify=CENTER, relief=FLAT, textvariable=self.plotBinCount)
         histBinInput.insert(END, 5)
         histBinInput.pack()
 
@@ -325,7 +387,8 @@ class GUI:
                                           bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                           labelanchor=N, padx=5)
         histGradSpacingFrame.grid(row=1, column=2, sticky=W+E+N+S)
-        histGradSpacingInput = Entry(histGradSpacingFrame, width=3, justify=CENTER, relief=FLAT)
+        histGradSpacingInput = Entry(histGradSpacingFrame, width=3, justify=CENTER, relief=FLAT,
+                                     textvariable=self.plotGradSpacing)
         histGradSpacingInput.insert(END, 1)
         histGradSpacingInput.pack()
 
@@ -338,11 +401,13 @@ class GUI:
         frameRangeFrame.columnconfigure(1, weight=1)
         frameRangeFrame.rowconfigure(0, weight=1)
 
-        plotStartFrameInput = Entry(frameRangeFrame, width=5, justify=CENTER, relief=FLAT)
+        plotStartFrameInput = Entry(frameRangeFrame, width=5, justify=CENTER, relief=FLAT,
+                                    textvariable=self.plotStartFrame)
         plotStartFrameInput.insert(END, 0)
         plotStartFrameInput.grid(row=0, column=0)
 
-        plotEndFrameInput = Entry(frameRangeFrame, width=5, justify=CENTER, relief=FLAT)
+        plotEndFrameInput = Entry(frameRangeFrame, width=5, justify=CENTER, relief=FLAT,
+                                  textvariable=self.plotEndFrame)
         plotEndFrameInput.insert(END, -1)
         plotEndFrameInput.grid(row=0, column=1)
 
