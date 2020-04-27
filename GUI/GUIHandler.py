@@ -1,7 +1,8 @@
+import graphing
 from np_vid_viewer import *
 from tkinter import *
 from tkinter import filedialog
-import graphing
+from NathanPlots import Histogram_generation as histogram
 
 
 def submit(self):
@@ -27,12 +28,11 @@ def submit(self):
         VIEWER.save_frame16(int(self.saveFrameNumber.get()), self.saveImageNumber.get())
 
     if self.gradientHistogram.get():
-        self.graphing.plotHistogram(temp_file=self.tempData.get() + "/thermal_cam_temps.npy",
-                                    pixel=(int(self.plotPixelLocX.get()), int(self.plotPixelLocY.get())),
-                                    threshold=int(self.plotTempThresh.get()),
-                                    binCount=int(self.plotBinCount.get()),
-                                    spacing=int(self.plotGradSpacing.get()))
-
+        histogram.histogram_generation(data=self.tempData.get(),
+                                       start_frame=int(self.plotStartFrame.get()),
+                                       end_frame=int(self.plotEndFrame.get()),
+                                       pixel=(int(self.plotPixelLocX.get()), int(self.plotPixelLocY.get())),
+                                       bins=int(self.plotBinCount.get()))
     if self.pixelTempRange.get():
         graphing.plotLine(temp_file=self.tempData.get() + "/thermal_cam_temps.npy",
                           pixel=(int(self.plotPixelLocX.get()), int(self.plotPixelLocY.get())),
