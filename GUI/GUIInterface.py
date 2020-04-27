@@ -1,5 +1,6 @@
 from tkinter import *
 from GUI import Descriptors, ToolTip
+from GUI import GUIHandler as handler
 
 
 class GUI:
