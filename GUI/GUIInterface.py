@@ -1,5 +1,5 @@
 from tkinter import *
-from GUI import GUIHandler as handler
+from GUI import Descriptors, ToolTip
 
 
 class GUI:
@@ -85,9 +85,11 @@ class GUI:
     def buildFileFrame(self):
         tempDataLabel = Label(self.filePanel, text="File Path Build Data Folder: ",
                               padx=0, pady=0, bg=self.BACKGROUND)
+        tempDataHint = Descriptors.getHintTextFileFrame('tempDataLabel')
+        ToolTip.createToolTip(tempDataLabel, tempDataHint)
         tempDataLabel.pack(side=LEFT)
         tempDataEntry = Entry(self.filePanel, width=75, textvariable=self.tempData,
-                                   relief=FLAT)
+                              relief=FLAT)
         tempDataEntry.pack(side=LEFT)
 
         tempDataBrowse = Button(self.filePanel, text="Browse", command=lambda: handler.browseFiles(self, tempDataEntry),
@@ -113,6 +115,8 @@ class GUI:
         genThresholdImgLabel = LabelFrame(functionsFrame, text="Gen Threshold Img",
                                           bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                           labelanchor=N, padx=5)
+        genThresholdImgHint = Descriptors.getHintTextFunctionFrame('genThresholdImgLabel')
+        ToolTip.createToolTip(genThresholdImgLabel, genThresholdImgHint)
         genThresholdImgLabel.grid(row=0, column=0, sticky=W+E+N+S)
         genThresholdImgCheckbox = Checkbutton(genThresholdImgLabel, variable=self.genThresholdImg,
                                               bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -124,6 +128,8 @@ class GUI:
         saveFrameLabel = LabelFrame(functionsFrame, text="Save Frame",
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                     labelanchor=N, padx=5)
+        saveFrameHint = Descriptors.getHintTextFunctionFrame('saveFrameLabel')
+        ToolTip.createToolTip(saveFrameLabel, saveFrameHint)
         saveFrameLabel.grid(row=0, column=1, sticky=W+E+N+S)
         saveFrameCheckbox = Checkbutton(saveFrameLabel, variable=self.saveFrame,
                                         bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -135,6 +141,8 @@ class GUI:
         playVideoLabel = LabelFrame(functionsFrame, text="Play Video",
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                     labelanchor=N, padx=5)
+        playVideoHint = Descriptors.getHintTextFunctionFrame('playVideoLabel')
+        ToolTip.createToolTip(playVideoLabel, playVideoHint)
         playVideoLabel.grid(row=0, column=2, sticky=W+E+N+S)
         playVideoCheckbox = Checkbutton(playVideoLabel, variable=self.playVideo,
                                         bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -145,6 +153,8 @@ class GUI:
         saveVideoLabel = LabelFrame(functionsFrame, text="Save Video",
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                     labelanchor=N, padx=5)
+        saveVideoHint = Descriptors.getHintTextFunctionFrame('saveVideoLabel')
+        ToolTip.createToolTip(saveVideoLabel, saveVideoHint)
         saveVideoLabel.grid(row=1, column=0, sticky=W+E+N+S)
         saveVideoCheckbox = Checkbutton(saveVideoLabel, variable=self.saveVideo,
                                         bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -155,6 +165,8 @@ class GUI:
         gradientHistogramLabel = LabelFrame(functionsFrame, text="Gradient Histogram",
                                             bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                             labelanchor=N, padx=5)
+        gradientHistogramHint = Descriptors.getHintTextFunctionFrame('gradientHistogramLabel')
+        ToolTip.createToolTip(gradientHistogramLabel, gradientHistogramHint)
         gradientHistogramLabel.grid(row=1, column=1, sticky=W+E+N+S)
         gradientHistogramCheckbox = Checkbutton(gradientHistogramLabel, variable=self.gradientHistogram,
                                                 bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -165,6 +177,8 @@ class GUI:
         pixelTempRangeLabel = LabelFrame(functionsFrame, text="Pixel Temp Line Plot",
                                          bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                          labelanchor=N, padx=5)
+        pixelTempRangeHint = Descriptors.getHintTextFunctionFrame('pixelTempRangeLabel')
+        ToolTip.createToolTip(pixelTempRangeLabel, pixelTempRangeHint)
         pixelTempRangeLabel.grid(row=1, column=2, sticky=W+E+N+S)
         pixelTempRangeCheckbox = Checkbutton(pixelTempRangeLabel, variable=self.pixelTempRange,
                                              bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -181,6 +195,8 @@ class GUI:
         thresholdFrame = LabelFrame(genThresholdImgFrame, text="Temperature Threshold",
                                     bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                     labelanchor=N, padx=5, relief=FLAT)
+        thresholdHint = Descriptors.getHintTextThresholdFrame('thresholdFrame')
+        ToolTip.createToolTip(thresholdFrame, thresholdHint)
         thresholdFrame.pack(side=LEFT, expand=1)
         genthreshold_thresholdInput = Entry(thresholdFrame, width=3, justify=CENTER, relief=FLAT,
                                             textvariable=self.genthreshold_threshold)
@@ -195,6 +211,8 @@ class GUI:
         frameFrame = LabelFrame(saveFrameFrame, text="Frame",
                                 bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                 labelanchor=N, padx=5, relief=FLAT)
+        frameHint = Descriptors.getHintTextSaveImageFrame('frameFrame')
+        ToolTip.createToolTip(frameFrame, frameHint)
         frameFrame.pack(side=LEFT, expand=1)
         frameInput = Entry(frameFrame, justify=CENTER, relief=FLAT, textvariable=self.saveFrameNumber)
         frameInput.pack()
@@ -202,6 +220,8 @@ class GUI:
         destDataLabel = LabelFrame(saveFrameFrame, text="Image Number",
                                    bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                    padx=5, relief=FLAT)
+        destHint = Descriptors.getHintTextSaveImageFrame('destDataLabel')
+        ToolTip.createToolTip(destDataLabel, destHint)
         destDataLabel.pack(side=LEFT, expand=1)
         destDataEntry = Entry(destDataLabel, width=3, justify=CENTER, relief=FLAT, textvariable=self.saveImageNumber)
         destDataEntry.insert(END, 1)
@@ -225,6 +245,8 @@ class GUI:
         scaleFactorFrame = LabelFrame(playVideoFrame, text="Scale Factor",
                                       bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                       labelanchor=N, padx=5)
+        scaleFactorHint = Descriptors.getHintTextSavePlayFrame('scaleFactorFrame')
+        ToolTip.createToolTip(scaleFactorFrame, scaleFactorHint)
         scaleFactorFrame.grid(row=0, column=0, sticky=W+E+N+S)
         play_scaleFactorInput = Entry(scaleFactorFrame, width=2, justify=CENTER, relief=FLAT,
                                       textvariable=self.scaleFactor)
@@ -234,6 +256,8 @@ class GUI:
         frameDelayFrame = LabelFrame(playVideoFrame, text="Frame Delay (for play video)",
                                      bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                      labelanchor=N, padx=5)
+        frameDelayHint = Descriptors.getHintTextSavePlayFrame('frameDelayFrame')
+        ToolTip.createToolTip(frameDelayFrame, frameDelayHint)
         frameDelayFrame.grid(row=0, column=1, sticky=W+E+N+S)
         play_frameDelayInput = Entry(frameDelayFrame, width=2, justify=CENTER, relief=FLAT,
                                      textvariable=self.frameDelay)
@@ -243,6 +267,8 @@ class GUI:
         fmaxFrame = LabelFrame(playVideoFrame, text="# pixels around max temp",
                                bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                labelanchor=N, padx=5)
+        fmaxHint = Descriptors.getHintTextSavePlayFrame('fmaxFrame')
+        ToolTip.createToolTip(fmaxFrame, fmaxHint)
         fmaxFrame.grid(row=0, column=2, sticky=W+E+N+S)
         play_fmaxInput = Entry(fmaxFrame, width=3, justify=CENTER, relief=FLAT, textvariable=self.pixelAroundMax)
         play_fmaxInput.insert(END, False)
@@ -251,6 +277,8 @@ class GUI:
         cthreshFrame = LabelFrame(playVideoFrame, text="Contour Temp Thresh",
                                   bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                   labelanchor=N, padx=5)
+        cthreshHint = Descriptors.getHintTextSavePlayFrame('cthreshFrame')
+        ToolTip.createToolTip(cthreshFrame, cthreshHint)
         cthreshFrame.grid(row=1, column=0, sticky=W+E+N+S)
         play_cthreshInput = Entry(cthreshFrame, width=3, justify=CENTER, relief=FLAT,
                                   textvariable=self.contourTempThresh)
@@ -260,6 +288,8 @@ class GUI:
         fcontourFrame = LabelFrame(playVideoFrame, text="Contour Pixel Range",
                                    bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                    labelanchor=N, padx=5)
+        fcontourHint = Descriptors.getHintTextSavePlayFrame('fcontourFrame')
+        ToolTip.createToolTip(fcontourFrame, fcontourHint)
         fcontourFrame.grid(row=1, column=1, sticky=W+E+N+S)
         play_fcontourInput = Entry(fcontourFrame, width=3, justify=CENTER, relief=FLAT,
                                    textvariable=self.contourPixelRange)
@@ -269,6 +299,8 @@ class GUI:
         fpsFrame = LabelFrame(playVideoFrame, text="Framerate (For Save Video Only)",
                               bd=0, highlightthickness=0, bg=self.BACKGROUND,
                               labelanchor=N, padx=5)
+        fpsHint = Descriptors.getHintTextSavePlayFrame('fpsFrame')
+        ToolTip.createToolTip(fpsFrame, fpsHint)
         fpsFrame.grid(row=1, column=2, sticky=W + E + N + S)
         save_fpsInput = Entry(fpsFrame, width=3, justify=CENTER, relief=FLAT, textvariable=self.frameRate)
         save_fpsInput.insert(END, 60)
@@ -277,6 +309,8 @@ class GUI:
         toprefFrame = LabelFrame(playVideoFrame, text="Remove Top Reflection",
                                  bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                  labelanchor=N, padx=5)
+        toprefHint = Descriptors.getHintTextSavePlayFrame('toprefFrame')
+        ToolTip.createToolTip(toprefFrame, toprefHint)
         toprefFrame.grid(row=2, column=0, sticky=W+E+N+S)
         play_toprefInput = Checkbutton(toprefFrame, variable=self.removeTopReflection,
                                        bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -287,6 +321,8 @@ class GUI:
         botrefFrame = LabelFrame(playVideoFrame, text="Remove Bottom Reflection",
                                  bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                  labelanchor=N, padx=5)
+        botrefHint = Descriptors.getHintTextSavePlayFrame('botrefFrame')
+        ToolTip.createToolTip(botrefFrame, botrefHint)
         botrefFrame.grid(row=2, column=1, sticky=W+E+N+S)
         play_botrefInput = Checkbutton(botrefFrame, variable=self.removeBottomReflection,
                                        bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -297,6 +333,8 @@ class GUI:
         mpFrame = LabelFrame(playVideoFrame, text="Display Meltpool",
                              bd=0, highlightthickness=0, bg=self.BACKGROUND,
                              labelanchor=N, padx=5)
+        mpHint = Descriptors.getHintTextSavePlayFrame('mpFrame')
+        ToolTip.createToolTip(mpFrame, mpHint)
         mpFrame.grid(row=2, column=2, sticky=W + E + N + S)
         play_mpInput = Checkbutton(mpFrame, variable=self.displayMeltPool,
                                    bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -308,6 +346,8 @@ class GUI:
         frameRangeFrame = LabelFrame(playVideoFrame, text="Frame Range (Save Video)",
                                      bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                      labelanchor=N, padx=5)
+        frameRangeHint = Descriptors.getHintTextSavePlayFrame('frameRangeFrame')
+        ToolTip.createToolTip(frameRangeFrame, frameRangeHint)
         frameRangeFrame.grid(row=3, column=1, sticky=W + E + N + S)
 
         frameRangeFrame.columnconfigure(0, weight=1)
@@ -326,6 +366,8 @@ class GUI:
         contourOnImgFrame = LabelFrame(playVideoFrame, text="Display Contour Info",
                                        bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                        labelanchor=N, padx=5)
+        contourOnImgHint = Descriptors.getHintTextSavePlayFrame('contourOnImgFrame')
+        ToolTip.createToolTip(contourOnImgFrame, contourOnImgHint)
         contourOnImgFrame.grid(row=3, column=2, sticky=W + E + N + S)
         contourOnImgInput = Checkbutton(contourOnImgFrame, variable=self.displayContour,
                                         bg=self.BACKGROUND, bd=0, activebackground=self.BACKGROUND,
@@ -350,6 +392,8 @@ class GUI:
         pixelLocationFrame = LabelFrame(plotOptionsFrame, text="Pixel Location",
                                         bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                         labelanchor=N, padx=5, pady=10)
+        pixelLocationHint = Descriptors.getHintTextPlotOptions('pixelLocationFrame')
+        ToolTip.createToolTip(pixelLocationFrame, pixelLocationHint)
         pixelLocationFrame.grid(row=0, column=1, sticky=W+E+N+S)
 
         pixelLocationFrame.columnconfigure(0, weight=1)
@@ -370,6 +414,8 @@ class GUI:
         histthreshFrame = LabelFrame(plotOptionsFrame, text="Temperature Threshold (histogram)",
                                      bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                      labelanchor=N, padx=5)
+        histthreshHint = Descriptors.getHintTextPlotOptions('histthreshFrame')
+        ToolTip.createToolTip(histthreshFrame, histthreshHint)
         histthreshFrame.grid(row=1, column=0, sticky=W+E+N+S)
         histthreshInput = Entry(histthreshFrame, width=4, justify=CENTER, relief=FLAT, textvariable=self.plotTempThresh)
         histthreshInput.insert(END, 200)
@@ -378,6 +424,8 @@ class GUI:
         histBinFrame = LabelFrame(plotOptionsFrame, text="Bin Count (histogram)",
                                   bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                   labelanchor=N, padx=5)
+        histBinHint = Descriptors.getHintTextPlotOptions('histBinFrame')
+        ToolTip.createToolTip(histBinFrame, histBinHint)
         histBinFrame.grid(row=1, column=1, sticky=W+E+N+S)
         histBinInput = Entry(histBinFrame, width=3, justify=CENTER, relief=FLAT, textvariable=self.plotBinCount)
         histBinInput.insert(END, 5)
@@ -386,6 +434,8 @@ class GUI:
         histGradSpacingFrame = LabelFrame(plotOptionsFrame, text="Gradient Spacing (histogram)",
                                           bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                           labelanchor=N, padx=5)
+        histGradSpacingHint = Descriptors.getHintTextPlotOptions('histGradSpacingFrame')
+        ToolTip.createToolTip(histGradSpacingFrame, histGradSpacingHint)
         histGradSpacingFrame.grid(row=1, column=2, sticky=W+E+N+S)
         histGradSpacingInput = Entry(histGradSpacingFrame, width=3, justify=CENTER, relief=FLAT,
                                      textvariable=self.plotGradSpacing)
@@ -395,6 +445,8 @@ class GUI:
         frameRangeFrame = LabelFrame(plotOptionsFrame, text="Frame Range (line plot)",
                                      bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                      labelanchor=N, padx=5)
+        frameRangeHint = Descriptors.getHintTextPlotOptions('frameRangeFrame')
+        ToolTip.createToolTip(frameRangeFrame, frameRangeHint)
         frameRangeFrame.grid(row=2, column=1, sticky=W+E+N+S)
 
         frameRangeFrame.columnconfigure(0, weight=1)

@@ -1,3 +1,3 @@
-from GUI import GUIInterface
+import GUI
 
-gui = GUIInterface.GUI()
+gui = GUI
