@@ -1,5 +1,5 @@
 from tkinter import *
-import GUIHandler as handler
+from GUI import GUIHandler as handler
 
 
 class GUI:
