@@ -69,6 +69,8 @@ def save_threshold_img(filename: str,
     # Generate a filename based on build_number and threshold used
     save_filename = filename = dst_folder + '/' + build_number + '_threshold' + str(
         threshold) + '.png'
+    raw_filename = filename = dst_folder + '/' + build_number + '_threshold' + str(
+        threshold) + '_raw.png'
 
     threshold_img = get_threshold_img(temp_data, threshold, start, end, cap,
                                       show_progress)
@@ -81,7 +83,9 @@ def save_threshold_img(filename: str,
                               ax=ax,
                               label='Number of frames above ' + str(threshold))
 
-    plt.savefig(filename)
+    plt.imsave(raw_filename, threshold_img, cmap='inferno')
+
+    plt.savefig(save_filename)
     plt.close()
     print('\n')
     print('Threshold img saved as: ' + filename)
