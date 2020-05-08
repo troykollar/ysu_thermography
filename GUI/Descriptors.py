@@ -6,7 +6,7 @@ def getHintTextFileFrame(frame):
 
 def getHintTextFunctionFrame(frame):
     FUNCTIONPANEL = {
-        'genThresholdImgLabel': "Generate an image displaying how often each pixel surpassed a certain temperature "
+        'genThresholdImgLabel': "Generate an image displaying the number of times each pixel surpassed a certain temperature "
                                 "threshold",
         'saveFrameLabel': "Save a particular frame in 16 bit color",
         'playVideoLabel': "Play the given build as a video",
