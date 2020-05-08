@@ -1,7 +1,6 @@
 """Generates a thermal image based on the number of times each pixel exceeds a temperature threshold"""
 import argparse
-from np_vid_viewer.composite import generate_threshold_image
-
+from np_vid_viewer.composite import save_threshold_img
 PARSER = argparse.ArgumentParser(description='Analyze temperature data.')
 PARSER.add_argument('temp_data',
                     type=str,
@@ -9,6 +8,9 @@ PARSER.add_argument('temp_data',
 PARSER.add_argument('THRESHOLD',
                     type=int,
                     help='temperature theshold of the image')
+PARSER.add_argument('-cap',
+                    type=int,
+                    help='Maximum number of frames to increment')
 PARSER.add_argument('-start',
                     type=int,
                     default=0,
@@ -26,8 +28,11 @@ TEMP_DATA_FILE = ARGS.temp_data
 THRESHOLD = ARGS.THRESHOLD
 START = ARGS.start
 END = ARGS.end
+CAP = ARGS.cap
 
-generate_threshold_image(TEMP_DATA_FILE,
-                         threshold=THRESHOLD,
-                         start=START,
-                         end=END)
+save_threshold_img(TEMP_DATA_FILE,
+                   THRESHOLD,
+                   start=START,
+                   end=END,
+                   cap=CAP,
+                   show_progress=True)
