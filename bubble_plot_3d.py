@@ -6,13 +6,12 @@ import pandas as pd
 from np_vid_viewer.helper_functions import printProgressBar
 
 
-def plotBubble(temp_file,
-               pixel,
+def plotBubble(temp_data: np.ndarray,
+               pixel: tuple,
                threshold=200,
                start_frame=0,
                end_frame=-1,
                frame_count=-1):
-    temp_data = np.load(temp_file, allow_pickle=True, mmap_mode='r')
 
     if start_frame == 0:
         if frame_count == -1 and end_frame == -1:
