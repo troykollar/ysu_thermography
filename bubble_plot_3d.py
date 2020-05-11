@@ -5,11 +5,24 @@ import numpy as np
 import pandas as pd
 
 
-def plotBubble(temp_file, pixel, threshold=200, frame_count=-1):
+def plotBubble(temp_file, pixel, threshold=200, start_frame=0, end_frame=-1, frame_count=-1):
     temp_data = np.load(temp_file, allow_pickle=True)
 
-    if frame_count == -1:
-        frame_count = temp_data.shape[0]
+    if start_frame == 0:
+        if frame_count == -1 and end_frame == -1:
+            frame_count = temp_data.shape[0]
+        elif end_frame != -1:
+            frame_count = end_frame - start_frame
+        elif frame_count != -1:
+            frame_count = frame_count
+
+    else:
+        if frame_count == -1 and end_frame == -1:
+            frame_count = temp_data.shape[0] - start_frame
+        elif end_frame != -1:
+            frame_count = end_frame - start_frame
+        elif frame_count != -1:
+            frame_count = frame_count
 
     pixel_grad_mag = []
     pixel_grad_dir = []
@@ -17,11 +30,11 @@ def plotBubble(temp_file, pixel, threshold=200, frame_count=-1):
     pixel_frame = []
 
     for i in range(frame_count):
-        temp = temp_data[i].copy()
+        temp = temp_data[i + start_frame].copy()
         gradientx, gradienty = np.gradient(temp)
         if temp[pixel] > threshold:
             print(temp[pixel])
-            pixel_frame.append(i)
+            pixel_frame.append(i + start_frame)
             pixel_grad_mag.append(math.sqrt((gradientx[pixel] ** 2) + (gradienty[pixel] ** 2)))
             pixel_temp.append(temp[pixel])
             if gradientx[pixel] == 0:
