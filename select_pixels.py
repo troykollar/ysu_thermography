@@ -1,5 +1,6 @@
 import cv2
 from Visualization_script import get_visualization
+from bubble_plot_3d import plotBubble
 from datetime import datetime
 
 pixel_locations = []
@@ -63,6 +64,8 @@ savetime = str(datetime.now().month) + '-' + str(
         datetime.now().minute)
 
 path = '/media/troy/TroyUSB/thermography/All/Thermal Camera'
+temp_file = '/media/troy/TroyUSB/thermography/All/Thermal Camera/thermal_cam_temps.npy'
+threshold = 200
 
 if len(corner_locations) == 4:
     if len(pixel_locations) > 0:
@@ -77,7 +80,11 @@ if len(corner_locations) == 4:
             loc_file.write(str(pixel) + '\n')
 
         loc_file.close()
-"""
-for x, y in zip(x_locations, y_locations):
-    get_visualization(path, x, y, end=27000)
-"""
+
+        for pixel in pixel_locations:
+            pixel_x = pixel[0]
+            pixel_y = pixel[1]
+            print('\nGenerating 2D plots for: ' + str(pixel))
+            get_visualization(path, pixel_x, pixel_y, threshold=threshold)
+            print('\nGenerating 3D plot for: ' + str(pixel))
+            plotBubble(temp_file, pixel, threshold=threshold)
