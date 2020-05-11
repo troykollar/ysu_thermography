@@ -3,10 +3,16 @@ import math
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
+from np_vid_viewer.helper_functions import printProgressBar
 
 
-def plotBubble(temp_file, pixel, threshold=200, start_frame=0, end_frame=-1, frame_count=-1):
-    temp_data = np.load(temp_file, allow_pickle=True)
+def plotBubble(temp_file,
+               pixel,
+               threshold=200,
+               start_frame=0,
+               end_frame=-1,
+               frame_count=-1):
+    temp_data = np.load(temp_file, allow_pickle=True, mmap_mode='r')
 
     if start_frame == 0:
         if frame_count == -1 and end_frame == -1:
@@ -30,12 +36,15 @@ def plotBubble(temp_file, pixel, threshold=200, start_frame=0, end_frame=-1, fra
     pixel_frame = []
 
     for i in range(frame_count):
+        printProgressBar(i, frame_count)
         temp = temp_data[i + start_frame].copy()
         gradientx, gradienty = np.gradient(temp)
+
         if temp[pixel] > threshold:
-            print(temp[pixel])
+            #print(temp[pixel])
             pixel_frame.append(i + start_frame)
-            pixel_grad_mag.append(math.sqrt((gradientx[pixel] ** 2) + (gradienty[pixel] ** 2)))
+            pixel_grad_mag.append(
+                math.sqrt((gradientx[pixel]**2) + (gradienty[pixel]**2)))
             pixel_temp.append(temp[pixel])
             if gradientx[pixel] == 0:
                 if gradienty[pixel] > 0:
@@ -45,29 +54,32 @@ def plotBubble(temp_file, pixel, threshold=200, start_frame=0, end_frame=-1, fra
                 else:
                     pixel_grad_dir.append(0)
             else:
-                pixel_grad_dir.append((180 / math.pi) * math.atan(gradienty[pixel] / gradientx[pixel]))
-
+                pixel_grad_dir.append(
+                    (180 / math.pi) *
+                    math.atan(gradienty[pixel] / gradientx[pixel]))
+    """
     print(len(np.asarray(pixel_temp).flatten()))
     print(len(np.asarray(pixel_grad_mag).flatten()))
     print(len(np.asarray(pixel_grad_dir).flatten()))
-    fig = go.Figure(data=go.Scatter3d(
-        x=np.asarray(pixel_frame).flatten(),
-        y=np.asarray(pixel_grad_mag).flatten(),
-        z=np.asarray(pixel_grad_dir).flatten(),
-        mode="markers",
-        marker=dict(
-            color=np.asarray(pixel_temp).flatten(),
-            size=5,
-            colorbar_title='Temperature'
-        )
-    ))
+    """
+    fig = go.Figure(
+        data=go.Scatter3d(x=np.asarray(pixel_frame).flatten(),
+                          y=np.asarray(pixel_grad_mag).flatten(),
+                          z=np.asarray(pixel_grad_dir).flatten(),
+                          mode="markers",
+                          marker=dict(color=np.asarray(pixel_temp).flatten(),
+                                      size=5,
+                                      colorbar_title='Temperature')))
 
-    fig.update_layout(height=800, width=800,
+    fig.update_layout(height=800,
+                      width=800,
                       title='Pixel Temp and Gradient Magnitude and Angle')
 
     fig.show()
 
 
+"""
 plotBubble('/home/rjyarwood/Documents/Research/ResearchData/4-20_part_merged_data/thermal_cam_temps.npy',
            pixel=(5, 88),
            threshold=500)
+"""
