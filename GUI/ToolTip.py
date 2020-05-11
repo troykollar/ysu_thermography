@@ -1,5 +1,5 @@
 from tkinter import *
-
+import time
 
 class ToolTip(object):
 
@@ -44,6 +44,7 @@ def createToolTip(widget, text):
     toolTip = ToolTip(widget)
 
     def enter(event):
+
         toolTip.showtip(text)
 
     def leave(event):
