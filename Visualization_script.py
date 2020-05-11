@@ -5,17 +5,15 @@ import math
 from np_vid_viewer.helper_functions import printProgressBar
 
 
-def get_visualization(path,
+def get_visualization(temp_data: np.ndarray,
+                      path,
                       pixel_x,
                       pixel_y,
-                      data_list='thermal_cam_temps.npy',
                       start=None,
                       end=None,
                       threshold=500,
                       gridlines=True):
 
-    path = path  #specify directory to look in
-    data_list = data_list  #specify data set to look at
     if start is None:
         start_frame = 0
     else:
@@ -29,7 +27,7 @@ def get_visualization(path,
     num_frame = 27000  #specify number of frames to look a
 
     directory = os.chdir(path)
-    temps = np.load(data_list, mmap_mode='r')
+    temps = temp_data
     end_frame = start_frame + num_frame
     vid_frames = np.arange(start_frame, end_frame)
 
