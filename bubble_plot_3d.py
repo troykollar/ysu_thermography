@@ -8,7 +8,7 @@ from np_vid_viewer.helper_functions import printProgressBar
 
 def plotBubble(temp_data: np.ndarray,
                pixel: tuple,
-               threshold=200,
+               threshold: int,
                start_frame=0,
                end_frame=-1,
                frame_count=-1):
@@ -70,8 +70,8 @@ def plotBubble(temp_data: np.ndarray,
                       width=1000,
                       title='Pixel Temp and Gradient Magnitude and Angle for: ' + str(pixel),
                       scene=dict(xaxis=dict(title='Frame'),
-                      yaxis=dict(title='Gradient Magnitude'),
-                      zaxis=dict(title='Gradient Angle')))
+                                 yaxis=dict(title='Gradient Magnitude'),
+                                 zaxis=dict(title='Gradient Angle')))
 
     fig.show()
 
