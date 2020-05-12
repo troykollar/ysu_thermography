@@ -123,10 +123,13 @@ if len(corner_locations) == 4:
             print('\nGenerating 2D plots for: ' + str(pixel))
             get_visualization(temp_data,
                               path,
-                              pixel_x,
-                              pixel_y,
+                              pixel,
                               threshold=composite_threshold,
-                              start=start_frame,
-                              end=end_frame)
+                              start_frame=start_frame,
+                              end_frame=end_frame)
             print('\nGenerating 3D plot for: ' + str(pixel))
-            plotBubble(temp_data, pixel, threshold=composite_threshold)
+            plotBubble(temp_data,
+                       pixel,
+                       threshold=composite_threshold,
+                       start_frame=start_frame,
+                       end_frame=end_frame)
