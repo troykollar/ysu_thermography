@@ -37,25 +37,20 @@ def plotBubble(temp_data: np.ndarray,
     for i in range(frame_count):
         printProgressBar(i, frame_count)
         temp = temp_data[i + start_frame].copy()
-        gradientx, gradienty = np.gradient(temp)
+        result_matrix = np.asmatrix(temp)
+        dy, dx = np.gradient(result_matrix)  #Retrieve image gradient data
+        x_dir = dx[pixel]  #Pixel magnitude W.R.T. x-axis
+        y_dir = dy[pixel]  #Pixel magnitude W.R.T. y-axis
 
         if temp[pixel] > threshold:
             #print(temp[pixel])
             pixel_frame.append(i + start_frame)
             pixel_grad_mag.append(
-                math.sqrt((gradientx[pixel]**2) + (gradienty[pixel]**2)))
+                math.sqrt((x_dir**2) + (y_dir**2)))
             pixel_temp.append(temp[pixel])
-            if gradientx[pixel] == 0:
-                if gradienty[pixel] > 0:
-                    pixel_grad_dir.append(90)
-                elif gradienty[pixel] < 0:
-                    pixel_grad_dir.append(-90)
-                else:
-                    pixel_grad_dir.append(0)
-            else:
-                pixel_grad_dir.append(
-                    (180 / math.pi) *
-                    math.atan(gradienty[pixel] / gradientx[pixel]))
+            angle_rad = (np.arctan2(y_dir, x_dir) - (math.pi / 2)
+                         )  #shift -90 deg
+            pixel_grad_dir.append(angle_rad * (180 / math.pi)) 
     """
     print(len(np.asarray(pixel_temp).flatten()))
     print(len(np.asarray(pixel_grad_mag).flatten()))
@@ -73,7 +68,7 @@ def plotBubble(temp_data: np.ndarray,
 
     fig.update_layout(height=1000,
                       width=1000,
-                      title='Pixel Temp and Gradient Magnitude and Angle',
+                      title='Pixel Temp and Gradient Magnitude and Angle for: ' + str(pixel),
                       scene=dict(xaxis=dict(title='Frame'),
                       yaxis=dict(title='Gradient Magnitude'),
                       zaxis=dict(title='Gradient Angle')))
@@ -81,8 +76,8 @@ def plotBubble(temp_data: np.ndarray,
     fig.show()
 
 
-'''
+
 plotBubble(np.load('/home/rjyarwood/Documents/Research/ResearchData/4-20_part_merged_data/thermal_cam_temps.npy'),
            pixel=(5, 88),
            threshold=500)
-'''
+
