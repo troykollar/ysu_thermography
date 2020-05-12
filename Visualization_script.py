@@ -6,29 +6,24 @@ from np_vid_viewer.helper_functions import printProgressBar
 
 
 def get_visualization(temp_data: np.ndarray,
-                      path,
-                      pixel_x,
-                      pixel_y,
-                      start=None,
-                      end=None,
-                      threshold=500,
+                      path: str,
+                      pixel: tuple,
+                      threshold: int,
+                      start_frame=-1,
+                      end_frame=-1,
                       gridlines=True):
 
-    if start is None:
-        start_frame = 0
-    else:
-        start_frame = start
-    if end is None:
-        end_frame = 27000
-    else:
-        end_frame = end
+    pixel_x = pixel[0]
+    pixel_y = pixel[1]
 
-    start_frame = 0  #specify which frame to begin at
-    num_frame = 27000  #specify number of frames to look a
+    if start_frame < 0:
+        start_frame = 0
+
+    if end_frame < 0:
+        end_frame = temp_data.shape[0]
 
     directory = os.chdir(path)
     temps = temp_data
-    end_frame = start_frame + num_frame
     vid_frames = np.arange(start_frame, end_frame)
 
     #Direction arrays
@@ -76,11 +71,13 @@ def get_visualization(temp_data: np.ndarray,
 
     data_points = len(record)
 
-    if not (x_mag or y_mag or mag_arr or angle_arr_rad or angle_arr_deg):
+    # Original code, but removed because angle_arr_rad is undefined
+    #if not (x_mag or y_mag or mag_arr or angle_arr_rad or angle_arr_deg):
+    if not (x_mag or y_mag or mag_arr or angle_arr_deg):
         print('Data array is empty!')
         print(
             'There are {} data points above threshold of {} within frames {} to {}'
-            .format(data_points, threshold, start_frame, num_frame))
+            .format(data_points, threshold, start_frame, end_frame))
 
     else:
         #Plotting
