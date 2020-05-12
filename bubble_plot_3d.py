@@ -65,20 +65,24 @@ def plotBubble(temp_data: np.ndarray,
         data=go.Scatter3d(x=np.asarray(pixel_frame).flatten(),
                           y=np.asarray(pixel_grad_mag).flatten(),
                           z=np.asarray(pixel_grad_dir).flatten(),
+                          text=np.asarray(pixel_temp).flatten(),
                           mode="markers",
                           marker=dict(color=np.asarray(pixel_temp).flatten(),
                                       size=5,
                                       colorbar_title='Temperature')))
 
-    fig.update_layout(height=800,
-                      width=800,
-                      title='Pixel Temp and Gradient Magnitude and Angle')
+    fig.update_layout(height=1000,
+                      width=1000,
+                      title='Pixel Temp and Gradient Magnitude and Angle',
+                      scene=dict(xaxis=dict(title='Frame'),
+                      yaxis=dict(title='Gradient Magnitude'),
+                      zaxis=dict(title='Gradient Angle')))
 
     fig.show()
 
 
-"""
-plotBubble('/home/rjyarwood/Documents/Research/ResearchData/4-20_part_merged_data/thermal_cam_temps.npy',
+'''
+plotBubble(np.load('/home/rjyarwood/Documents/Research/ResearchData/4-20_part_merged_data/thermal_cam_temps.npy'),
            pixel=(5, 88),
            threshold=500)
-"""
+'''
