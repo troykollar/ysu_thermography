@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from matplotlib import pyplot as plt
+import plotly.graph_objects as go
 
 
 class PlotGen:
@@ -15,6 +16,14 @@ class PlotGen:
         self.threshold = threshold
         self.start_frame, self.end_frame = self.validate_start_end_frames(
             start_frame, end_frame)
+        self.directions = []
+        self.angles_deg = []
+        self.magnitudes = []
+        self.pixel_temps = []
+        self.pixel_frames = []
+
+        # Turns true after running gather data, so it can be run automatically
+        self.data_gathered = False
 
     def validate_start_end_frames(self, start_frame, end_frame):
         final_data_frame = self.temp_data.shape[0]
@@ -27,6 +36,37 @@ class PlotGen:
             end_frame = final_data_frame
 
         return start_frame, end_frame
+
+    def gather_data(self):
+        for i, frame in enumerate(
+                self.temp_data[self.start_frame:self.end_frame]):
+            self.printProgressBar(i, self.end_frame, 'Gathering data...')
+            pixel_x = self.pixel[0]
+            pixel_y = self.pixel[1]
+            cur_pixel_temp = frame[pixel_y, pixel_x]
+            result_matrix = np.asmatrix(frame)
+
+            print('frame: ' + str(i) + ' temp: ' + str(cur_pixel_temp))
+            if cur_pixel_temp > self.threshold:
+                self.pixel_frames.append(i)
+                self.pixel_temps.append(cur_pixel_temp)
+
+                dy, dx = np.gradient(
+                    result_matrix)  # Retrieve image gradient data
+                x_dir = dx[pixel_y, pixel_x]  # Pixel magnitude W.R.T. x-axis
+                y_dir = dy[pixel_y, pixel_x]  # Pixel magnitude W.R.T. y-axis
+                self.directions.append((x_dir, y_dir))
+
+                # Calc magnitude and add to magnitude array
+                magnitude = math.sqrt((x_dir**2) + (y_dir**2))
+                self.magnitudes.append(magnitude)
+
+                # Calc angle and add to angle array
+                angle_rad = (np.arctan2(y_dir, x_dir) - (math.pi / 2)
+                             )  #shift -90 deg
+                angle_deg = (angle_rad * (180 / math.pi))  #Convert to degrees
+                self.angles_deg.append(angle_deg)
+        self.data_gathered = True
 
     def printProgressBar(self, iteration, total, prefix=''):
         suffix = ''
@@ -46,51 +86,7 @@ class PlotGen:
 
 
 class DataVisualizer(PlotGen):
-    def __init__(self,
-                 temp_data: np.ndarray,
-                 pixel: tuple,
-                 threshold: int,
-                 start_frame=-1,
-                 end_frame=-1):
-        super().__init__(temp_data, pixel, threshold, start_frame, end_frame)
-        self.directions = []
-        self.angles_deg = []
-        self.magnitudes = []
-        self.pixel_temps = []
-
-        # Turns true after running gather data, so it can be run automatically
-        self.data_gathered = False
-
-    def gather_data(self):
-        for i, frame in enumerate(
-                self.temp_data[self.start_frame:self.end_frame]):
-            self.printProgressBar(i, self.end_frame, 'Gathering data...')
-            pixel_x = self.pixel[0]
-            pixel_y = self.pixel[1]
-            cur_pixel_temp = frame[pixel_y, pixel_x]
-            result_matrix = np.asmatrix(frame)
-
-            if cur_pixel_temp > self.threshold:
-                self.pixel_temps.append(cur_pixel_temp)
-
-                dy, dx = np.gradient(
-                    result_matrix)  # Retrieve image gradient data
-                x_dir = dx[pixel_x, pixel_y]  # Pixel magnitude W.R.T. x-axis
-                y_dir = dy[pixel_x, pixel_y]  # Pixel magnitude W.R.T. y-axis
-                self.directions.append((x_dir, y_dir))
-
-                # Calc magnitude and add to magnitude array
-                magnitude = math.sqrt((x_dir**2) + (y_dir**2))
-                self.magnitudes.append(magnitude)
-
-                # Calc angle and add to angle array
-                angle_rad = (np.arctan2(y_dir, x_dir) - (math.pi / 2)
-                             )  #shift -90 deg
-                angle_deg = (angle_rad * (180 / math.pi))  #Convert to degrees
-                self.angles_deg.append(angle_deg)
-        self.data_gathered = True
-
-    def generate_plots(self, gridlines=True):
+    def generate_2dplots(self, gridlines=True):
         if not self.data_gathered:
             self.gather_data()
 
@@ -173,9 +169,30 @@ class DataVisualizer(PlotGen):
 
         plt.show()
 
+    def generate_3dplot(self):
+        fig = go.Figure(data=go.Scatter3d(
+            x=np.asarray(self.pixel_frames).flatten(),
+            y=np.asarray(self.magnitudes).flatten(),
+            z=np.asarray(self.directions).flatten(),
+            text=np.asarray(self.pixel_temps).flatten(),
+            mode='markers',
+            marker=dict(color=np.asarray(self.pixel_temps).flatten(),
+                        size=5,
+                        colorbar_title='Temperature')))
+
+        fig.update_layout(height=1000,
+                          width=1000,
+                          title='Pixel Temp and Gradient Magnitude and Angle',
+                          scene=dict(xaxis=dict(title='Frame'),
+                                     yaxis=dict(title='Gradient Magnitude'),
+                                     zaxis=dict(title='Gradient Angle')))
+
+        fig.show()
+
 
 if __name__ == '__main__':
     temp_data_fname = '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy'
-    temp_data = np.load(temp_data_fname, allow_pickle=True, mmap_mode='r')
-    dv = DataVisualizer(temp_data, (120, 110), 500)
-    dv.generate_plots()
+    data = np.load(temp_data_fname, allow_pickle=True, mmap_mode='r')
+    dv = DataVisualizer(data, (50, 100), 500)
+    dv.generate_2dplots()
+    dv.generate_3dplot()
