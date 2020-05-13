@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from helper_functions import printProgressBar
+from reflection_remover import remove_bottom, remove_top
 
 
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
@@ -19,8 +20,10 @@ def get_threshold_img(dataset: np.ndarray,
                       threshold: int,
                       start=0,
                       end=0,
+                      rm_refl=False,
                       cap=None,
-                      show_progress=False):
+                      show_progress=False,
+                      debug_showframe=False):
     # Get frame size info
     height = dataset[0].shape[0]
     width = dataset[0].shape[1]
@@ -40,6 +43,21 @@ def get_threshold_img(dataset: np.ndarray,
         if show_progress:
             printProgressBar(i - start, end - start,
                              "Generating threshold image...")
+        if rm_refl:
+            frame = frame.copy()
+            remove_top(frame)
+            remove_bottom(frame)
+        showframe = frame.copy()
+        showframe = cv2.normalize(showframe,
+                                  showframe,
+                                  0,
+                                  255,
+                                  norm_type=cv2.NORM_MINMAX,
+                                  dtype=cv2.CV_8UC1)
+        if debug_showframe:
+            showframe = cv2.applyColorMap(showframe, cv2.COLORMAP_INFERNO)
+            cv2.imshow('frame', showframe)
+            cv2.waitKey(1)
         increment_from_thresh(threshold_img, frame, threshold)
 
     if cap is not None:
@@ -53,10 +71,12 @@ def get_threshold_img(dataset: np.ndarray,
 def save_threshold_img(filename: str,
                        threshold: int,
                        dst_folder=None,
+                       rm_refl=False,
                        start=0,
                        end=0,
                        cap=None,
-                       show_progress=False):
+                       show_progress=False,
+                       debug_showframe=False):
     # Get temp data info
     temp_data = np.load(filename, mmap_mode="r", allow_pickle=True)
     build_folder = filename[:filename.rfind('/')]
@@ -73,8 +93,14 @@ def save_threshold_img(filename: str,
     raw_filename = filename = dst_folder + '/' + build_number + '_threshold' + str(
         threshold) + '_raw.png'
 
-    threshold_img = get_threshold_img(temp_data, threshold, start, end, cap,
-                                      show_progress)
+    threshold_img = get_threshold_img(dataset=temp_data,
+                                      threshold=threshold,
+                                      start=start,
+                                      end=end,
+                                      cap=cap,
+                                      show_progress=show_progress,
+                                      rm_refl=rm_refl,
+                                      debug_showframe=debug_showframe)
 
     fig, ax = plt.subplots()
     fig.suptitle('Build: ' + str(build_number) + ' Threshold: ' +
@@ -104,6 +130,10 @@ if __name__ == '__main__':
                         type=str,
                         default=None,
                         help='Destination folder to save composite image.')
+    parser.add_argument('-rm_refl',
+                        type=int,
+                        default=False,
+                        help='Whether or not to remove reflections.')
     parser.add_argument('-cap',
                         type=int,
                         help='Maximum number of frames to increment')
@@ -117,8 +147,21 @@ if __name__ == '__main__':
                         default=0,
                         required=False,
                         help='Last frame to consider.')
+    parser.add_argument(
+        '-debug',
+        type=int,
+        default=False,
+        help='Show each frame composite is using to generate from.')
+
     args = parser.parse_args()
     load_filename = '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy'
     dst_folder = '/home/troy/thermography/4-20_corrected/'
-    save_threshold_img(args.temp_data, args.THRESHOLD, args.dst_folder,
-                       args.start, args.end, args.cap, True)
+    save_threshold_img(filename=args.temp_data,
+                       threshold=args.THRESHOLD,
+                       dst_folder=args.dst_folder,
+                       start=args.start,
+                       end=args.end,
+                       cap=args.cap,
+                       show_progress=True,
+                       rm_refl=bool(args.rm_refl),
+                       debug_showframe=bool(args.debug))
