@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from helper_functions import printProgressBar
-from dataset import DataSet
+from dataset import DataSet, get_dataset_CLargs
 
 
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
@@ -86,11 +86,24 @@ def save_threshold_img(filename: str,
     print('Threshold img saved as: ' + filename)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate a composite image.')
-    parser.add_argument('temp_data',
-                        type=str,
-                        help='filename (and location) of temp data')
+def get_composite_CLargs(parser: argparse.ArgumentParser):
+    """Add composite related CL arguments to given parser.
+
+    Added Arguments
+    ---------------
+    THRESHOLD: required
+        int specifying the threshold to be used for the composite image.
+    dst_folder: optional
+        str specifying where to save the composite image. Defaults to build folder.
+    cap: optional
+        int specifying the max number of frames to use for composite.
+    start: optional
+        int specifying the first frame to consider for the composite.
+    end: optional
+        int specifying the last frame to consider for the composite.
+    debug: optional
+        0 or 1 specifying whether to show each frame being used for the composite.
+    """
     parser.add_argument('THRESHOLD',
                         type=int,
                         help='temperature theshold of the image')
@@ -98,10 +111,6 @@ if __name__ == '__main__':
                         type=str,
                         default=None,
                         help='Destination folder to save composite image.')
-    parser.add_argument('-rm_refl',
-                        type=int,
-                        default=False,
-                        help='Whether or not to remove reflections.')
     parser.add_argument('-cap',
                         type=int,
                         help='Maximum number of frames to increment')
@@ -121,17 +130,35 @@ if __name__ == '__main__':
         default=False,
         help='Show each frame composite is using to generate from.')
 
-    args = parser.parse_args()
-    load_filename = '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy'
-    dst_folder = '/home/troy/thermography/4-20_corrected/'
 
-    dataset = DataSet(args.temp_data, bool(args.rm_refl), bool(args.rm_refl))
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate a composite image.')
+
+    get_dataset_CLargs(parser)
+    get_composite_CLargs(parser)
+
+    args = parser.parse_args()
+
+    temp_data = args.temp_data
+    top = bool(args.top)
+    bot = bool(args.bot)
+    threshold = args.THRESHOLD
+
+    dst_folder = args.dst_folder
+    cap = args.cap
+    start = args.start
+    end = args.end
+    debug = bool(args.debug)
+
+    dataset = DataSet(temp_data,
+                      remove_top_reflection=top,
+                      remove_bottom_reflection=bot)
     threshold_img = get_threshold_img(dataset=dataset,
-                                      threshold=args.THRESHOLD,
-                                      start=args.start,
-                                      end=args.end,
-                                      cap=args.cap)
-    save_threshold_img(filename=args.temp_data,
+                                      threshold=threshold,
+                                      start=start,
+                                      end=end,
+                                      cap=cap)
+    save_threshold_img(filename=temp_data,
                        threshold_img=threshold_img,
-                       threshold=args.THRESHOLD,
-                       dst_folder=args.dst_folder)
+                       threshold=threshold,
+                       dst_folder=dst_folder)
