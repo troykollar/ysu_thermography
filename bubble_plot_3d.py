@@ -13,21 +13,7 @@ def plotBubble(temp_data: np.ndarray,
                end_frame=-1,
                frame_count=-1):
 
-    if start_frame == 0:
-        if frame_count == -1 and end_frame == -1:
-            frame_count = temp_data.shape[0]
-        elif end_frame != -1:
-            frame_count = end_frame - start_frame
-        elif frame_count != -1:
-            frame_count = frame_count
 
-    else:
-        if frame_count == -1 and end_frame == -1:
-            frame_count = temp_data.shape[0] - start_frame
-        elif end_frame != -1:
-            frame_count = end_frame - start_frame
-        elif frame_count != -1:
-            frame_count = frame_count
 
     pixel_grad_mag = []
     pixel_grad_dir = []
@@ -37,20 +23,27 @@ def plotBubble(temp_data: np.ndarray,
     for i in range(frame_count):
         printProgressBar(i, frame_count)
         temp = temp_data[i + start_frame].copy()
-        result_matrix = np.asmatrix(temp)
-        dy, dx = np.gradient(result_matrix)  #Retrieve image gradient data
-        x_dir = dx[pixel]  #Pixel magnitude W.R.T. x-axis
-        y_dir = dy[pixel]  #Pixel magnitude W.R.T. y-axis
 
         if temp[pixel] > threshold:
-            #print(temp[pixel])
-            pixel_frame.append(i + start_frame)
-            pixel_grad_mag.append(
-                math.sqrt((x_dir**2) + (y_dir**2)))
-            pixel_temp.append(temp[pixel])
+
+            result_matrix = np.asmatrix(temp)
+
+            dy, dx = np.gradient(result_matrix)  # Retrieve image gradient data
+            x_dir = dx[pixel]  # Pixel magnitude W.R.T. x-axis
+            y_dir = dy[pixel]  # Pixel magnitude W.R.T. y-axis
+
+            # Magnitude Calculation
+            magnitude = math.sqrt((x_dir**2) + (y_dir**2))
+
+            # Angle Calculation
             angle_rad = (np.arctan2(y_dir, x_dir) - (math.pi / 2)
-                         )  #shift -90 deg
-            pixel_grad_dir.append(angle_rad * (180 / math.pi)) 
+                         )  # shift -90 deg
+            angle_deg = (angle_rad * (180 / math.pi))  # Convert to degrees
+
+            pixel_frame.append(i + start_frame)
+            pixel_grad_mag.append(magnitude)
+            pixel_temp.append(temp[pixel])
+            pixel_grad_dir.append(angle_deg)
     """
     print(len(np.asarray(pixel_temp).flatten()))
     print(len(np.asarray(pixel_grad_mag).flatten()))
@@ -68,10 +61,10 @@ def plotBubble(temp_data: np.ndarray,
 
     fig.update_layout(height=1000,
                       width=1000,
-                      title='Pixel Temp and Gradient Magnitude and Angle for: ' + str(pixel),
-                      scene=dict(xaxis=dict(title='Frame'),
-                                 yaxis=dict(title='Gradient Magnitude'),
-                                 zaxis=dict(title='Gradient Angle')))
+                      title='Pixel Temp and Gradient Magnitude and Angle for: ' + str(pixel) + ' Threshold: ' + str(threshold),
+                      scene=dict(xaxis=dict(title='X: Frame'),
+                                 yaxis=dict(title='Y: Gradient Magnitude'),
+                                 zaxis=dict(title='Z: Gradient Angle')))
 
     fig.show()
 

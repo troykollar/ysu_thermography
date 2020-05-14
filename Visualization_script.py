@@ -6,15 +6,11 @@ from np_vid_viewer.helper_functions import printProgressBar
 
 
 def get_visualization(temp_data: np.ndarray,
-                      path: str,
                       pixel: tuple,
                       threshold: int,
                       start_frame=-1,
                       end_frame=-1,
                       gridlines=True):
-
-    pixel_x = pixel[0]
-    pixel_y = pixel[1]
 
     if start_frame < 0:
         start_frame = 0
@@ -22,8 +18,6 @@ def get_visualization(temp_data: np.ndarray,
     if end_frame < 0:
         end_frame = temp_data.shape[0]
 
-    directory = os.chdir(path)
-    temps = temp_data
     vid_frames = np.arange(start_frame, end_frame)
 
     #Direction arrays
@@ -42,17 +36,16 @@ def get_visualization(temp_data: np.ndarray,
     for frame_index in vid_frames:
         printProgressBar(frame_index, vid_frames[-1])
 
-        pixel = temps[frame_index, pixel_x, pixel_y]
-        data = temps[frame_index, :, :]
-        result_matrix = np.asmatrix(data)
+        temp = temp_data[frame_index]
+        result_matrix = np.asmatrix(temp)
 
-        if pixel > threshold:
+        if temp[pixel] > threshold:
 
             record.append(pixel)
 
             dy, dx = np.gradient(result_matrix)  #Retrieve image gradient data
-            x_dir = dx[pixel_x, pixel_y]  #Pixel magnitude W.R.T. x-axis
-            y_dir = dy[pixel_x, pixel_y]  #Pixel magnitude W.R.T. y-axis
+            x_dir = dx[pixel]  #Pixel magnitude W.R.T. x-axis
+            y_dir = dy[pixel]  #Pixel magnitude W.R.T. y-axis
 
             #Magnitude Calculation
             magnitude = math.sqrt((x_dir**2) + (y_dir**2))
@@ -87,8 +80,8 @@ def get_visualization(temp_data: np.ndarray,
         binning1 = int((abs(mag_maximum - mag_minimum)) / 5)
         fig1, ax1 = plt.subplots()
         fig1.suptitle(
-            'Pixel ({},{}) Magnitude Histogram:\n{} Bins, Threshold: {}'.
-            format(pixel_x, pixel_y, binning1, threshold))
+            'Pixel {} Magnitude Histogram:\n{} Bins, Threshold: {}'.
+            format(pixel, binning1, threshold))
         ax1.set_xlabel('Magnitude (sqrt(x^2+y^2))')
         ax1.set_ylabel('Frequency')
         ax1.hist(mag_arr,
@@ -103,8 +96,8 @@ def get_visualization(temp_data: np.ndarray,
         binning2 = int(binning1 / 1.5)
         fig2, ax2 = plt.subplots()
         fig2.suptitle(
-            'Pixel ({},{}) Angle Histogram:\n{} Bins, Threshold: {}\n'.format(
-                pixel_x, pixel_y, binning2, threshold))
+            'Pixel {} Angle Histogram:\n{} Bins, Threshold: {}\n'.format(
+                pixel, binning2, threshold))
         ax2.set_xlabel('Angle (°)')
         ax2.set_ylabel('Frequency')
         counts, bins, bars = ax2.hist(angle_arr_deg,
@@ -118,8 +111,8 @@ def get_visualization(temp_data: np.ndarray,
         histgrid = (binning1, binning2)
         fig3, ax3 = plt.subplots()
         fig3.suptitle(
-            'Pixel ({},{}) Magnitude vs Angle Histogram:\nThreshold: {}\n'.
-            format(pixel_x, pixel_y, threshold))
+            'Pixel {} Magnitude vs Angle Histogram:\nThreshold: {}\n'.
+            format(pixel, threshold))
         ax3.set_xlabel('Angle (°)')
         ax3.set_ylabel('Magnitude (sqrt(x^2+y^2))')
         histplot = ax3.hist2d(angle_arr_deg,
@@ -132,8 +125,8 @@ def get_visualization(temp_data: np.ndarray,
         #Scatterplot - Magnitude vs Angle (degrees)
         fig4, ax4 = plt.subplots()
         fig4.suptitle(
-            'Pixel ({},{}) Magnitude vs Angle Scatterplot:\nThreshold: {}\n'.
-            format(pixel_x, pixel_y, threshold))
+            'Pixel {} Magnitude vs Angle Scatterplot:\nThreshold: {}\n'.
+            format(pixel, threshold))
         ax4.set_xlabel('Angle (°)')
         ax4.set_ylabel('Magnitude (sqrt(x^2+y^2))')
         ax4.scatter(angle_arr_deg, mag_arr)
@@ -143,8 +136,8 @@ def get_visualization(temp_data: np.ndarray,
         hexgrid = (binning1, binning2)
         fig5, ax5 = plt.subplots()
         fig5.suptitle(
-            'Pixel ({},{}) Magnitude and Angle Hist:\nThreshold: {}\n'.format(
-                pixel_x, pixel_y, threshold))
+            'Pixel {} Magnitude and Angle Hist:\nThreshold: {}\n'.format(
+                pixel, threshold))
         ax5.set_xlabel('Angle (°)')
         ax5.set_ylabel('Magnitude (sqrt(x^2+y^2))')
         hexplot = ax5.hexbin(angle_arr_deg,
