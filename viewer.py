@@ -1,3 +1,5 @@
+import os
+import shutil
 import argparse
 import cv2
 import numpy as np
@@ -44,12 +46,27 @@ class Viewer:
 
     def save_frame16(self, start: int, end=-1):
         # TODO: Add ability to save range of frames
+        # TODO: Add frame choice validation
         # Save only one frame
         if end < 0:
             savename = self.dataset.build_folder + '/frame' + str(
                 start) + '.png'
             plt.imsave(savename, dataset[start], cmap='inferno')
             print('Saved to: ' + savename)
+        else:
+            # Create folder to save frames in
+            frame_range_folder = self.dataset.build_folder + '/frames' + str(
+                start) + '-' + str(end - 1)
+
+            if os.path.isdir(frame_range_folder):
+                shutil.rmtree(frame_range_folder)
+            os.mkdir(frame_range_folder)
+
+            i = start
+            for i in range(start, end):
+                savename = frame_range_folder + '/frame' + str(i) + '.png'
+                plt.imsave(savename, self.dataset[i], cmap='inferno')
+            print('Frame range saved in: ' + frame_range_folder)
 
     def key_handler(self, key):
         # TODO: Add ability to jump forward and back frames
@@ -111,6 +128,13 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         type=int,
         help='int specifying a frame to save in 16 bit color using matplotlib.'
     )
+    parser.add_argument(
+        '-framerange',
+        default=None,
+        type=str,
+        help=
+        'tuple (start,end) specifying frame range to save in 16 bit color using matplotlib.'
+    )
 
 
 if __name__ == '__main__':
@@ -128,6 +152,7 @@ if __name__ == '__main__':
     bot = bool(args.bot)
     scale = args.scale
     frame = args.frame
+    framerange = args.framerange
 
     dataset = DataSet(temp_data, top, bot, int(scale))
     thermal_viewer = Viewer(dataset)
@@ -136,3 +161,8 @@ if __name__ == '__main__':
         thermal_viewer.save_frame16(int(frame))
     if play:
         thermal_viewer.play_video()
+    if framerange is not None:
+        comma_index = str(framerange).find(',')
+        start = int(framerange[:comma_index])
+        end = int(framerange[comma_index + 1:])
+        thermal_viewer.save_frame16(start=start, end=end)
