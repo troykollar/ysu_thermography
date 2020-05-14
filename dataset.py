@@ -116,12 +116,16 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
         '-top',
         type=int,
         default=False,
-        help='0 or 1 specifying whether or not to remove top reflections.')
+        help=
+        '0 or 1 specifying whether or not to remove top reflections from dataset.'
+    )
     parser.add_argument(
         '-bot',
         type=int,
         default=False,
-        help='0 or 1 specifying whether or not to remove bottom reflections.')
+        help=
+        '0 or 1 specifying whether or not to remove bottom reflections from dataset.'
+    )
 
 
 if __name__ == '__main__':
