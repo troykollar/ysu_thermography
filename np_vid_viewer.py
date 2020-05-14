@@ -5,8 +5,8 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from np_vid_viewer.helper_functions import *
-from np_vid_viewer.dataset import DataSet
+from helper_functions import *
+from dataset import DataSet
 
 
 def format_time(t):
