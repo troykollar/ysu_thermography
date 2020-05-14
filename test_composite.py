@@ -24,8 +24,8 @@ class TestThresholdIncrementer(unittest.TestCase):
 
     def test_increment_from_thresh(self):
         """Test that a threshold image is properly incremented when given a threshold"""
-        data_array = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
-                              dtype=np.float32)
+        full_dataset = DataSet('test_dataset.npy')
+        data_array = full_dataset[0]
         height = data_array.shape[0]
         width = data_array.shape[1]
         threshold_img = np.zeros((height, width), dtype=np.float32)
@@ -41,13 +41,15 @@ class TestThresholdIncrementer(unittest.TestCase):
 
     def test_get_threshold_img(self):
         """Test that a threshold image can be correctly generated"""
+        """
         data_array1 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
                                dtype=np.float32)
         data_array2 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
                                dtype=np.float32)
         data_array3 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
                                dtype=np.float32)
-        full_dataset = np.stack((data_array1, data_array2, data_array3))
+        """
+        full_dataset = DataSet(temps_file='test_dataset.npy')
 
         threshold = 3
         threshold_img = get_threshold_img(full_dataset, threshold)
