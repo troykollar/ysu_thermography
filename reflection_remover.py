@@ -5,7 +5,7 @@ import cv2
 #TODO: Remove side reflections
 
 
-def remove_top(frame, min_value=174, min_value_threshold=5):
+def remove_top_reflection(frame, min_value=174, min_value_threshold=5):
     max_value = np.amax(frame)
     max_value_location = np.where(frame == max_value)
     max_value_y = max_value_location[0][0]

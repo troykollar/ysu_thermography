@@ -22,7 +22,7 @@ def get_visualization(temp_data: np.ndarray,
     if end_frame < 0:
         end_frame = temp_data.shape[0]
 
-    directory = os.chdir(path)
+    #directory = os.chdir(path)
     temps = temp_data
     vid_frames = np.arange(start_frame, end_frame)
 
@@ -42,6 +42,7 @@ def get_visualization(temp_data: np.ndarray,
     for frame_index in vid_frames:
         printProgressBar(frame_index, vid_frames[-1])
 
+        # Possible bug, I think numpy arrays are read y,x instead of x,y
         pixel = temps[frame_index, pixel_x, pixel_y]
         data = temps[frame_index, :, :]
         result_matrix = np.asmatrix(data)

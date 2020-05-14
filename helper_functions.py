@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import np_vid_viewer
 
 
 def min_scale_factor(data_frame):
