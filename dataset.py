@@ -5,7 +5,7 @@ from helper_functions import printProgressBar
 
 class DataSet:
     def __init__(self,
-                 temps_file: str,
+                 temps_file: str = None,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False,
                  scale_factor=1):
@@ -22,19 +22,17 @@ class DataSet:
         self.cleaned_frame_data = np.empty(self.frame_data.shape,
                                            dtype=np.float32)
 
-        if remove_top_reflection or remove_bottom_reflection:
-            for i, frame in enumerate(self.frame_data):
-                printProgressBar(i, self.frame_data.shape[0],
-                                 'Removing reflections...')
-                frame = frame.copy()
-                if remove_top_reflection:
-                    self.remove_top(frame)
-                if remove_bottom_reflection:
-                    self.remove_bottom(frame)
-                self.cleaned_frame_data[i] = frame
+        for i, frame in enumerate(self.frame_data):
+            printProgressBar(i, self.frame_data.shape[0],
+                             'Removing reflections...')
+            frame = frame.copy()
+            if remove_top_reflection:
+                self.remove_top(frame)
+            if remove_bottom_reflection:
+                self.remove_bottom(frame)
+            self.cleaned_frame_data[i] = frame
 
-        # Save index of last frame
-        self.final_frame = self.frame_data.shape[0] - 1
+        self.shape = self.frame_data.shape
 
     def __len__(self):
         return len(self.frame_data)
