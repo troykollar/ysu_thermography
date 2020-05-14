@@ -53,8 +53,12 @@ class Viewer:
             self.quit = True
         elif key == ord('s'):
             self.save_frame16(self.cur_frame)
-        elif key == ord('p') or key == 32:
+        elif key == ord('p') or key == 32 or key == ord('k'):
             self.pause = not self.pause
+        elif key == ord('l'):
+            self.advance_frame(10)
+        elif key == ord('j'):
+            self.rewind_frame(10)
         else:
             pass
 
