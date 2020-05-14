@@ -75,13 +75,30 @@ class Viewer:
         pass
 
 
+def get_viewer_CLargs(parser: argparse.ArgumentParser):
+    """Add viewer related CL arguments to given parser
+
+    Added Arguments
+    ---------------
+    play: optional
+        Play the video using OpenCV.
+    """
+    parser.add_argument(
+        '-play',
+        type=int,
+        help='0 or 1 specifying whether to play the video using OpenCV.')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Play a video from the given dataset.')
 
+    get_viewer_CLargs(parser)
     get_dataset_CLargs(parser)
+
     args = parser.parse_args()
 
+    play = bool(args.play)
     temp_data = args.temp_data
     top = bool(args.top)
     bot = bool(args.bot)
@@ -89,4 +106,6 @@ if __name__ == '__main__':
 
     dataset = DataSet(temp_data, top, bot, scale)
     thermal_viewer = Viewer(dataset)
-    thermal_viewer.play_video()
+
+    if play:
+        thermal_viewer.play_video()
