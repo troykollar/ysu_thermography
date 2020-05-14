@@ -6,8 +6,6 @@ from dataset import DataSet, get_dataset_CLargs
 
 
 def on_click(event, x, y, flags, param):
-    x_loc = x
-    y_loc = y
     if event == cv2.EVENT_LBUTTONDOWN:
         param.append((x, y))
 
