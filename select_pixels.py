@@ -4,8 +4,6 @@ import numpy as np
 import argparse
 from np_vid_viewer.helper_functions import get_build_number, get_build_folder
 from np_vid_viewer.composite import get_threshold_img
-from Visualization_script import get_visualization
-from bubble_plot_3d import plotBubble
 from plot import Plots
 
 PARSER = argparse.ArgumentParser(description='Generate plots from a dataset.')
