@@ -26,10 +26,13 @@ def get_threshold_img(dataset: DataSet,
     width = dataset[0].shape[1]
 
     # TODO: Add better validation for start and end frames
-    if end < 0 or end > dataset.final_frame:
-        end = dataset.final_frame
+    final_frame = dataset.shape[0]
+    if end < 0 or end > final_frame:
+        end = final_frame
+    else:
+        end = end + 1
 
-    if start < 0 or start > dataset.final_frame:
+    if start < 0 or start > final_frame:
         start = 0
 
     # Make blank image to increment
