@@ -11,19 +11,23 @@ class Viewer:
         self.quit = False
         self.cur_frame = None
         self.pause = False
+        self.update_frame = True
 
     def play_video(self):
         window_name = self.dataset.build_folder
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         self.cur_frame = 0
         while not self.quit:
-            if not self.pause:
+            if self.update_frame:
                 frame = self.dataset[self.cur_frame]
-                if self.quit:
-                    break
                 frame = self.colormap_frame(frame)
-                self.advance_frame(1)
+            if self.quit:
+                break
             cv2.imshow(window_name, frame)
+            if not self.pause:
+                self.advance_frame(1)
+            else:
+                self.update_frame = False
             key = cv2.waitKey(1) & 0xFF
             self.key_handler(key)
         cv2.destroyAllWindows()
@@ -68,11 +72,15 @@ class Viewer:
         else:
             self.cur_frame += advancement
 
+        self.update_frame = True
+
     def rewind_frame(self, rewind_amount: int):
         if self.cur_frame - rewind_amount <= 0:
             self.cur_frame = 0
         else:
             self.cur_frame -= rewind_amount
+
+        self.update_frame = True
 
     def draw_contour(self):
         # TODO: Add contour drawing
