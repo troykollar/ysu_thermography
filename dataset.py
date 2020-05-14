@@ -22,15 +22,16 @@ class DataSet:
         self.cleaned_frame_data = np.empty(self.frame_data.shape,
                                            dtype=np.float32)
 
-        for i, frame in enumerate(self.frame_data):
-            printProgressBar(i, self.frame_data.shape[0],
-                             'Removing reflections...')
-            frame = frame.copy()
-            if remove_top_reflection:
-                self.remove_top(frame)
-            if remove_bottom_reflection:
-                self.remove_bottom(frame)
-            self.cleaned_frame_data[i] = frame
+        if self.remove_top_reflection or self.remove_bottom_reflection:
+            for i, frame in enumerate(self.frame_data):
+                printProgressBar(i, self.frame_data.shape[0],
+                                 'Removing reflections...')
+                frame = frame.copy()
+                if remove_top_reflection:
+                    self.remove_top(frame)
+                if remove_bottom_reflection:
+                    self.remove_bottom(frame)
+                self.cleaned_frame_data[i] = frame
 
         self.shape = self.frame_data.shape
 
@@ -38,7 +39,11 @@ class DataSet:
         return len(self.frame_data)
 
     def __getitem__(self, index: int):
-        return self.cleaned_frame_data[index]
+        if self.remove_top_reflection or self.remove_bottom_reflection:
+            frame = self.cleaned_frame_data[index]
+        else:
+            frame = self.frame_data[index]
+        return frame
 
     def remove_top(self, frame: np.ndarray):
         min_value = 174
