@@ -2,3 +2,5 @@
 *__pycache__
 np_vid_viewer/*__pycache__
 .vscode
+thresh_imgs_all_builds.py
+pixel_locations*

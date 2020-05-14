@@ -3,10 +3,15 @@ import math
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
+from np_vid_viewer.helper_functions import printProgressBar
 
 
-def plotBubble(temp_file, pixel, threshold=200, start_frame=0, end_frame=-1, frame_count=-1):
-    temp_data = np.load(temp_file, allow_pickle=True)
+def plotBubble(temp_data: np.ndarray,
+               pixel: tuple,
+               threshold: int,
+               start_frame=0,
+               end_frame=-1,
+               frame_count=-1):
 
     if start_frame == 0:
         if frame_count == -1 and end_frame == -1:
@@ -30,44 +35,49 @@ def plotBubble(temp_file, pixel, threshold=200, start_frame=0, end_frame=-1, fra
     pixel_frame = []
 
     for i in range(frame_count):
+        printProgressBar(i, frame_count)
         temp = temp_data[i + start_frame].copy()
-        gradientx, gradienty = np.gradient(temp)
-        if temp[pixel] > threshold:
-            print(temp[pixel])
-            pixel_frame.append(i + start_frame)
-            pixel_grad_mag.append(math.sqrt((gradientx[pixel] ** 2) + (gradienty[pixel] ** 2)))
-            pixel_temp.append(temp[pixel])
-            if gradientx[pixel] == 0:
-                if gradienty[pixel] > 0:
-                    pixel_grad_dir.append(90)
-                elif gradienty[pixel] < 0:
-                    pixel_grad_dir.append(-90)
-                else:
-                    pixel_grad_dir.append(0)
-            else:
-                pixel_grad_dir.append((180 / math.pi) * math.atan(gradienty[pixel] / gradientx[pixel]))
+        result_matrix = np.asmatrix(temp)
+        dy, dx = np.gradient(result_matrix)  #Retrieve image gradient data
+        x_dir = dx[pixel]  #Pixel magnitude W.R.T. x-axis
+        y_dir = dy[pixel]  #Pixel magnitude W.R.T. y-axis
 
+        if temp[pixel] > threshold:
+            #print(temp[pixel])
+            pixel_frame.append(i + start_frame)
+            pixel_grad_mag.append(
+                math.sqrt((x_dir**2) + (y_dir**2)))
+            pixel_temp.append(temp[pixel])
+            angle_rad = (np.arctan2(y_dir, x_dir) - (math.pi / 2)
+                         )  #shift -90 deg
+            pixel_grad_dir.append(angle_rad * (180 / math.pi)) 
+    """
     print(len(np.asarray(pixel_temp).flatten()))
     print(len(np.asarray(pixel_grad_mag).flatten()))
     print(len(np.asarray(pixel_grad_dir).flatten()))
-    fig = go.Figure(data=go.Scatter3d(
-        x=np.asarray(pixel_frame).flatten(),
-        y=np.asarray(pixel_grad_mag).flatten(),
-        z=np.asarray(pixel_grad_dir).flatten(),
-        mode="markers",
-        marker=dict(
-            color=np.asarray(pixel_temp).flatten(),
-            size=5,
-            colorbar_title='Temperature'
-        )
-    ))
+    """
+    fig = go.Figure(
+        data=go.Scatter3d(x=np.asarray(pixel_frame).flatten(),
+                          y=np.asarray(pixel_grad_mag).flatten(),
+                          z=np.asarray(pixel_grad_dir).flatten(),
+                          text=np.asarray(pixel_temp).flatten(),
+                          mode="markers",
+                          marker=dict(color=np.asarray(pixel_temp).flatten(),
+                                      size=5,
+                                      colorbar_title='Temperature')))
 
-    fig.update_layout(height=800, width=800,
-                      title='Pixel Temp and Gradient Magnitude and Angle')
+    fig.update_layout(height=1000,
+                      width=1000,
+                      title='Pixel Temp and Gradient Magnitude and Angle for: ' + str(pixel),
+                      scene=dict(xaxis=dict(title='Frame'),
+                                 yaxis=dict(title='Gradient Magnitude'),
+                                 zaxis=dict(title='Gradient Angle')))
 
     fig.show()
 
 
-plotBubble('/home/rjyarwood/Documents/Research/ResearchData/4-20_part_merged_data/thermal_cam_temps.npy',
+
+plotBubble(np.load('/home/rjyarwood/Documents/Research/ResearchData/4-20_part_merged_data/thermal_cam_temps.npy'),
            pixel=(5, 88),
            threshold=500)
+

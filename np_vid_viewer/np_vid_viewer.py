@@ -5,7 +5,6 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from np_vid_viewer.progress_bar import printProgressBar
 from np_vid_viewer.helper_functions import *
 from np_vid_viewer.dataset import DataSet
 

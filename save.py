@@ -88,11 +88,22 @@ FOLLOW_MAX = ARGS.fmax
 FOLLOW_CONTOUR = ARGS.fcontour
 CONTOUR_THRESHOLD = ARGS.cthresh
 CDATA = bool(ARGS.cData)
+<<<<<<< HEAD
+
+DATASET = dset(DATA_DIRECTORY, REMOVE_TOP_REFLECTION, REMOVE_BOTTOM_REFLECTION)
+VIEWER = np_vid_viewer.data_video(DATASET,
+                                  ARGS.mp,
+                                  follow_max_temp=FOLLOW_MAX,
+                                  contour_threshold=CONTOUR_THRESHOLD,
+                                  follow_contour=FOLLOW_CONTOUR,
+                                  contour_data_on_img=CDATA)
+=======
 START_FRAME = ARGS.start
 END_FRAME = ARGS.end
 
 VIEWER = NpVidTool(DATA_DIRECTORY, REMOVE_TOP_REFLECTION,
                    REMOVE_BOTTOM_REFLECTION, ARGS.mp, FOLLOW_MAX,
                    CONTOUR_THRESHOLD, FOLLOW_CONTOUR, CDATA)
+>>>>>>> c8033238d8f0a7e861ca50410a2982e66bec8923
 
 VIEWER.save_video(SCALE_FACTOR, FPS, START_FRAME, END_FRAME)

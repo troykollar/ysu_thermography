@@ -81,7 +81,7 @@ PARSER.add_argument(
     type=int,
     default=False,
     required=False,
-    help='0 or 1 specifying wether or not to remove bottom reflections')
+    help='0 or 1 specifying wether or not to add contour data onto the video')
 
 ARGS = PARSER.parse_args()
 
