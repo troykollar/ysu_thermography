@@ -163,7 +163,7 @@ class GUI:
                                         relief=FLAT, highlightcolor=self.BACKGROUND)
         saveVideoCheckbox.pack()
 
-        gradientHistogramLabel = LabelFrame(functionsFrame, text="Gradient Histogram",
+        gradientHistogramLabel = LabelFrame(functionsFrame, text="Gradient Plots",
                                             bd=0, highlightthickness=0, bg=self.BACKGROUND,
                                             labelanchor=N, padx=5)
         gradientHistogramHint = Descriptors.getHintTextFunctionFrame('gradientHistogramLabel')

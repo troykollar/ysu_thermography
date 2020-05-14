@@ -4,8 +4,7 @@ import numpy as np
 import argparse
 from np_vid_viewer.helper_functions import get_build_number, get_build_folder
 from np_vid_viewer.composite import get_threshold_img
-from Visualization_script import get_visualization
-from bubble_plot_3d import plotBubble
+from plot import Plots
 
 PARSER = argparse.ArgumentParser(description='Generate plots from a dataset.')
 PARSER.add_argument('temp_data',
@@ -118,18 +117,11 @@ if len(corner_locations) == 4:
         loc_file.close()
 
         for pixel in pixel_locations:
-            pixel_x = pixel[0]
-            pixel_y = pixel[1]
+            print(temp_data.shape)
             print('\nGenerating 2D plots for: ' + str(pixel))
-            get_visualization(temp_data,
-                              path,
-                              pixel,
-                              threshold=composite_threshold,
-                              start_frame=start_frame,
-                              end_frame=end_frame)
-            print('\nGenerating 3D plot for: ' + str(pixel))
-            plotBubble(temp_data,
-                       pixel,
-                       threshold=composite_threshold,
-                       start_frame=start_frame,
-                       end_frame=end_frame)
+            plot = Plots(temp_data,
+                         (pixel_y, pixel_x),
+                         threshold=composite_threshold,
+                         start_frame=start_frame,
+                         end_frame=end_frame)
+            plot.all()
