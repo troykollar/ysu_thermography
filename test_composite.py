@@ -41,14 +41,6 @@ class TestThresholdIncrementer(unittest.TestCase):
 
     def test_get_threshold_img(self):
         """Test that a threshold image can be correctly generated"""
-        """
-        data_array1 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
-                               dtype=np.float32)
-        data_array2 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
-                               dtype=np.float32)
-        data_array3 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
-                               dtype=np.float32)
-        """
         full_dataset = DataSet(temps_file='test_dataset.npy')
 
         threshold = 3
