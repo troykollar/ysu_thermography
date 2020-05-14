@@ -40,7 +40,7 @@ class DataSet:
         return len(self.frame_data)
 
     def __getitem__(self, index: int):
-        return self.frame_data[index]
+        return self.cleaned_frame_data[index]
 
     def remove_top(self, frame: np.ndarray):
         min_value = 174
