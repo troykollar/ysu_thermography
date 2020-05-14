@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import numpy as np
 from helper_functions import printProgressBar
@@ -96,13 +97,49 @@ class DataSet:
         #cv2.line(frame, (0, y), (frame.shape[1], y), int(np.amax(frame)), 1)
 
 
+def get_dataset_CLargs(parser: argparse.ArgumentParser):
+    """Add dataset related CL arguments to given parser.
+
+    Added Arguments
+    ---------------
+    temp_data: required
+        filename (and location) of temp data
+    top: optional
+        0 or 1 specifying whether or not to remove top reflections.
+    bot: optional
+        0 or 1 specifying whether or not to remove bottom reflections.
+    """
+    parser.add_argument('temp_data',
+                        type=str,
+                        help='filename (and location) of temp data')
+    parser.add_argument(
+        '-top',
+        type=int,
+        default=False,
+        help='0 or 1 specifying whether or not to remove top reflections.')
+    parser.add_argument(
+        '-bot',
+        type=int,
+        default=False,
+        help='0 or 1 specifying whether or not to remove bottom reflections.')
+
+
 if __name__ == '__main__':
-    test_file = '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy'
-    dset = DataSet(test_file)
-    dset_noRefl = DataSet(test_file,
-                          remove_top_reflection=True,
-                          remove_bottom_reflection=True)
-    for frame in dset_noRefl:
+    parser = argparse.ArgumentParser(
+        description=
+        'Run a video of the dataset to ensure it is reading correctly')
+
+    get_dataset_CLargs(parser)
+
+    args = parser.parse_args()
+    test_file = args.temp_data
+    top = bool(args.top)
+    bot = bool(args.bot)
+
+    dset = DataSet(test_file,
+                   remove_top_reflection=top,
+                   remove_bottom_reflection=bot)
+    for frame in dset:
         frame = cv2.normalize(frame, frame, 0, 255, cv2.NORM_MINMAX,
                               cv2.CV_8UC1)
         frame = cv2.applyColorMap(frame, cv2.COLORMAP_INFERNO)
