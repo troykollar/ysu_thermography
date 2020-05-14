@@ -1,7 +1,8 @@
+import argparse
 import cv2
 import numpy as np
-from composite import get_threshold_img
-from dataset import DataSet
+from composite import get_threshold_img, save_threshold_img, get_composite_CLargs
+from dataset import DataSet, get_dataset_CLargs
 
 
 def on_click(event, x, y, flags, param):
@@ -9,6 +10,34 @@ def on_click(event, x, y, flags, param):
     y_loc = y
     if event == cv2.EVENT_LBUTTONDOWN:
         param.append((x, y))
+
+
+def select_pixels_and_gen_plots(temp_file: str,
+                                threshold: int,
+                                rm_refl=False,
+                                start=-1,
+                                end=-1,
+                                cap=None):
+    test_data = DataSet(temp_file,
+                        remove_top_reflection=rm_refl,
+                        remove_bottom_reflection=rm_refl)
+
+    thresh_img = get_threshold_img(test_data,
+                                   threshold,
+                                   start=start,
+                                   end=end,
+                                   cap=cap)
+    save_threshold_img(temp_file, thresh_img, threshold)
+    thresh_img = cv2.normalize(thresh_img,
+                               thresh_img,
+                               0,
+                               255,
+                               cv2.NORM_MINMAX,
+                               dtype=cv2.CV_8UC1)
+    thresh_img = cv2.applyColorMap(thresh_img, cv2.COLORMAP_INFERNO)
+
+    pix_sel = PixelSelector()
+    pix_sel.create_window('test_window', thresh_img)
 
 
 class PixelSelector:
@@ -58,17 +87,27 @@ class PixelSelector:
 
 
 if __name__ == '__main__':
-    test_data = DataSet(
-        '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy')
+    parser = argparse.ArgumentParser(
+        description='Select pixels, and run analysis on those pixels.')
+    get_dataset_CLargs(parser)
+    get_composite_CLargs(parser)
 
-    thresh_img = get_threshold_img(test_data, 700)
-    thresh_img = cv2.normalize(thresh_img,
-                               thresh_img,
-                               0,
-                               255,
-                               cv2.NORM_MINMAX,
-                               dtype=cv2.CV_8UC1)
-    thresh_img = cv2.applyColorMap(thresh_img, cv2.COLORMAP_INFERNO)
+    args = parser.parse_args()
 
-    pix_sel = PixelSelector()
-    pix_sel.create_window('test_window', thresh_img)
+    temp_data = args.temp_data
+    top = bool(args.top)
+    bot = bool(args.bot)
+    rm_refl = top or bot
+    THRESHOLD = args.THRESHOLD
+    dst_folder = args.dst_folder
+    cap = args.cap
+    start = args.start
+    end = args.end
+    debug = args.debug
+
+    select_pixels_and_gen_plots(temp_data,
+                                THRESHOLD,
+                                rm_refl=rm_refl,
+                                start=start,
+                                end=end,
+                                cap=cap)
