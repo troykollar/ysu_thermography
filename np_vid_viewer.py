@@ -112,9 +112,9 @@ class NpVidTool:
                 shutil.rmtree(frame_range_folder)
             os.mkdir(frame_range_folder)
 
-            total = end - start
+            total = int(end) - int(start)
             progress = 0
-            for i in range(start, end):
+            for i in range(int(start), int(end)):
                 # Display completion percentage
                 printProgressBar(progress + 1,
                                  total,
