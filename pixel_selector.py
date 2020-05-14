@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from composite import get_threshold_img, save_threshold_img, get_composite_CLargs
 from dataset import DataSet, get_dataset_CLargs
+from plot import Plots
 
 
 def on_click(event, x, y, flags, param):
@@ -36,6 +37,13 @@ def select_pixels_and_gen_plots(temp_file: str,
 
     pix_sel = PixelSelector()
     pix_sel.create_window('Select pixels to run analysis on', thresh_img)
+
+    if len(pix_sel.location_list) < 3:
+        print('No pixels selected for analysis!')
+    else:
+        for pixel in pix_sel.location_list[2:]:
+            plot_maker = Plots(test_data, pixel, threshold, start, end)
+            plot_maker.all()
 
 
 class PixelSelector:
