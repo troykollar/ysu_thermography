@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from dataset import DataSet, get_dataset_CLargs
+from helper_functions import printProgressBar
 
 
 class Viewer:
@@ -62,8 +63,10 @@ class Viewer:
                 shutil.rmtree(frame_range_folder)
             os.mkdir(frame_range_folder)
 
-            i = start
             for i in range(start, end):
+                printProgressBar(
+                    i - start, end - start,
+                    'Saving frame range ' + str(start) + '-' + str(end))
                 savename = frame_range_folder + '/frame' + str(i) + '.png'
                 plt.imsave(savename, self.dataset[i], cmap='inferno')
             print('Frame range saved in: ' + frame_range_folder)
@@ -159,10 +162,10 @@ if __name__ == '__main__':
 
     if frame is not None:
         thermal_viewer.save_frame16(int(frame))
-    if play:
-        thermal_viewer.play_video()
     if framerange is not None:
         comma_index = str(framerange).find(',')
         start = int(framerange[:comma_index])
         end = int(framerange[comma_index + 1:])
         thermal_viewer.save_frame16(start=start, end=end)
+    if play:
+        thermal_viewer.play_video()
