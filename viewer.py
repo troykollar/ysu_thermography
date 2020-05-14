@@ -59,12 +59,16 @@ class Viewer:
             pass
 
     def advance_frame(self, advancement: int):
-        # TODO: Add frame advancement validation
-        self.cur_frame += advancement
+        if self.cur_frame + advancement >= self.dataset.shape[0] - 1:
+            self.cur_frame = self.dataset.shape[0] - 1
+        else:
+            self.cur_frame += advancement
 
     def rewind_frame(self, rewind_amount: int):
-        # TODO: Add frame rewind validation
-        self.cur_frame -= rewind_amount
+        if self.cur_frame - rewind_amount <= 0:
+            self.cur_frame = 0
+        else:
+            self.cur_frame -= rewind_amount
 
     def draw_contour(self):
         # TODO: Add contour drawing
@@ -82,11 +86,19 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     ---------------
     play: optional
         Play the video using OpenCV.
+    frame: optional
+        int specifying a frame to save in 16 bit color using matplotlib.
     """
     parser.add_argument(
         '-play',
         type=int,
         help='0 or 1 specifying whether to play the video using OpenCV.')
+    parser.add_argument(
+        '-frame',
+        default=None,
+        type=int,
+        help='int specifying a frame to save in 16 bit color using matplotlib.'
+    )
 
 
 if __name__ == '__main__':
@@ -99,13 +111,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     play = bool(args.play)
-    temp_data = args.temp_data
+    temp_data = str(args.temp_data)
     top = bool(args.top)
     bot = bool(args.bot)
     scale = args.scale
+    frame = args.frame
 
-    dataset = DataSet(temp_data, top, bot, scale)
+    dataset = DataSet(temp_data, top, bot, int(scale))
     thermal_viewer = Viewer(dataset)
 
+    if frame is not None:
+        thermal_viewer.save_frame16(int(frame))
     if play:
         thermal_viewer.play_video()
