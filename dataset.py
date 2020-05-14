@@ -112,6 +112,10 @@ class DataSet:
         build_folder = self.temp_fname[:self.temp_fname.rfind('/')]
         return build_folder
 
+    def find_contour(self):
+        # TODO: Add contour calculation
+        pass
+
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
     """Add dataset related CL arguments to given parser.
