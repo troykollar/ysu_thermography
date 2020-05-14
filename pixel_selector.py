@@ -12,19 +12,19 @@ def on_click(event, x, y, flags, param):
 
 def select_pixels_and_gen_plots(temp_file: str,
                                 threshold: int,
-                                rm_refl=False,
-                                start=-1,
-                                end=-1,
-                                cap=None):
+                                remove_reflections=False,
+                                start_frame=-1,
+                                end_frame=-1,
+                                frame_cap=None):
     test_data = DataSet(temp_file,
-                        remove_top_reflection=rm_refl,
-                        remove_bottom_reflection=rm_refl)
+                        remove_top_reflection=remove_reflections,
+                        remove_bottom_reflection=remove_reflections)
 
     thresh_img = get_threshold_img(test_data,
                                    threshold,
-                                   start=start,
-                                   end=end,
-                                   cap=cap)
+                                   start=start_frame,
+                                   end=end_frame,
+                                   cap=frame_cap)
     save_threshold_img(temp_file, thresh_img, threshold)
     thresh_img = cv2.normalize(thresh_img,
                                thresh_img,
@@ -35,7 +35,7 @@ def select_pixels_and_gen_plots(temp_file: str,
     thresh_img = cv2.applyColorMap(thresh_img, cv2.COLORMAP_INFERNO)
 
     pix_sel = PixelSelector()
-    pix_sel.create_window('test_window', thresh_img)
+    pix_sel.create_window('Select pixels to run analysis on', thresh_img)
 
 
 class PixelSelector:
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     select_pixels_and_gen_plots(temp_data,
                                 THRESHOLD,
-                                rm_refl=rm_refl,
-                                start=start,
-                                end=end,
-                                cap=cap)
+                                remove_reflections=rm_refl,
+                                start_frame=start,
+                                end_frame=end,
+                                frame_cap=cap)
