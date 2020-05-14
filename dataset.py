@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from helper_functions import printProgressBar
 
 
 class DataSet:
@@ -18,6 +19,19 @@ class DataSet:
         self.frame_data = np.load(self.temp_fname,
                                   mmap_mode='r',
                                   allow_pickle=True)
+        self.cleaned_frame_data = np.empty(self.frame_data.shape,
+                                           dtype=np.float32)
+
+        if remove_top_reflection or remove_bottom_reflection:
+            for i, frame in enumerate(self.frame_data):
+                printProgressBar(i, self.frame_data.shape[0],
+                                 'Removing reflections...')
+                frame = frame.copy()
+                if remove_top_reflection:
+                    self.remove_top(frame)
+                if remove_bottom_reflection:
+                    self.remove_bottom(frame)
+                self.cleaned_frame_data[i] = frame
 
         # Save index of last frame
         self.final_frame = self.frame_data.shape[0] - 1
@@ -26,12 +40,7 @@ class DataSet:
         return len(self.frame_data)
 
     def __getitem__(self, index: int):
-        frame = self.frame_data[index].copy()
-        if self.remove_top_reflection:
-            self.remove_top(frame)
-        if self.remove_bottom_reflection:
-            self.remove_bottom(frame)
-        return frame
+        return self.frame_data[index]
 
     def remove_top(self, frame: np.ndarray):
         min_value = 174

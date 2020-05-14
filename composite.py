@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from helper_functions import printProgressBar
-from reflection_remover import remove_bottom, remove_top
+from dataset import DataSet
 
 
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
@@ -16,48 +16,28 @@ def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
     img += over_thresh_array
 
 
-def get_threshold_img(dataset: np.ndarray,
+def get_threshold_img(dataset: DataSet,
                       threshold: int,
-                      start=0,
-                      end=0,
-                      rm_refl=False,
-                      cap=None,
-                      show_progress=False,
-                      debug_showframe=False):
+                      start=-1,
+                      end=-1,
+                      cap=None):
     # Get frame size info
     height = dataset[0].shape[0]
     width = dataset[0].shape[1]
-    last_frame = dataset.shape[0]
 
-    if end <= 0 or end >= last_frame:
-        end = last_frame
-    else:
-        end = end + 1
+    # TODO: Add better validation for start and end frames
+    if end < 0 or end > dataset.final_frame:
+        end = dataset.final_frame
+
+    if start < 0 or start > dataset.final_frame:
+        start = 0
 
     # Make blank image to increment
     threshold_img = np.zeros((height, width), dtype=np.float32)
 
-    # Check each pixel, if pixel is over threshold, increment that pixel in theshold_img
-    start_time = time.time()
     for i, frame in enumerate(dataset[start:end]):
-        if show_progress:
-            printProgressBar(i - start, end - start,
-                             "Generating threshold image...")
-        if rm_refl:
-            frame = frame.copy()
-            remove_top(frame)
-            remove_bottom(frame)
-        showframe = frame.copy()
-        showframe = cv2.normalize(showframe,
-                                  showframe,
-                                  0,
-                                  255,
-                                  norm_type=cv2.NORM_MINMAX,
-                                  dtype=cv2.CV_8UC1)
-        if debug_showframe:
-            showframe = cv2.applyColorMap(showframe, cv2.COLORMAP_INFERNO)
-            cv2.imshow('frame', showframe)
-            cv2.waitKey(1)
+        printProgressBar(i - start, end - start,
+                         "Generating threshold image...")
         increment_from_thresh(threshold_img, frame, threshold)
 
     if cap is not None:
@@ -69,16 +49,10 @@ def get_threshold_img(dataset: np.ndarray,
 
 
 def save_threshold_img(filename: str,
+                       threshold_img: np.ndarray,
                        threshold: int,
-                       dst_folder=None,
-                       rm_refl=False,
-                       start=0,
-                       end=0,
-                       cap=None,
-                       show_progress=False,
-                       debug_showframe=False):
+                       dst_folder=None):
     # Get temp data info
-    temp_data = np.load(filename, mmap_mode="r", allow_pickle=True)
     build_folder = filename[:filename.rfind('/')]
     build_number = build_folder[:build_folder.find('_')]
     build_number = build_number[(build_number.rfind('/') + 1):]
@@ -92,15 +66,6 @@ def save_threshold_img(filename: str,
         threshold) + '.png'
     raw_filename = filename = dst_folder + '/' + build_number + '_threshold' + str(
         threshold) + '_raw.png'
-
-    threshold_img = get_threshold_img(dataset=temp_data,
-                                      threshold=threshold,
-                                      start=start,
-                                      end=end,
-                                      cap=cap,
-                                      show_progress=show_progress,
-                                      rm_refl=rm_refl,
-                                      debug_showframe=debug_showframe)
 
     fig, ax = plt.subplots()
     fig.suptitle('Build: ' + str(build_number) + ' Threshold: ' +
@@ -139,12 +104,12 @@ if __name__ == '__main__':
                         help='Maximum number of frames to increment')
     parser.add_argument('-start',
                         type=int,
-                        default=0,
+                        default=-1,
                         required=False,
                         help='First frame to consider.')
     parser.add_argument('-end',
                         type=int,
-                        default=0,
+                        default=-1,
                         required=False,
                         help='Last frame to consider.')
     parser.add_argument(
@@ -156,12 +121,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
     load_filename = '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy'
     dst_folder = '/home/troy/thermography/4-20_corrected/'
+
+    dataset = DataSet(args.temp_data, bool(args.rm_refl), bool(args.rm_refl))
+    threshold_img = get_threshold_img(dataset=dataset,
+                                      threshold=args.THRESHOLD,
+                                      start=args.start,
+                                      end=args.end,
+                                      cap=args.cap)
     save_threshold_img(filename=args.temp_data,
+                       threshold_img=threshold_img,
                        threshold=args.THRESHOLD,
-                       dst_folder=args.dst_folder,
-                       start=args.start,
-                       end=args.end,
-                       cap=args.cap,
-                       show_progress=True,
-                       rm_refl=bool(args.rm_refl),
-                       debug_showframe=bool(args.debug))
+                       dst_folder=args.dst_folder)
