@@ -8,14 +8,24 @@ from dataset import DataSet, get_dataset_CLargs
 class Viewer:
     def __init__(self, dataset: DataSet):
         self.dataset = dataset
+        self.quit = False
+        self.cur_frame = None
+        self.pause = False
 
     def play_video(self):
         window_name = self.dataset.build_folder
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-        for frame in self.dataset:
-            frame = self.colormap_frame(frame)
+        self.cur_frame = 0
+        while not self.quit:
+            if not self.pause:
+                frame = self.dataset[self.cur_frame]
+                if self.quit:
+                    break
+                frame = self.colormap_frame(frame)
+                self.advance_frame(1)
             cv2.imshow(window_name, frame)
-            cv2.waitKey(1)
+            key = cv2.waitKey(1) & 0xFF
+            self.key_handler(key)
         cv2.destroyAllWindows()
 
     def colormap_frame(self, frame):
@@ -28,7 +38,40 @@ class Viewer:
         frame = cv2.applyColorMap(frame, cv2.COLORMAP_INFERNO)
         return frame
 
-    def save_frame16(self, frame):
+    def save_frame16(self, start: int, end=-1):
+        # TODO: Add ability to save range of frames
+        # Save only one frame
+        if end < 0:
+            savename = self.dataset.build_folder + '/frame' + str(
+                start) + '.png'
+            plt.imsave(savename, dataset[start], cmap='inferno')
+            print('Saved to: ' + savename)
+
+    def key_handler(self, key):
+        # TODO: Add ability to jump forward and back frames
+        if key == ord('q'):
+            self.quit = True
+        elif key == ord('s'):
+            self.save_frame16(self.cur_frame)
+        elif key == ord('p') or key == 32:
+            self.pause = not self.pause
+        else:
+            pass
+
+    def advance_frame(self, advancement: int):
+        # TODO: Add frame advancement validation
+        self.cur_frame += advancement
+
+    def rewind_frame(self, rewind_amount: int):
+        # TODO: Add frame rewind validation
+        self.cur_frame -= rewind_amount
+
+    def draw_contour(self):
+        # TODO: Add contour drawing
+        pass
+
+    def add_info_pane(self):
+        # TODO: Add info pane function
         pass
 
 
