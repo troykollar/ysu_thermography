@@ -46,15 +46,16 @@ class Viewer:
             generated_frame = self.draw_contour(self.cur_frame,
                                                 generated_frame,
                                                 self.contour_threshold)
+        frame_size = 20
         if self.follow == 'max':
             _, max_temp_location = self.dataset.get_max_temp(generated_frame)
             if max_temp_location is not None:
                 generated_frame = self.center_frame(generated_frame,
-                                                    max_temp_location)
+                                                    max_temp_location,
+                                                    frame_size)
         return generated_frame
 
-    def center_frame(self, frame: np.ndarray, point: tuple):
-        frame_size = 20
+    def center_frame(self, frame: np.ndarray, point: tuple, frame_size: int):
         center_x = point[0]
         center_y = point[1]
 
@@ -174,6 +175,10 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         start,end specifying frame range to save in 16 bit color using matplotlib.
     contour: optional
         int specifying the threshold to use if drawing a contour
+    follow: optional
+        str specifying what to focus the frame on.
+        follow = 'max' centers the frame on the max temperature.
+        follow = 'contour' centers the frame on the center of gravity of the contour (if present).
     """
     parser.add_argument(
         '-play',
@@ -197,6 +202,13 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         type=int,
         default=None,
         help='int specifying threshold to use to find contours in dataset.')
+    parser.add_argument(
+        '-follow',
+        type=str,
+        default=None,
+        help=
+        "str, 'max' or 'contour' will center the frame on the max temp or the contour center of gravity, respectively"
+    )
 
 
 if __name__ == '__main__':
@@ -216,9 +228,16 @@ if __name__ == '__main__':
     save_frame = args.frame
     framerange = args.framerange
     contour = args.contour
+    follow_arg = args.follow
+
+    # Validate follow argument
+    acceptable_follow_args = ['max', 'contour']
+    if follow_arg is not None:
+        if not follow_arg in acceptable_follow_args:
+            follow_arg = None
 
     data = DataSet(temp_data, top, bot, int(scale))
-    thermal_viewer = Viewer(data, contour, follow='max')
+    thermal_viewer = Viewer(data, contour, follow=follow_arg)
 
     if save_frame is not None:
         thermal_viewer.save_frame16(int(save_frame))
