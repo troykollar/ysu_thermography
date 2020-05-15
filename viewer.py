@@ -9,12 +9,13 @@ from helper_functions import printProgressBar
 
 
 class Viewer:
-    def __init__(self, dataset: DataSet):
+    def __init__(self, dataset: DataSet, contour_threshold: int = None):
         self.dataset = dataset
         self.quit = False
         self.cur_frame = None
         self.pause = False
         self.update_frame = True
+        self.contour_threshold = contour_threshold
 
     def play_video(self):
         window_name = self.dataset.build_folder
@@ -24,6 +25,9 @@ class Viewer:
             if self.update_frame:
                 frame = self.dataset[self.cur_frame]
                 frame = self.colormap_frame(frame)
+                if self.contour_threshold is not None:
+                    frame = self.draw_contour(self.cur_frame, frame,
+                                              self.contour_threshold)
             if self.quit:
                 break
             cv2.imshow(window_name, frame)
@@ -102,9 +106,14 @@ class Viewer:
 
         self.update_frame = True
 
-    def draw_contour(self):
+    def draw_contour(self, frame_index: int, colormapped_frame: np.ndarray,
+                     contour_threshold: int):
         # TODO: Add contour drawing
-        pass
+        frame = self.dataset[frame_index]
+        contours = self.dataset.find_contours(frame, contour_threshold)
+        colormapped_frame = cv2.drawContours(colormapped_frame, contours, -1,
+                                             (0, 255, 0), 1)
+        return colormapped_frame
 
     def add_info_pane(self):
         # TODO: Add info pane function
@@ -120,6 +129,10 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         Play the video using OpenCV.
     frame: optional
         int specifying a frame to save in 16 bit color using matplotlib.
+    framerange: optional
+        start,end specifying frame range to save in 16 bit color using matplotlib.
+    contour: optional
+        int specifying the threshold to use if drawing a contour
     """
     parser.add_argument(
         '-play',
@@ -136,8 +149,13 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         default=None,
         type=str,
         help=
-        'tuple (start,end) specifying frame range to save in 16 bit color using matplotlib.'
+        'start,end specifying frame range to save in 16 bit color using matplotlib.'
     )
+    parser.add_argument(
+        '-contour',
+        type=int,
+        default=None,
+        help='int specifying threshold to use to find contours in dataset.')
 
 
 if __name__ == '__main__':
@@ -156,9 +174,10 @@ if __name__ == '__main__':
     scale = args.scale
     frame = args.frame
     framerange = args.framerange
+    contour = args.contour
 
     dataset = DataSet(temp_data, top, bot, int(scale))
-    thermal_viewer = Viewer(dataset)
+    thermal_viewer = Viewer(dataset, contour)
 
     if frame is not None:
         thermal_viewer.save_frame16(int(frame))
