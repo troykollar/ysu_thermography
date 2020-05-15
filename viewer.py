@@ -23,14 +23,10 @@ class Viewer:
         self.cur_frame = 0
         while not self.quit:
             if self.update_frame:
-                frame = self.dataset[self.cur_frame]
-                frame = self.colormap_frame(frame)
-                if self.contour_threshold is not None:
-                    frame = self.draw_contour(self.cur_frame, frame,
-                                              self.contour_threshold)
+                video_frame = self.generate_frame(self.dataset[self.cur_frame])
             if self.quit:
                 break
-            cv2.imshow(window_name, frame)
+            cv2.imshow(window_name, video_frame)
             if not self.pause:
                 self.advance_frame(1)
             else:
@@ -38,6 +34,14 @@ class Viewer:
             key = cv2.waitKey(1) & 0xFF
             self.key_handler(key)
         cv2.destroyAllWindows()
+
+    def generate_frame(self, frame_data: np.ndarray):
+        generated_frame = self.colormap_frame(frame_data)
+        if self.contour_threshold is not None:
+            generated_frame = self.draw_contour(self.cur_frame,
+                                                generated_frame,
+                                                self.contour_threshold)
+        return generated_frame
 
     def colormap_frame(self, frame):
         frame = cv2.normalize(frame,
