@@ -43,6 +43,35 @@ class Viewer:
                                                 self.contour_threshold)
         return generated_frame
 
+    def center_frame(self, frame: np.ndarray, point: tuple):
+        frame_size = 20
+        center_x = point[0]
+        center_y = point[1]
+
+        # Decide if too far left or right
+        if center_x < frame_size:
+            left_x = 0
+            right_x = frame_size * 2
+        elif center_x + frame_size > frame.shape[1]:
+            right_x = frame.shape[1]
+            left_x = right_x - (2 * frame_size)
+        else:
+            left_x = center_x - frame_size
+            right_x = center_x + frame_size
+
+        # Decide if too far up or down
+        if center_y < frame_size:
+            top_y = 0
+            bot_y = frame_size * 2
+        elif center_y + frame_size > frame.shape[0]:
+            bot_y = frame.shape[1]
+            top_y = bot_y - (frame_size * 2)
+        else:
+            top_y = center_y - frame_size
+            bot_y = center_y + frame_size
+
+        return frame[top_y:bot_y, left_x:right_x]
+
     def colormap_frame(self, frame):
         frame = cv2.normalize(frame,
                               frame,
@@ -59,7 +88,7 @@ class Viewer:
         if end < 0:
             savename = self.dataset.build_folder + '/frame' + str(
                 start) + '.png'
-            plt.imsave(savename, dataset[start], cmap='inferno')
+            plt.imsave(savename, self.dataset[start], cmap='inferno')
             print('Saved to: ' + savename)
         else:
             # Create folder to save frames in
@@ -174,15 +203,15 @@ if __name__ == '__main__':
     top = bool(args.top)
     bot = bool(args.bot)
     scale = args.scale
-    frame = args.frame
+    save_frame = args.frame
     framerange = args.framerange
     contour = args.contour
 
-    dataset = DataSet(temp_data, top, bot, int(scale))
-    thermal_viewer = Viewer(dataset, contour)
+    data = DataSet(temp_data, top, bot, int(scale))
+    thermal_viewer = Viewer(data, contour)
 
-    if frame is not None:
-        thermal_viewer.save_frame16(int(frame))
+    if save_frame is not None:
+        thermal_viewer.save_frame16(int(save_frame))
     if framerange is not None:
         comma_index = str(framerange).find(',')
         start = int(framerange[:comma_index])
