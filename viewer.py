@@ -50,7 +50,6 @@ class Viewer:
         return frame
 
     def save_frame16(self, start: int, end=-1):
-        # TODO: Add ability to save range of frames
         # TODO: Add frame choice validation
         # Save only one frame
         if end < 0:
@@ -76,7 +75,7 @@ class Viewer:
             print('Frame range saved in: ' + frame_range_folder)
 
     def key_handler(self, key):
-        # TODO: Add ability to jump forward and back frames
+        # TODO: Add ability to jump forward and back different amounts of frames
         if key == ord('q'):
             self.quit = True
         elif key == ord('s'):
@@ -108,7 +107,6 @@ class Viewer:
 
     def draw_contour(self, frame_index: int, colormapped_frame: np.ndarray,
                      contour_threshold: int):
-        # TODO: Add contour drawing
         frame = self.dataset[frame_index]
         contours = self.dataset.find_contours(frame, contour_threshold)
         colormapped_frame = cv2.drawContours(colormapped_frame, contours, -1,
