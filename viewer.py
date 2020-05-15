@@ -199,13 +199,13 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
+    argument_parser = argparse.ArgumentParser(
         description='Play a video from the given dataset.')
 
-    get_viewer_CLargs(parser)
-    get_dataset_CLargs(parser)
+    get_viewer_CLargs(argument_parser)
+    get_dataset_CLargs(argument_parser)
 
-    args = parser.parse_args()
+    args = argument_parser.parse_args()
 
     play = bool(args.play)
     temp_data = str(args.temp_data)
@@ -223,8 +223,8 @@ if __name__ == '__main__':
         thermal_viewer.save_frame16(int(save_frame))
     if framerange is not None:
         comma_index = str(framerange).find(',')
-        start = int(framerange[:comma_index])
-        end = int(framerange[comma_index + 1:])
-        thermal_viewer.save_frame16(start=start, end=end)
+        start_frame = int(framerange[:comma_index])
+        end_frame = int(framerange[comma_index + 1:])
+        thermal_viewer.save_frame16(start=start_frame, end=end_frame)
     if play:
         thermal_viewer.play_video()
