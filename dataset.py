@@ -24,10 +24,11 @@ class DataSet:
         self.cleaned_frame_data = np.empty(self.frame_data.shape,
                                            dtype=np.float32)
 
+        # Remove reflections if specified
         if self.remove_top_reflection or self.remove_bottom_reflection:
             for i, frame in enumerate(self.frame_data):
-                printProgressBar(i, self.frame_data.shape[0],
-                                 'Removing reflections...')
+                loading_status = 'Removing reflections...'
+                printProgressBar(i, self.frame_data.shape[0], loading_status)
                 frame = frame.copy()
                 if remove_top_reflection:
                     self.remove_top(frame)
@@ -112,9 +113,12 @@ class DataSet:
         build_folder = self.temp_fname[:self.temp_fname.rfind('/')]
         return build_folder
 
-    def find_contour(self):
+    def find_contours(self, frame: np.ndarray, threshold: int):
         # TODO: Add contour calculation
-        pass
+        thresh_img = cv2.inRange(frame, threshold, int(np.amax(frame)))
+        contours, _ = cv2.findContours(thresh_img, cv2.RETR_TREE,
+                                       cv2.CHAIN_APPROX_TC89_KCOS)
+        return contours
 
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
