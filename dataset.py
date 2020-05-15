@@ -114,11 +114,43 @@ class DataSet:
         return build_folder
 
     def find_contours(self, frame: np.ndarray, threshold: int):
-        # TODO: Add contour calculation
         thresh_img = cv2.inRange(frame, threshold, int(np.amax(frame)))
         contours, _ = cv2.findContours(thresh_img, cv2.RETR_TREE,
                                        cv2.CHAIN_APPROX_TC89_KCOS)
         return contours
+
+    def get_contour_geometry(self, contours):
+        cog_x = None
+        cog_y = None
+        contour_x = None
+        contour_y = None
+        contour_w = None
+        contour_h = None
+        contour_area = None
+        contour_moments = None
+        if contours is not None:
+            for contour in contours:
+                contour_x, contour_y, contour_w, contour_h = cv2.boundingRect(
+                    contour)
+                contour_area = float(cv2.contourArea(contour))
+                contour_moments = cv2.moments(contour)
+                if contour_moments['m00'] != 0:
+                    cog_x = int(contour_moments['m10'] /
+                                contour_moments['m00'])
+                    cog_y = int(contour_moments['m01'] /
+                                contour_moments['m00'])
+
+        geo_dict = {
+            'cog_x': cog_x,
+            'cog_y': cog_y,
+            'x': contour_x,
+            'y': contour_y,
+            'width': contour_w,
+            'height': contour_h,
+            'area': contour_area
+        }
+
+        return geo_dict
 
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
