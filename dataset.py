@@ -154,6 +154,13 @@ class DataSet:
 
         return geo_dict
 
+    def get_max_temp(self, frame):
+        max_temp = np.amax(frame)
+        max_temp_y = np.where(frame == max_temp)[0][0]
+        max_temp_x = np.where(frame == max_temp)[1][0]
+
+        return max_temp, (max_temp_x, max_temp_y)
+
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
     """Add dataset related CL arguments to given parser.
@@ -193,13 +200,13 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
+    argument_parser = argparse.ArgumentParser(
         description=
         'Run a video of the dataset to ensure it is reading correctly')
 
-    get_dataset_CLargs(parser)
+    get_dataset_CLargs(argument_parser)
 
-    args = parser.parse_args()
+    args = argument_parser.parse_args()
     test_file = args.temp_data
     top = bool(args.top)
     bot = bool(args.bot)
@@ -209,11 +216,11 @@ if __name__ == '__main__':
                    remove_top_reflection=top,
                    remove_bottom_reflection=bot,
                    scale_factor=scale)
-    for frame in dset:
-        frame = cv2.normalize(frame, frame, 0, 255, cv2.NORM_MINMAX,
-                              cv2.CV_8UC1)
-        frame = cv2.applyColorMap(frame, cv2.COLORMAP_INFERNO)
+    for data_frame in dset:
+        data_frame = cv2.normalize(data_frame, data_frame, 0, 255,
+                                   cv2.NORM_MINMAX, cv2.CV_8UC1)
+        data_frame = cv2.applyColorMap(data_frame, cv2.COLORMAP_INFERNO)
         cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
-        cv2.imshow('Frame', frame)
+        cv2.imshow('Frame', data_frame)
         cv2.waitKey(1)
     cv2.destroyAllWindows()
