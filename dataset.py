@@ -14,6 +14,7 @@ class DataSet:
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
         self.scale_factor = scale_factor
+        self.contours = []
 
         # Load thermal cam temp data
         self.temp_fname = temps_file
@@ -117,6 +118,7 @@ class DataSet:
         thresh_img = cv2.inRange(frame, threshold, int(np.amax(frame)))
         contours, _ = cv2.findContours(thresh_img, cv2.RETR_TREE,
                                        cv2.CHAIN_APPROX_TC89_KCOS)
+        self.contours.append(contours)
         return contours
 
     def get_contour_geometry(self, contours):
