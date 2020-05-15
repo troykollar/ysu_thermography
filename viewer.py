@@ -53,7 +53,6 @@ class Viewer:
         return generated_frame
 
     def center_frame(self, frame: np.ndarray, point: tuple):
-        cv2.imshow('center_frame', frame)
         frame_size = 20
         center_x = point[0]
         center_y = point[1]
