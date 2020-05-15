@@ -9,13 +9,17 @@ from helper_functions import printProgressBar
 
 
 class Viewer:
-    def __init__(self, dataset: DataSet, contour_threshold: int = None):
+    def __init__(self,
+                 dataset: DataSet,
+                 contour_threshold: int = None,
+                 follow: str = None):
         self.dataset = dataset
         self.quit = False
         self.cur_frame = None
         self.pause = False
         self.update_frame = True
         self.contour_threshold = contour_threshold
+        self.follow = follow
 
     def play_video(self):
         window_name = self.dataset.build_folder
@@ -41,9 +45,15 @@ class Viewer:
             generated_frame = self.draw_contour(self.cur_frame,
                                                 generated_frame,
                                                 self.contour_threshold)
+        if self.follow == 'max':
+            _, max_temp_location = self.dataset.get_max_temp(generated_frame)
+            if max_temp_location is not None:
+                generated_frame = self.center_frame(generated_frame,
+                                                    max_temp_location)
         return generated_frame
 
     def center_frame(self, frame: np.ndarray, point: tuple):
+        cv2.imshow('center_frame', frame)
         frame_size = 20
         center_x = point[0]
         center_y = point[1]
@@ -63,8 +73,8 @@ class Viewer:
         if center_y < frame_size:
             top_y = 0
             bot_y = frame_size * 2
-        elif center_y + frame_size > frame.shape[0]:
-            bot_y = frame.shape[1]
+        elif center_y + (frame_size * 2) > frame.shape[0]:
+            bot_y = frame.shape[0]
             top_y = bot_y - (frame_size * 2)
         else:
             top_y = center_y - frame_size
@@ -208,7 +218,7 @@ if __name__ == '__main__':
     contour = args.contour
 
     data = DataSet(temp_data, top, bot, int(scale))
-    thermal_viewer = Viewer(data, contour)
+    thermal_viewer = Viewer(data, contour, follow='max')
 
     if save_frame is not None:
         thermal_viewer.save_frame16(int(save_frame))
