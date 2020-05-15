@@ -9,6 +9,7 @@ from helper_functions import printProgressBar
 
 
 class Viewer:
+    """Contains functions related to viewing and saving video/images of thermal data"""
     def __init__(self,
                  dataset: DataSet,
                  contour_threshold: int = None,
