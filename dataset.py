@@ -53,6 +53,9 @@ class DataSet:
             frame = self.scale_frame(frame)
         return frame
 
+    def increase_scale(self, increase: int):
+        self.scale_factor += increase
+
     def remove_top(self, frame: np.ndarray):
         min_value = 174
         min_value_threshold = 5
