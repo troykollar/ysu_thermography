@@ -25,18 +25,36 @@ class Viewer:
         self.follow_size = follow_size
 
         # Keycodes stored as list so multiple keys can be assigned to a function w/o other changes
-        self.key_pause = [ord('p'), 32, ord('k')]
-        # TODO: Add escape keycode to self.key_quit
-        self.key_quit = [ord('q')]
-        self.key_save_frame = [ord('s')]
-        self.key_adv1_frame = [ord('m')]
-        self.key_adv10_frame = [ord('l')]
-        self.key_adv100_frame = [ord('o')]
-        self.key_rew1_frame = [ord('n')]
-        self.key_rew10_frame = [ord('j')]
-        self.key_rew100_frame = [ord('i')]
+        # Could be made simpler using ASCII lookup and keycodes, but apparently keycodes are
+        # different depending on platform
+        self.keys = {
+            'Play/Pause': ['P', 'Space', 'K'],
+            'Quit': ['Q', 'Esc'],
+            'Save': ['S'],
+            'Adv 1 Frame': ['M'],
+            'Adv 10 Frame': ['L'],
+            'Adv 100 Frame': ['O'],
+            'Rew 1 Frame': ['N'],
+            'Rew 10 Frame': ['J'],
+            'Rew 100 Frame': ['I'],
+        }
+
+        self.keycodes = {
+            'Play/Pause': [ord('p'), 32, ord('k')],
+            # TODO: Add keycode for Esc
+            'Quit': [ord('q')],
+            'Save': [ord('s')],
+            'Adv 1 Frame': [ord('m')],
+            'Adv 10 Frame': [ord('l')],
+            'Adv 100 Frame': [ord('o')],
+            'Rew 1 Frame': [ord('n')],
+            'Rew 10 Frame': [ord('j')],
+            'Rew 100 Frame': [ord('i')]
+        }
 
     def play_video(self):
+        for item in self.keys:
+            print(item + ':', *self.keys[item], sep=' | ')
         window_name = self.dataset.build_folder
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         self.cur_frame = 0
@@ -148,23 +166,23 @@ class Viewer:
 
     def key_handler(self, key):
         # TODO: Add ability to jump forward and back different amounts of frames
-        if key in self.key_quit:
+        if key in self.keycodes['Quit']:
             self.quit = True
-        elif key in self.key_save_frame:
+        elif key in self.keycodes['Save']:
             self.save_frame16(self.cur_frame)
-        elif key in self.key_pause:
+        elif key in self.keycodes['Play/Pause']:
             self.pause = not self.pause
-        elif key in self.key_adv1_frame:
+        elif key in self.keycodes['Adv 1 Frame']:
             self.advance_frame(1)
-        elif key in self.key_adv10_frame:
+        elif key in self.keycodes['Adv 10 Frame']:
             self.advance_frame(10)
-        elif key in self.key_adv100_frame:
+        elif key in self.keycodes['Adv 100 Frame']:
             self.advance_frame(100)
-        elif key in self.key_rew1_frame:
+        elif key in self.keycodes['Rew 1 Frame']:
             self.rewind_frame(1)
-        elif key in self.key_rew10_frame:
+        elif key in self.keycodes['Rew 10 Frame']:
             self.rewind_frame(10)
-        elif key in self.key_rew100_frame:
+        elif key in self.keycodes['Rew 100 Frame']:
             self.rewind_frame(100)
         else:
             pass
