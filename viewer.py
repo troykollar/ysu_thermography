@@ -42,10 +42,11 @@ class Viewer:
 
     def generate_frame(self, frame_data: np.ndarray):
         generated_frame = self.colormap_frame(frame_data)
+        # TODO: Add validation that contouring must be ON to follow contour
         if self.contour_threshold is not None:
-            generated_frame = self.draw_contour(self.cur_frame,
-                                                generated_frame,
-                                                self.contour_threshold)
+            contours = self.dataset.find_contours(frame_data,
+                                                  self.contour_threshold)
+            generated_frame = self.draw_contour(contours, generated_frame)
         frame_size = 20
         if self.follow == 'max':
             _, max_temp_location = self.dataset.get_max_temp(generated_frame)
@@ -53,6 +54,21 @@ class Viewer:
                 generated_frame = self.center_frame(generated_frame,
                                                     max_temp_location,
                                                     frame_size)
+        elif self.follow == 'contour':
+            contour_geo_dict = self.dataset.get_contour_geometry(contours)
+            center_x = contour_geo_dict['cog_x']
+            center_y = contour_geo_dict['cog_y']
+            if center_x is not None and center_y is not None:
+                generated_frame = self.center_frame(generated_frame,
+                                                    (center_x, center_y),
+                                                    frame_size)
+            else:
+                _, max_temp_location = self.dataset.get_max_temp(
+                    generated_frame)
+                generated_frame = self.center_frame(generated_frame,
+                                                    max_temp_location,
+                                                    frame_size)
+
         return generated_frame
 
     def center_frame(self, frame: np.ndarray, point: tuple, frame_size: int):
@@ -149,10 +165,7 @@ class Viewer:
 
         self.update_frame = True
 
-    def draw_contour(self, frame_index: int, colormapped_frame: np.ndarray,
-                     contour_threshold: int):
-        frame = self.dataset[frame_index]
-        contours = self.dataset.find_contours(frame, contour_threshold)
+    def draw_contour(self, contours, colormapped_frame: np.ndarray):
         colormapped_frame = cv2.drawContours(colormapped_frame, contours, -1,
                                              (0, 255, 0), 1)
         return colormapped_frame
