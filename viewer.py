@@ -102,6 +102,7 @@ class Viewer:
                         generated_frame, max_temp_location, frame_size)
 
         # Change conditional to be specific for mp data or contour data
+        # TODO: Add conditional for meltpool info pane
         if self.info_pane == 'contour':
             generated_frame = self.add_info_pane(generated_frame,
                                                  contour_geo_dict)
@@ -172,7 +173,6 @@ class Viewer:
             print('Frame range saved in: ' + frame_range_folder)
 
     def key_handler(self, key):
-        # TODO: Add ability to jump forward and back different amounts of frames
         if key in self.keycodes['Quit']:
             self.quit = True
         elif key in self.keycodes['Save']:
@@ -216,7 +216,6 @@ class Viewer:
         return colormapped_frame
 
     def add_info_pane(self, colormapped_frame: np.ndarray, info: dict):
-        # TODO: Add info pane function
         frame_height = colormapped_frame.shape[0]
         frame_width = colormapped_frame.shape[1]
         font = cv2.FONT_HERSHEY_DUPLEX
