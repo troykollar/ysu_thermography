@@ -57,6 +57,7 @@ class DataSet:
         self.scale_factor += increase
 
     def remove_top(self, frame: np.ndarray):
+        # TODO: Fix reflection removing so it can be done as each frame is returned
         min_value = 174
         min_value_threshold = 5
         max_value = np.amax(frame)
