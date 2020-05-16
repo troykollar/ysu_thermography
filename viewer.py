@@ -223,7 +223,10 @@ class Viewer:
         font_size = .002 * frame_height
         font_color = (0, 0, 0)
         #pane_height = 30 * len(info) * self.dataset.scale_factor
-        pane_height = int(len(info) * .09 * frame_height)
+        pane_height = int(len(info) * .08 * frame_height)
+
+        if font_size < .35:
+            self.dataset.increase_scale(1)
 
         # Add white pane
         colormapped_frame = cv2.copyMakeBorder(src=colormapped_frame,
