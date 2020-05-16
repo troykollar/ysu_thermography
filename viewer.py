@@ -74,6 +74,11 @@ class Viewer:
             self.key_handler(key)
         cv2.destroyAllWindows()
 
+    def save_video(self, start: int = -1, end: int = -1, framerate: int = 60):
+        # TODO: Finish save_video() function
+        if start != 0 or end != self.dataset.shape[0]:
+            pass
+
     def generate_frame(self, frame_data: np.ndarray):
         generated_frame = self.colormap_frame(frame_data)
         if self.contour_threshold is not None:
@@ -271,6 +276,8 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     fsize: optional
         int specifying the size of the window when following max temp or contour
     """
+    # TODO: Add save argument
+    # TODO: Add infopane argument
     parser.add_argument(
         '-play',
         type=int,
