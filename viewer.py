@@ -24,6 +24,18 @@ class Viewer:
         self.follow = follow
         self.follow_size = follow_size
 
+        # Keycodes stored as list so multiple keys can be assigned to a function w/o other changes
+        self.key_pause = [ord('p'), 32, ord('k')]
+        # TODO: Add escape keycode to self.key_quit
+        self.key_quit = [ord('q')]
+        self.key_save_frame = [ord('s')]
+        self.key_adv1_frame = [ord('m')]
+        self.key_adv10_frame = [ord('l')]
+        self.key_adv100_frame = [ord('o')]
+        self.key_rew1_frame = [ord('n')]
+        self.key_rew10_frame = [ord('j')]
+        self.key_rew100_frame = [ord('i')]
+
     def play_video(self):
         window_name = self.dataset.build_folder
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
@@ -136,23 +148,23 @@ class Viewer:
 
     def key_handler(self, key):
         # TODO: Add ability to jump forward and back different amounts of frames
-        if key == ord('q'):
+        if key in self.key_quit:
             self.quit = True
-        elif key == ord('s'):
+        elif key in self.key_save_frame:
             self.save_frame16(self.cur_frame)
-        elif key == ord('p') or key == 32 or key == ord('k'):
+        elif key in self.key_pause:
             self.pause = not self.pause
-        elif key == ord('m'):
+        elif key in self.key_adv1_frame:
             self.advance_frame(1)
-        elif key == ord('l'):
+        elif key in self.key_adv10_frame:
             self.advance_frame(10)
-        elif key == ord('o'):
+        elif key in self.key_adv100_frame:
             self.advance_frame(100)
-        elif key == ord('n'):
+        elif key in self.key_rew1_frame:
             self.rewind_frame(1)
-        elif key == ord('j'):
+        elif key in self.key_rew10_frame:
             self.rewind_frame(10)
-        elif key == ord('i'):
+        elif key in self.key_rew100_frame:
             self.rewind_frame(100)
         else:
             pass
