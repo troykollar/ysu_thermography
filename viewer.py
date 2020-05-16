@@ -80,6 +80,7 @@ class Viewer:
             contours = self.dataset.find_contours(frame_data,
                                                   self.contour_threshold)
             generated_frame = self.draw_contour(contours, generated_frame)
+            contour_geo_dict = self.dataset.get_contour_geometry(contours)
         frame_size = self.follow_size * self.dataset.scale_factor
         if self.follow == 'max':
             _, max_temp_location = self.dataset.get_max_temp(generated_frame)
@@ -89,7 +90,6 @@ class Viewer:
                                                     frame_size)
         elif self.follow == 'contour':
             if self.contour_threshold is not None:
-                contour_geo_dict = self.dataset.get_contour_geometry(contours)
                 center_x = contour_geo_dict['cog_x']
                 center_y = contour_geo_dict['cog_y']
                 if center_x is not None and center_y is not None:
@@ -102,14 +102,9 @@ class Viewer:
                         generated_frame, max_temp_location, frame_size)
 
         # Change conditional to be specific for mp data or contour data
-        if self.info_pane is not None:
-            generated_frame = self.add_info_pane(
-                generated_frame, {
-                    'Test 1': 2,
-                    'Test 2': 'Other test',
-                    'Test 3': 'Third test',
-                    'Test 4': 4564684
-                })
+        if self.info_pane == 'contour':
+            generated_frame = self.add_info_pane(generated_frame,
+                                                 contour_geo_dict)
 
         return generated_frame
 
@@ -343,7 +338,7 @@ if __name__ == '__main__':
                             contour,
                             follow=follow_arg,
                             follow_size=fsize,
-                            info_pane=True)
+                            info_pane='contour')
 
     if save_frame is not None:
         thermal_viewer.save_frame16(int(save_frame))
