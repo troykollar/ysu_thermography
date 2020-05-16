@@ -14,7 +14,8 @@ class Viewer:
                  dataset: DataSet,
                  contour_threshold: int = None,
                  follow: str = None,
-                 follow_size: int = 20):
+                 follow_size: int = 20,
+                 info_pane=None):
         self.dataset = dataset
         self.quit = False
         self.cur_frame = None
@@ -23,6 +24,7 @@ class Viewer:
         self.contour_threshold = contour_threshold
         self.follow = follow
         self.follow_size = follow_size
+        self.info_pane = info_pane
 
         # Keycodes stored as list so multiple keys can be assigned to a function w/o other changes
         # Could be made simpler using ASCII lookup and keycodes, but apparently keycodes are
@@ -98,6 +100,16 @@ class Viewer:
                         generated_frame)
                     generated_frame = self.center_frame(
                         generated_frame, max_temp_location, frame_size)
+
+        # Change conditional to be specific for mp data or contour data
+        if self.info_pane is not None:
+            generated_frame = self.add_info_pane(
+                generated_frame, {
+                    'Test 1': 2,
+                    'Test 2': 'Other test',
+                    'Test 3': 'Third test',
+                    'Test 4': 4564684
+                })
 
         return generated_frame
 
@@ -208,9 +220,38 @@ class Viewer:
                                              (0, 255, 0), 1)
         return colormapped_frame
 
-    def add_info_pane(self):
+    def add_info_pane(self, colormapped_frame: np.ndarray, info: dict):
         # TODO: Add info pane function
-        pass
+        frame_height = colormapped_frame.shape[0]
+        frame_width = colormapped_frame.shape[1]
+        font = cv2.FONT_HERSHEY_DUPLEX
+        font_size = .002 * frame_height
+        font_color = (0, 0, 0)
+        #pane_height = 30 * len(info) * self.dataset.scale_factor
+        pane_height = int(len(info) * .09 * frame_height)
+
+        # Add white pane
+        colormapped_frame = cv2.copyMakeBorder(src=colormapped_frame,
+                                               top=pane_height,
+                                               bottom=0,
+                                               left=0,
+                                               right=0,
+                                               borderType=cv2.BORDER_CONSTANT,
+                                               value=(255, 255, 255))
+
+        # Add text
+        for i, item in enumerate(info):
+            text_y = int(.07 * frame_height * (i + 1))
+            text_x = int(.01 * frame_width)
+            colormapped_frame = cv2.putText(
+                colormapped_frame,
+                item + ': ' + str(info[item]), (text_x, text_y),
+                font,
+                font_size,
+                font_color,
+                thickness=int(.05 * self.dataset.scale_factor))
+
+        return colormapped_frame
 
 
 def get_viewer_CLargs(parser: argparse.ArgumentParser):
@@ -301,7 +342,8 @@ if __name__ == '__main__':
     thermal_viewer = Viewer(data,
                             contour,
                             follow=follow_arg,
-                            follow_size=fsize)
+                            follow_size=fsize,
+                            info_pane=True)
 
     if save_frame is not None:
         thermal_viewer.save_frame16(int(save_frame))
