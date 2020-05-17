@@ -54,7 +54,7 @@ class Viewer:
             'Rew 100 Frame': [ord('i')]
         }
 
-    def play_video(self):
+    def play_video(self, frame_delay: int = 1):
         for item in self.keys:
             print(item + ':', *self.keys[item], sep=' | ')
         window_name = self.dataset.build_folder
@@ -70,7 +70,7 @@ class Viewer:
                 self.advance_frame(1)
             else:
                 self.update_frame = False
-            key = cv2.waitKey(1) & 0xFF
+            key = cv2.waitKey(frame_delay) & 0xFF
             self.key_handler(key)
         cv2.destroyAllWindows()
 
@@ -281,7 +281,8 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     parser.add_argument(
         '-play',
         type=int,
-        help='0 or 1 specifying whether to play the video using OpenCV.')
+        help='int specifying frame delay in ms to play the video using OpenCV.',
+        default=None)
     parser.add_argument(
         '-frame',
         default=None,
@@ -325,7 +326,7 @@ if __name__ == '__main__':
 
     args = argument_parser.parse_args()
 
-    play = bool(args.play)
+    play = args.play
     temp_data = str(args.temp_data)
     top = bool(args.top)
     bot = bool(args.bot)
@@ -356,5 +357,6 @@ if __name__ == '__main__':
         start_frame = int(framerange[:comma_index])
         end_frame = int(framerange[comma_index + 1:])
         thermal_viewer.save_frame16(start=start_frame, end=end_frame)
-    if play:
-        thermal_viewer.play_video()
+    if play is not None:
+        print(play)
+        thermal_viewer.play_video(play)
