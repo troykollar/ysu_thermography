@@ -1,5 +1,4 @@
 import graphing
-from np_vid_viewer import *
 from tkinter import *
 from tkinter import filedialog
 from NathanPlots import Histogram_generation as histogram
@@ -8,7 +7,8 @@ from NathanPlots import Histogram_generation as histogram
 def submit(self):
 
     if self.genThresholdImg.get():
-        self.generate_threshold_image(self.tempDataEntry.get() + "/thermal_cam_temps.npy", int(self.genthreshold_thresholdInput.get()))
+        self.generate_threshold_image(self.tempDataEntry.get() + "/thermal_cam_temps.npy",
+                                      int(self.genthreshold_thresholdInput.get()))
 
     if self.playVideo.get():
         VIEWER = createNpVidTool(self)
