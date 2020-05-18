@@ -165,6 +165,25 @@ class DataSet:
 
         return max_temp, (max_temp_x, max_temp_y)
 
+    def validate_start_end(self, start: int, end: int):
+        """Checks if start and end are valid values. 
+    
+        If they are invalid and cannot be fixed, return False
+        Otherwise, return True
+        """
+
+        validity = True
+        if start < 0:
+            start = 0
+
+        if end < 0 or end > self.shape[0]:
+            end = self.shape[0]
+
+        if start > end:
+            validity = False
+
+        return validity
+
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
     """Add dataset related CL arguments to given parser.

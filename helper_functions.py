@@ -50,22 +50,3 @@ def printProgressBar(iteration,
     # Print New Line on Complete
     if iteration == total:
         print('\n')
-
-
-def validate_start_end(start: int, end: int, dataset: DataSet):
-    """Checks if start and end are valid values. 
-    
-    If they are invalid and cannot be fixed, return False
-    Otherwise, return True
-    """
-    validity = True
-    if start < 0:
-        start = 0
-
-    if end < 0 or end > dataset.shape[0]:
-        end = dataset.shape[0]
-
-    if start > end:
-        validity = False
-
-    return validity
