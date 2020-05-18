@@ -45,6 +45,7 @@ class DataSet:
         self.scale_factor += increase
 
     def remove_top(self, frame: np.ndarray):
+        """Attempt to remove reflection from above the piece."""
         # TODO: Fix reflection removing so it can be done as each frame is returned
         min_value = 174
         min_value_threshold = 5
@@ -67,6 +68,7 @@ class DataSet:
         #cv2.line(frame, (0, y), (frame.shape[1], y), int(np.amax(frame)), 1)
 
     def remove_bottom(self, frame: np.ndarray):
+        """Attempt to remove reflection from below the piece."""
         min_value = 174
         max_value = np.amax(frame)
         max_value_location = np.where(frame == max_value)
