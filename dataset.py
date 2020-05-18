@@ -182,7 +182,7 @@ class DataSet:
         if start > end:
             validity = False
 
-        return validity
+        return start, end, validity
 
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
