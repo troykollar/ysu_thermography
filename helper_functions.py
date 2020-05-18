@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from dataset import DataSet
 
 
 def get_build_folder(temp_filename: str):
