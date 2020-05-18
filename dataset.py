@@ -20,23 +20,8 @@ class DataSet:
         self.temp_fname = temps_file
         self.build_folder = self.get_build_folder()
         self.frame_data = np.load(self.temp_fname,
-                                  mmap_mode='r',
+                                  mmap_mode='c',
                                   allow_pickle=True)
-        self.cleaned_frame_data = np.empty(self.frame_data.shape,
-                                           dtype=np.float32)
-
-        # Remove reflections if specified
-        if self.remove_top_reflection or self.remove_bottom_reflection:
-            for i, frame in enumerate(self.frame_data):
-                loading_status = 'Removing reflections...'
-                printProgressBar(i, self.frame_data.shape[0], loading_status)
-                frame = frame.copy()
-                if remove_top_reflection:
-                    self.remove_top(frame)
-                if remove_bottom_reflection:
-                    self.remove_bottom(frame)
-
-                self.cleaned_frame_data[i] = frame
 
         self.shape = self.frame_data.shape
 
@@ -44,11 +29,14 @@ class DataSet:
         return len(self.frame_data)
 
     def __getitem__(self, index: int):
-        if self.remove_top_reflection or self.remove_bottom_reflection:
-            frame = self.cleaned_frame_data[index]
-        else:
-            frame = self.frame_data[index]
+        return self.clean_frame(index)
 
+    def clean_frame(self, index: int):
+        frame = self.frame_data[index]
+        if self.remove_top_reflection:
+            self.remove_top(frame)
+        if self.remove_bottom_reflection:
+            self.remove_bottom(frame)
         if self.scale_factor != 1:
             frame = self.scale_frame(frame)
         return frame
