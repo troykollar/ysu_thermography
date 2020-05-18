@@ -75,9 +75,29 @@ class Viewer:
         cv2.destroyAllWindows()
 
     def save_video(self, start: int = -1, end: int = -1, framerate: int = 60):
-        # TODO: Finish save_video() function
-        if start != 0 or end != self.dataset.shape[0]:
-            pass
+        start, end, valid_inputs = self.dataset.validate_start_end(start, end)
+        if valid_inputs:
+            # Generate the filename based on what frames are used
+            filename = self.dataset.build_folder + 'video'
+            if start != 0 or end != self.dataset.shape[0]:
+                filename += str(start) + '-' + str(end)
+
+            filename += '.avi'
+
+            # Generate a reference frame to get height and width
+            ref_frame = self.generate_frame(self.dataset[0])
+            height = ref_frame.shape[0]
+            width = ref_frame.shape[1]
+            video_writer = cv2.VideoWriter(
+                filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'),
+                framerate, (width, height))
+
+            for i, frame in enumerate(self.dataset[start:end]):
+                printProgressBar(i, end - start, 'Saving Video...')
+                generated_frame = self.generate_frame(frame)
+                video_writer.write(generated_frame)
+
+            print('\nVideo saved as :', filename)
 
     def generate_frame(self, frame_data: np.ndarray):
         generated_frame = self.colormap_frame(frame_data)
@@ -262,7 +282,9 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     Added Arguments
     ---------------
     play: optional
-        Play the video using OpenCV.
+        int specifying frame delay in ms to play the video using OpenCV.
+    save: optional
+        int specifying the framerate to save the video in using OpenCV.
     frame: optional
         int specifying a frame to save in 16 bit color using matplotlib.
     framerange: optional
@@ -282,6 +304,11 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         '-play',
         type=int,
         help='int specifying frame delay in ms to play the video using OpenCV.',
+        default=None)
+    parser.add_argument(
+        '-save',
+        type=int,
+        help='int specifying the framerate to save the video in using OpenCV.',
         default=None)
     parser.add_argument(
         '-frame',
@@ -336,6 +363,7 @@ if __name__ == '__main__':
     contour = args.contour
     follow_arg = args.follow
     fsize = args.fsize
+    save_framerate = args.save
 
     # Validate follow argument
     acceptable_follow_args = ['max', 'contour']
@@ -348,15 +376,19 @@ if __name__ == '__main__':
                             contour,
                             follow=follow_arg,
                             follow_size=fsize,
-                            info_pane='contour')
+                            info_pane=None)
 
     if save_frame is not None:
         thermal_viewer.save_frame16(int(save_frame))
     if framerange is not None:
+        # TODO: Allow framerange to be used for all functions
         comma_index = str(framerange).find(',')
         start_frame = int(framerange[:comma_index])
         end_frame = int(framerange[comma_index + 1:])
         thermal_viewer.save_frame16(start=start_frame, end=end_frame)
     if play is not None:
-        print(play)
         thermal_viewer.play_video(play)
+
+    if save_framerate is not None:
+        # TODO: Update start and end to use framerange values
+        thermal_viewer.save_video(start=-1, end=-1, framerate=save_framerate)
