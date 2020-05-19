@@ -30,6 +30,12 @@ class GUI:
         self.remove_bot = BooleanVar(False)
         self.scale_factor = IntVar(value=1)
 
+        # Viewer related variables
+        self.contour_threshold = IntVar(value=None)
+        self.follow = StringVar(value=None)
+        self.follow_size = IntVar(value=20)
+        self.info_pane = StringVar(value=None)
+
         self.generate_img = BooleanVar(False)
         self.save_frame = BooleanVar()
         self.play_video = BooleanVar(False)
@@ -75,8 +81,13 @@ class GUI:
         # Creating Frame Sections
         self.filePanel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
         self.filePanel.pack(side=TOP, fill=BOTH, pady=10)
+
         self.dataset_panel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
         self.dataset_panel.pack(side=TOP, fill=BOTH, pady=10)
+
+        self.viewer_panel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
+        self.viewer_panel.pack(side=TOP, fill=BOTH, pady=10)
+
         self.optionsPanel = Frame(self.root,
                                   bg=self.ACTIVEBACKGROUND,
                                   bd=1,
@@ -98,8 +109,9 @@ class GUI:
         self.buttonPanel.pack(side=BOTTOM, fill=X)
 
         # Building  all frames
-        self.build_dataset_frame()
         self.buildFileFrame()
+        self.build_dataset_frame()
+        self.build_viewer_frame()
         self.buildFunctionFrame()
         self.buildThresholdImageFrame()
         self.buildSaveImageFrame()
@@ -245,6 +257,40 @@ class GUI:
                                              root=scale_factor_label,
                                              textvariable=self.scale_factor)
         scale_factor_entry.pack()
+
+    def build_viewer_frame(self):
+        # Main Frame
+        self.viewer_frame = func.buildOuterLabelFrame(obj=self,
+                                                      root=self.viewer_panel,
+                                                      label='Viewer Options')
+
+        self.viewer_frame.grid(row=0,
+                               column=0,
+                               columnspan=2,
+                               sticky=W + E + N + S,
+                               ipady=5,
+                               pady=5)
+
+        self.viewer_frame.columnconfigure(0, weight=1)
+        self.viewer_frame.columnconfigure(1, weight=1)
+        self.viewer_frame.columnconfigure(2, weight=1)
+        self.viewer_frame.columnconfigure(3, weight=1)
+        self.viewer_frame.rowconfigure(0, weight=1)
+
+        # Frame to hold entry for contour threshold
+        contour_thresh_label = func.buildInnerLabelFrame(
+            obj=self, root=self.viewer_frame, label='Contour Threshold')
+
+        contour_thresh_hint = 'Threshold used for contouring.'
+        ToolTip.createToolTip(contour_thresh_label, contour_thresh_hint)
+
+        contour_thresh_label.grid(row=0, column=0, sticky=W + E + N + S)
+
+        contour_thresh_entry = func.buildEntry(
+            obj=self,
+            root=contour_thresh_label,
+            textvariable=self.contour_threshold)
+        contour_thresh_entry.pack()
 
     def buildFunctionFrame(self):
         # Main Frame
