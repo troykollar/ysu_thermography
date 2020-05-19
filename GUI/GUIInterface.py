@@ -4,6 +4,7 @@ from GUI import GUIHandler as handler
 import GUI.constants as consts
 from GUI import helper_functions as func
 
+
 class GUI:
 
     def __init__(self):
@@ -30,7 +31,7 @@ class GUI:
         self.save_video = BooleanVar(False)
         self.gen_threshold_img = BooleanVar(False)
         self.data_set = BooleanVar()
-        self.gradient_histogram = BooleanVar()
+        self.gradient_plots = BooleanVar()
         self.pixel_temp_range = BooleanVar()
 
         self.tempData = StringVar()
@@ -56,10 +57,15 @@ class GUI:
         self.plot_PixelLocX = StringVar()
         self.plot_PixelLocY = StringVar()
         self.plot_TempThresh = StringVar()
-        self.plot_BinCount = StringVar()
-        self.plot_GradSpacing = StringVar()
         self.plot_StartFrame = StringVar()
         self.plot_EndFrame = StringVar()
+        self.grad_mag = BooleanVar()
+        self.grad_angle = BooleanVar()
+        self.grad_2dHist = BooleanVar()
+        self.grad_scatter = BooleanVar()
+        self.grad_hexBin = BooleanVar()
+        self.grad_3D = BooleanVar()
+        self.grad_all = BooleanVar()
 
         # Creating Frame Sections
         self.filePanel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
@@ -93,6 +99,15 @@ class GUI:
         # Main GUI loop
         self.root.mainloop()
 
+    def gradSelectAll(self):
+        if self.grad_all.get():
+            self.grad_mag = TRUE
+            self.grad_angle = TRUE
+            self.grad_2dHist = TRUE
+            self.grad_scatter = TRUE
+            self.grad_hexBin = TRUE
+            self.grad_3D = TRUE
+
     def activatePanels(self):
         if self.gen_threshold_img.get():
             func.enableChildren(self.genThresholdImgFrame)
@@ -106,12 +121,12 @@ class GUI:
 
         if self.play_video.get() or self.save_video.get():
             func.enableChildren(self.playVideoFrame)
-        else: 
+        else:
             func.disableChildren(self.playVideoFrame)
 
-        if self.gradient_histogram.get() or self.pixel_temp_range.get():
+        if self.gradient_plots.get() or self.pixel_temp_range.get():
             func.enableChildren(self.plotOptionsFrame)
-        else: 
+        else:
             func.disableChildren(self.plotOptionsFrame)
 
     def buildFileFrame(self):
@@ -131,11 +146,11 @@ class GUI:
 
     def buildFunctionFrame(self):
         # Main Frame
-        functionsFrame = func.buildOuterLabelFrame(obj=self, 
-                                                   root=self.optionsPanel, 
+        functionsFrame = func.buildOuterLabelFrame(obj=self,
+                                                   root=self.optionsPanel,
                                                    label='Functions')
 
-        functionsFrame.grid(row=0, column=0, columnspan=2, sticky=W+E+N+S, ipady=5, pady=5)
+        functionsFrame.grid(row=0, column=0, columnspan=2, sticky=W + E + N + S, ipady=5, pady=5)
 
         functionsFrame.columnconfigure(0, weight=1)
         functionsFrame.columnconfigure(1, weight=1)
@@ -144,48 +159,48 @@ class GUI:
         functionsFrame.rowconfigure(1, weight=1)
 
         # Frame to hold checkbox to create a threshold image
-        genThresholdImgLabel = func.buildInnerLabelFrame(obj=self, 
-                                                         root=functionsFrame, 
+        genThresholdImgLabel = func.buildInnerLabelFrame(obj=self,
+                                                         root=functionsFrame,
                                                          label='Gen Thresh Image')
 
         genThresholdImgHint = Descriptors.getHintTextFunctionFrame('genThresholdImgLabel')
         ToolTip.createToolTip(genThresholdImgLabel, genThresholdImgHint)
-        genThresholdImgLabel.grid(row=0, column=0, sticky=W+E+N+S)
+        genThresholdImgLabel.grid(row=0, column=0, sticky=W + E + N + S)
 
         genThresholdImgCheckbox = func.buildFunctionCheckButton(obj=self,
-                                                        root=genThresholdImgLabel, 
-                                                        variable=self.gen_threshold_img, 
-                                                        command=self.activatePanels)
+                                                                root=genThresholdImgLabel,
+                                                                variable=self.gen_threshold_img,
+                                                                command=self.activatePanels)
         genThresholdImgCheckbox.pack()
 
         # Frame to hold checkbox to save a frame
-        saveFrameLabel = func.buildInnerLabelFrame(obj=self, 
-                                                   root=functionsFrame, 
+        saveFrameLabel = func.buildInnerLabelFrame(obj=self,
+                                                   root=functionsFrame,
                                                    label='Save Frame')
 
         saveFrameHint = Descriptors.getHintTextFunctionFrame('saveFrameLabel')
         ToolTip.createToolTip(saveFrameLabel, saveFrameHint)
-        saveFrameLabel.grid(row=0, column=1, sticky=W+E+N+S)
+        saveFrameLabel.grid(row=0, column=1, sticky=W + E + N + S)
 
         saveFrameCheckbox = func.buildFunctionCheckButton(obj=self,
-                                                  root=saveFrameLabel, 
-                                                  variable=self.save_frame, 
-                                                  command=self.activatePanels)
+                                                          root=saveFrameLabel,
+                                                          variable=self.save_frame,
+                                                          command=self.activatePanels)
         saveFrameCheckbox.pack()
 
         # Frame to hold checkbox to play video
-        playVideoLabel = func.buildInnerLabelFrame(obj=self, 
-                                                   root=functionsFrame, 
+        playVideoLabel = func.buildInnerLabelFrame(obj=self,
+                                                   root=functionsFrame,
                                                    label='Play Video')
-                                                   
+
         playVideoHint = Descriptors.getHintTextFunctionFrame('playVideoLabel')
         ToolTip.createToolTip(playVideoLabel, playVideoHint)
-        playVideoLabel.grid(row=0, column=2, sticky=W+E+N+S)
+        playVideoLabel.grid(row=0, column=2, sticky=W + E + N + S)
 
         playVideoCheckbox = func.buildFunctionCheckButton(obj=self,
-                                                  root=playVideoLabel,
-                                                  variable=self.play_video, 
-                                                  command=self.activatePanels)
+                                                          root=playVideoLabel,
+                                                          variable=self.play_video,
+                                                          command=self.activatePanels)
         playVideoCheckbox.pack()
 
         # Frame to Hold Option to Save Video
@@ -195,12 +210,12 @@ class GUI:
 
         saveVideoHint = Descriptors.getHintTextFunctionFrame('saveVideoLabel')
         ToolTip.createToolTip(saveVideoLabel, saveVideoHint)
-        saveVideoLabel.grid(row=1, column=0, sticky=W+E+N+S)
+        saveVideoLabel.grid(row=1, column=0, sticky=W + E + N + S)
 
         saveVideoCheckbox = func.buildFunctionCheckButton(obj=self,
-                                                  root=saveVideoLabel,
-                                                  variable=self.save_video,
-                                                  command=self.activatePanels)
+                                                          root=saveVideoLabel,
+                                                          variable=self.save_video,
+                                                          command=self.activatePanels)
         saveVideoCheckbox.pack()
 
         # Frame to Hold Option to Plot Gradient Info
@@ -210,12 +225,12 @@ class GUI:
 
         gradientHistogramHint = Descriptors.getHintTextFunctionFrame('gradientHistogramLabel')
         ToolTip.createToolTip(gradientHistogramLabel, gradientHistogramHint)
-        gradientHistogramLabel.grid(row=1, column=1, sticky=W+E+N+S)
+        gradientHistogramLabel.grid(row=1, column=1, sticky=W + E + N + S)
 
         gradientHistogramCheckbox = func.buildFunctionCheckButton(obj=self,
-                                                          root=gradientHistogramLabel,
-                                                          variable=self.gradient_histogram,
-                                                          command=self.activatePanels)
+                                                                  root=gradientHistogramLabel,
+                                                                  variable=self.gradient_plots,
+                                                                  command=self.activatePanels)
         gradientHistogramCheckbox.pack()
 
         # Frame to Hold Option to Plot Temporal Data
@@ -225,12 +240,12 @@ class GUI:
 
         pixelTempRangeHint = Descriptors.getHintTextFunctionFrame('pixelTempRangeLabel')
         ToolTip.createToolTip(pixelTempRangeLabel, pixelTempRangeHint)
-        pixelTempRangeLabel.grid(row=1, column=2, sticky=W+E+N+S)
+        pixelTempRangeLabel.grid(row=1, column=2, sticky=W + E + N + S)
 
         pixelTempRangeCheckbox = func.buildFunctionCheckButton(obj=self,
-                                                       root=pixelTempRangeLabel,
-                                                       variable=self.pixel_temp_range,
-                                                       command=self.activatePanels)
+                                                               root=pixelTempRangeLabel,
+                                                               variable=self.pixel_temp_range,
+                                                               command=self.activatePanels)
         pixelTempRangeCheckbox.pack()
 
     def buildThresholdImageFrame(self):
@@ -238,7 +253,7 @@ class GUI:
                                                               root=self.optionsPanel,
                                                               label='Threshold Image Options')
 
-        self.genThresholdImgFrame.grid(row=1, column=0, sticky=W+E+N+S, ipady=5, pady=5, padx=5)
+        self.genThresholdImgFrame.grid(row=1, column=0, sticky=W + E + N + S, ipady=5, pady=5, padx=5)
 
         thresholdFrame = func.buildInnerLabelFrame(obj=self,
                                                    root=self.genThresholdImgFrame,
@@ -258,7 +273,7 @@ class GUI:
                                                         root=self.optionsPanel,
                                                         label='Save Frame Options')
 
-        self.saveFrameFrame.grid(row=1, column=1, sticky=W+E+N+S)
+        self.saveFrameFrame.grid(row=1, column=1, sticky=W + E + N + S)
 
         frameFrame = func.buildInnerLabelFrame(obj=self,
                                                root=self.saveFrameFrame,
@@ -294,7 +309,7 @@ class GUI:
                                                         root=self.optionsPanel,
                                                         label='Play and Save Video Options')
 
-        self.playVideoFrame.grid(row=2, column=0, columnspan=2, sticky=W+E+N+S, ipady=7)
+        self.playVideoFrame.grid(row=2, column=0, columnspan=2, sticky=W + E + N + S, ipady=7)
 
         self.playVideoFrame.columnconfigure(0, weight=1)
         self.playVideoFrame.columnconfigure(1, weight=1)
@@ -310,7 +325,7 @@ class GUI:
 
         scaleFactorHint = Descriptors.getHintTextSavePlayFrame('scaleFactorFrame')
         ToolTip.createToolTip(scaleFactorFrame, scaleFactorHint)
-        scaleFactorFrame.grid(row=0, column=0, sticky=W+E+N+S)
+        scaleFactorFrame.grid(row=0, column=0, sticky=W + E + N + S)
 
         play_scaleFactorInput = func.buildEntry(obj=self,
                                                 root=scaleFactorFrame,
@@ -324,7 +339,7 @@ class GUI:
 
         frameDelayHint = Descriptors.getHintTextSavePlayFrame('frameDelayFrame')
         ToolTip.createToolTip(frameDelayFrame, frameDelayHint)
-        frameDelayFrame.grid(row=0, column=1, sticky=W+E+N+S)
+        frameDelayFrame.grid(row=0, column=1, sticky=W + E + N + S)
 
         play_frameDelayInput = func.buildEntry(obj=self,
                                                root=frameDelayFrame,
@@ -338,7 +353,7 @@ class GUI:
 
         fmaxHint = Descriptors.getHintTextSavePlayFrame('fmaxFrame')
         ToolTip.createToolTip(fmaxFrame, fmaxHint)
-        fmaxFrame.grid(row=0, column=2, sticky=W+E+N+S)
+        fmaxFrame.grid(row=0, column=2, sticky=W + E + N + S)
 
         play_fmaxInput = func.buildEntry(obj=self,
                                          root=fmaxFrame,
@@ -352,7 +367,7 @@ class GUI:
 
         cthreshHint = Descriptors.getHintTextSavePlayFrame('cthreshFrame')
         ToolTip.createToolTip(cthreshFrame, cthreshHint)
-        cthreshFrame.grid(row=1, column=0, sticky=W+E+N+S)
+        cthreshFrame.grid(row=1, column=0, sticky=W + E + N + S)
 
         play_cthreshInput = func.buildEntry(obj=self,
                                             root=cthreshFrame,
@@ -366,7 +381,7 @@ class GUI:
 
         fcontourHint = Descriptors.getHintTextSavePlayFrame('fcontourFrame')
         ToolTip.createToolTip(fcontourFrame, fcontourHint)
-        fcontourFrame.grid(row=1, column=1, sticky=W+E+N+S)
+        fcontourFrame.grid(row=1, column=1, sticky=W + E + N + S)
 
         play_fcontourInput = func.buildEntry(obj=self,
                                              root=fcontourFrame,
@@ -393,7 +408,7 @@ class GUI:
                                                 label='Remove Top Reflection')
         toprefHint = Descriptors.getHintTextSavePlayFrame('toprefFrame')
         ToolTip.createToolTip(toprefFrame, toprefHint)
-        toprefFrame.grid(row=2, column=0, sticky=W+E+N+S)
+        toprefFrame.grid(row=2, column=0, sticky=W + E + N + S)
         play_toprefInput = func.buildFlagCheckButton(obj=self,
                                                      root=toprefFrame,
                                                      variable=self.play_removeTopReflection)
@@ -405,7 +420,7 @@ class GUI:
 
         botrefHint = Descriptors.getHintTextSavePlayFrame('botrefFrame')
         ToolTip.createToolTip(botrefFrame, botrefHint)
-        botrefFrame.grid(row=2, column=1, sticky=W+E+N+S)
+        botrefFrame.grid(row=2, column=1, sticky=W + E + N + S)
         play_botrefInput = func.buildFlagCheckButton(obj=self,
                                                      root=botrefFrame,
                                                      variable=self.play_removeBottomReflection)
@@ -424,10 +439,9 @@ class GUI:
                                                  variable=self.play_displayMeltPool)
         play_mpInput.pack()
 
-
-        frameRangeFrame =func.buildInnerLabelFrame(obj=self,
-                                                   root=self.playVideoFrame,
-                                                   label='Frame Range (For Saved Video)')
+        frameRangeFrame = func.buildInnerLabelFrame(obj=self,
+                                                    root=self.playVideoFrame,
+                                                    label='Frame Range (For Saved Video)')
 
         frameRangeHint = Descriptors.getHintTextSavePlayFrame('frameRangeFrame')
         ToolTip.createToolTip(frameRangeFrame, frameRangeHint)
@@ -465,7 +479,7 @@ class GUI:
                                                           root=self.optionsPanel,
                                                           label='Plot Options')
 
-        self.plotOptionsFrame.grid(row=3, column=0, columnspan=2, sticky=W+E+N+S)
+        self.plotOptionsFrame.grid(row=3, column=0, columnspan=2, sticky=W + E + N + S)
 
         self.plotOptionsFrame.columnconfigure(0, weight=1)
         self.plotOptionsFrame.columnconfigure(1, weight=1)
@@ -480,7 +494,7 @@ class GUI:
 
         pixelLocationHint = Descriptors.getHintTextPlotOptions('pixelLocationFrame')
         ToolTip.createToolTip(pixelLocationFrame, pixelLocationHint)
-        pixelLocationFrame.grid(row=0, column=1, sticky=W+E+N+S)
+        pixelLocationFrame.grid(row=0, column=1, sticky=W + E + N + S)
 
         pixelLocationFrame.columnconfigure(0, weight=1)
         pixelLocationFrame.columnconfigure(1, weight=1)
@@ -491,10 +505,10 @@ class GUI:
                                               root=pixelLocationFrame,
                                               textvariable=self.plot_PixelLocX)
 
-        pixelXLocationInput.grid(row=0, column=0, sticky=W+E+N+S)
+        pixelXLocationInput.grid(row=0, column=0, sticky=W + E + N + S)
         comma = Label(pixelLocationFrame, text=",",
                       bd=0, highlightthickness=0, bg=self.ACTIVEBACKGROUND)
-        comma.grid(row=0, column=1, sticky=W+E+N+S)
+        comma.grid(row=0, column=1, sticky=W + E + N + S)
         pixelYLocationInput = func.buildEntry(obj=self,
                                               root=pixelLocationFrame,
                                               textvariable=self.plot_PixelLocY)
@@ -507,7 +521,7 @@ class GUI:
 
         histthreshHint = Descriptors.getHintTextPlotOptions('histthreshFrame')
         ToolTip.createToolTip(histthreshFrame, histthreshHint)
-        histthreshFrame.grid(row=1, column=0, sticky=W+E+N+S)
+        histthreshFrame.grid(row=1, column=0, sticky=W + E + N + S)
 
         histthreshInput = func.buildEntry(obj=self,
                                           root=histthreshFrame,
@@ -515,39 +529,13 @@ class GUI:
         histthreshInput.insert(END, 200)
         histthreshInput.pack()
 
-        histBinFrame = func.buildInnerLabelFrame(obj=self,
-                                                 root=self.plotOptionsFrame,
-                                                 label='Bin Count (Histogram Plots')
-
-        histBinHint = Descriptors.getHintTextPlotOptions('histBinFrame')
-        ToolTip.createToolTip(histBinFrame, histBinHint)
-        histBinFrame.grid(row=1, column=1, sticky=W+E+N+S)
-        histBinInput = func.buildEntry(obj=self,
-                                       root=histBinFrame,
-                                       textvariable=self.plot_BinCount)
-        histBinInput.insert(END, 5)
-        histBinInput.pack()
-
-        histGradSpacingFrame = func.buildInnerLabelFrame(obj=self,
-                                                         root=self.plotOptionsFrame,
-                                                         label='Gradient Spacing')
-
-        histGradSpacingHint = Descriptors.getHintTextPlotOptions('histGradSpacingFrame')
-        ToolTip.createToolTip(histGradSpacingFrame, histGradSpacingHint)
-        histGradSpacingFrame.grid(row=1, column=2, sticky=W+E+N+S)
-        histGradSpacingInput = func.buildEntry(obj=self,
-                                               root=histGradSpacingFrame,
-                                               textvariable=self.plot_GradSpacing)
-        histGradSpacingInput.insert(END, 1)
-        histGradSpacingInput.pack()
-
         frameRangeFrame = func.buildInnerLabelFrame(obj=self,
                                                     root=self.plotOptionsFrame,
                                                     label='Frame Range')
 
         frameRangeHint = Descriptors.getHintTextPlotOptions('frameRangeFrame')
         ToolTip.createToolTip(frameRangeFrame, frameRangeHint)
-        frameRangeFrame.grid(row=2, column=1, sticky=W+E+N+S)
+        frameRangeFrame.grid(row=2, column=1, sticky=W + E + N + S)
 
         frameRangeFrame.columnconfigure(0, weight=1)
         frameRangeFrame.columnconfigure(1, weight=1)
@@ -565,6 +553,14 @@ class GUI:
         plotEndFrameInput.insert(END, -1)
         plotEndFrameInput.grid(row=0, column=1)
 
+        gradFrame = func.buildInnerLabelFrame(obj=self,
+                                              root=self.plotOptionsFrame,
+                                              label='Gradient Plots')
+
+        gradFrame.grid(row=3, column=0, columnspan=3)
+
+
+
     def buildButtonFrame(self):
         closeButton = Button(self.buttonPanel, text="Close", command=self.root.quit,
                              bg=self.ACTIVEBUTTONBACKGROUND, relief=FLAT)
@@ -573,4 +569,3 @@ class GUI:
         submitButton = Button(self.buttonPanel, text="Submit", command=lambda: handler.submit(self=self),
                               bg=self.ACTIVEBUTTONBACKGROUND, relief=FLAT)
         submitButton.pack(side=RIGHT)
-
