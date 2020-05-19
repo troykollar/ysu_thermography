@@ -344,6 +344,18 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     )
 
 
+# TODO: Convert other colormap frame calls to use this one outside of the class
+def colormap_frame(frame):
+    frame = cv2.normalize(frame,
+                          frame,
+                          0,
+                          255,
+                          cv2.NORM_MINMAX,
+                          dtype=cv2.CV_8UC1)
+    frame = cv2.applyColorMap(frame, cv2.COLORMAP_INFERNO)
+    return frame
+
+
 if __name__ == '__main__':
     argument_parser = argparse.ArgumentParser(
         description='Play a video from the given dataset.')
