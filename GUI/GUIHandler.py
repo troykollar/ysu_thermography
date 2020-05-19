@@ -2,15 +2,29 @@ import graphing
 from tkinter import *
 from tkinter import filedialog
 
-from np_vid_viewer.np_vid_viewer import NpVidTool
+from viewer import Viewer
+from dataset import DataSet
 from plot import Plots
+from composite import save_threshold_img, get_threshold_img
 
 
 def submit(self):
 
+    # TODO: Make reflection removing and scaling based on dataset
+    dataset = DataSet(self.tempData.get() + "/thermal_cam_temps.npy",
+                      self.play_removeTopReflection.get(),
+                      self.play_removeBottomReflection.get(), 1)
+
+    # TODO: Make contour threshold based on Viewer itself, and implement other arguments
+    viewer = Viewer(dataset, self.play_contourTempThresh)
+
     if self.gen_threshold_img.get():
-        self.generate_threshold_image(self.tempDataEntry.get() + "/thermal_cam_temps.npy",
-                                      int(self.genthreshold_thresholdInput.get()))
+        # TODO: Include implementation of start, end, and cap
+        print(self.genthreshold_threshold)
+        thresh_img = get_threshold_img(dataset,
+                                       int(self.genthreshold_threshold.get()))
+        save_threshold_img(self.tempData.get() + "/thermal_cam_temps.npy",
+                           thresh_img, self.genthreshold_threshold.get())
 
     if self.play_video.get():
         VIEWER = createNpVidTool(self)
@@ -22,16 +36,20 @@ def submit(self):
         VIEWER = createNpVidTool(self)
 
         VIEWER.save_video(scale_factor=int(self.play_scaleFactor.get()),
-                          framerate=int(self.play_frameRate.get()), start=int(self.play_saveStartFrame.get()),
+                          framerate=int(self.play_frameRate.get()),
+                          start=int(self.play_saveStartFrame.get()),
                           end=self.play_saveEndFrame.get())
 
     if self.save_frame.get():
         VIEWER = createNpVidTool(self)
-        VIEWER.save_frame16(int(self.saveFrameNumber.get()), self.saveImageNumber.get())
+        VIEWER.save_frame16(int(self.saveFrameNumber.get()),
+                            self.saveImageNumber.get())
 
     if self.pixel_temp_range.get():
-        graphing.plotLine(temp_file=self.tempData.get() + "/thermal_cam_temps.npy",
-                          pixel=(int(self.plot_PixelLocX.get()), int(self.plot_PixelLocY.get())),
+        graphing.plotLine(temp_file=self.tempData.get() +
+                          "/thermal_cam_temps.npy",
+                          pixel=(int(self.plot_PixelLocX.get()),
+                                 int(self.plot_PixelLocY.get())),
                           startFrame=int(self.plot_StartFrame.get()),
                           endFrame=int(self.plot_EndFrame.get()))
 
@@ -61,7 +79,8 @@ def submit(self):
 
 def browseFiles(self, entry):
     entry.delete(0, END)
-    self.root.filepath = filedialog.askdirectory(initialdir="/home/rjyarwood/Documents/Research/ResearchData")
+    self.root.filepath = filedialog.askdirectory(
+        initialdir="/home/rjyarwood/Documents/Research/ResearchData")
     entry.insert(0, self.root.filepath)
 
 
@@ -78,8 +97,8 @@ def createNpVidTool(self):
 
 def createPlotTool(self):
     return Plots(temp_data=self.tempData.get(),
-                 pixel=(int(self.plot_PixelLocX.get()), int(self.plot_PixelLocY.get())),
+                 pixel=(int(self.plot_PixelLocX.get()),
+                        int(self.plot_PixelLocY.get())),
                  threshold=int(self.plot_TempThresh.get()),
                  start_frame=int(self.plot_StartFrame.get()),
                  end_frame=int(self.plot_EndFrame.get()))
-
