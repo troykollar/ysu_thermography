@@ -5,6 +5,7 @@ import GUI.constants as consts
 from GUI import helper_functions as func
 from viewer import Viewer
 from dataset import DataSet
+from composite import get_threshold_img, save_threshold_img
 
 
 class GUI:
@@ -43,6 +44,9 @@ class GUI:
         self.info_pane = StringVar(value=None)
         self.frame_delay = IntVar(value=1)
         self.framerate = IntVar(value=60)
+
+        # Composite related variables
+        self.composite_threshold = IntVar(value=None)
 
         self.generate_img = BooleanVar(False)
         self.save_frame = BooleanVar()
@@ -121,9 +125,7 @@ class GUI:
         self.build_dataset_frame()
         self.build_viewer_frame()
         self.buildFunctionFrame()
-        self.buildThresholdImageFrame()
-        self.buildSaveImageFrame()
-        self.buildPlaySaveFrame()
+        self.build_composite_frame()
         self.buildPlotOptionsFrame()
         self.buildButtonFrame()
 
@@ -143,19 +145,9 @@ class GUI:
 
     def activatePanels(self):
         if self.gen_threshold_img.get():
-            func.enableChildren(self.genThresholdImgFrame)
+            func.enableChildren(self.composite_frame)
         else:
-            func.disableChildren(self.genThresholdImgFrame)
-
-        if self.save_frame.get():
-            func.enableChildren(self.saveFrameFrame)
-        else:
-            func.disableChildren(self.saveFrameFrame)
-
-        if self.play_video.get() or self.save_video.get():
-            func.enableChildren(self.playVideoFrame)
-        else:
-            func.disableChildren(self.playVideoFrame)
+            func.disableChildren(self.composite_frame)
 
         if self.gradient_plots.get() or self.pixel_temp_range.get():
             func.enableChildren(self.plotOptionsFrame)
@@ -249,7 +241,7 @@ class GUI:
         remove_bot_cb = func.buildFunctionCheckButton(
             obj=self,
             root=remove_bot_label,
-            variable=self.gen_threshold_img,
+            variable=self.remove_bot,
             command=self.activatePanels)
         remove_bot_cb.pack()
 
@@ -523,255 +515,36 @@ class GUI:
             command=self.activatePanels)
         pixelTempRangeCheckbox.pack()
 
-    def buildThresholdImageFrame(self):
-        self.genThresholdImgFrame = func.buildOuterLabelFrame(
-            obj=self, root=self.optionsPanel, label='Threshold Image Options')
+    def build_composite_frame(self):
+        self.composite_frame = func.buildOuterLabelFrame(
+            obj=self, root=self.optionsPanel, label='Composite options')
 
-        self.genThresholdImgFrame.grid(row=1,
-                                       column=0,
-                                       sticky=W + E + N + S,
-                                       ipady=5,
-                                       pady=5,
-                                       padx=5)
+        self.composite_frame.grid(row=1,
+                                  column=0,
+                                  sticky=W + E + N + S,
+                                  ipady=5,
+                                  pady=5,
+                                  padx=5)
 
-        thresholdFrame = func.buildInnerLabelFrame(
+        threshold_frame = func.buildInnerLabelFrame(
+            obj=self, root=self.composite_frame, label='Temperature Threshold')
+
+        threshold_hint = 'Threshold used to increment image.'
+        ToolTip.createToolTip(threshold_frame, threshold_hint)
+        threshold_frame.pack(side=LEFT, expand=1)
+
+        threshold_input = func.buildEntry(
             obj=self,
-            root=self.genThresholdImgFrame,
-            label='Temperature Threshold')
+            root=threshold_frame,
+            textvariable=self.composite_threshold)
+        threshold_input.pack()
 
-        thresholdHint = Descriptors.getHintTextThresholdFrame('thresholdFrame')
-        ToolTip.createToolTip(thresholdFrame, thresholdHint)
-        thresholdFrame.pack(side=LEFT, expand=1)
-
-        genthreshold_thresholdInput = func.buildEntry(
-            obj=self,
-            root=thresholdFrame,
-            textvariable=self.genthreshold_threshold)
-        genthreshold_thresholdInput.pack()
-
-    def buildSaveImageFrame(self):
-        self.saveFrameFrame = func.buildOuterLabelFrame(
-            obj=self, root=self.optionsPanel, label='Save Frame Options')
-
-        self.saveFrameFrame.grid(row=1, column=1, sticky=W + E + N + S)
-
-        frameFrame = func.buildInnerLabelFrame(obj=self,
-                                               root=self.saveFrameFrame,
-                                               label='Frame Number')
-
-        frameHint = Descriptors.getHintTextSaveImageFrame('frameFrame')
-        ToolTip.createToolTip(frameFrame, frameHint)
-        frameFrame.pack(side=LEFT, expand=1)
-
-        frameInput = func.buildEntry(obj=self,
-                                     root=frameFrame,
-                                     width=10,
-                                     textvariable=self.save_FrameNumber)
-        frameInput.pack()
-
-        destDataLabel = func.buildInnerLabelFrame(obj=self,
-                                                  root=self.saveFrameFrame,
-                                                  label='Image Title')
-
-        destHint = Descriptors.getHintTextSaveImageFrame('destDataLabel')
-        ToolTip.createToolTip(destDataLabel, destHint)
-        destDataLabel.pack(side=LEFT, expand=1)
-
-        destDataEntry = func.buildEntry(obj=self,
-                                        root=destDataLabel,
-                                        width=10,
-                                        textvariable=self.save_ImageNumber)
-        destDataEntry.insert(END, 1)
-        destDataEntry.pack()
-
-    def buildPlaySaveFrame(self):
-        self.playVideoFrame = func.buildOuterLabelFrame(
-            obj=self,
-            root=self.optionsPanel,
-            label='Play and Save Video Options')
-
-        self.playVideoFrame.grid(row=2,
-                                 column=0,
-                                 columnspan=2,
-                                 sticky=W + E + N + S,
-                                 ipady=7)
-
-        self.playVideoFrame.columnconfigure(0, weight=1)
-        self.playVideoFrame.columnconfigure(1, weight=1)
-        self.playVideoFrame.columnconfigure(2, weight=1)
-        self.playVideoFrame.rowconfigure(0, weight=1)
-        self.playVideoFrame.rowconfigure(1, weight=1)
-        self.playVideoFrame.rowconfigure(2, weight=1)
-        self.playVideoFrame.rowconfigure(3, weight=1)
-
-        scaleFactorFrame = func.buildInnerLabelFrame(obj=self,
-                                                     root=self.playVideoFrame,
-                                                     label='Scale Factor')
-
-        scaleFactorHint = Descriptors.getHintTextSavePlayFrame(
-            'scaleFactorFrame')
-        ToolTip.createToolTip(scaleFactorFrame, scaleFactorHint)
-        scaleFactorFrame.grid(row=0, column=0, sticky=W + E + N + S)
-
-        play_scaleFactorInput = func.buildEntry(
-            obj=self,
-            root=scaleFactorFrame,
-            textvariable=self.play_scaleFactor)
-        play_scaleFactorInput.insert(END, 1)
-        play_scaleFactorInput.pack()
-
-        frameDelayFrame = func.buildInnerLabelFrame(
-            obj=self,
-            root=self.playVideoFrame,
-            label='Frame Delay (For Play Video)')
-
-        frameDelayHint = Descriptors.getHintTextSavePlayFrame(
-            'frameDelayFrame')
-        ToolTip.createToolTip(frameDelayFrame, frameDelayHint)
-        frameDelayFrame.grid(row=0, column=1, sticky=W + E + N + S)
-
-        play_frameDelayInput = func.buildEntry(
-            obj=self, root=frameDelayFrame, textvariable=self.play_frameDelay)
-        play_frameDelayInput.insert(END, 1)
-        play_frameDelayInput.pack()
-
-        fmaxFrame = func.buildInnerLabelFrame(
-            obj=self,
-            root=self.playVideoFrame,
-            label='# of Pixels to Display Around Max Temp')
-
-        fmaxHint = Descriptors.getHintTextSavePlayFrame('fmaxFrame')
-        ToolTip.createToolTip(fmaxFrame, fmaxHint)
-        fmaxFrame.grid(row=0, column=2, sticky=W + E + N + S)
-
-        play_fmaxInput = func.buildEntry(obj=self,
-                                         root=fmaxFrame,
-                                         textvariable=self.play_pixelAroundMax)
-        play_fmaxInput.insert(END, False)
-        play_fmaxInput.pack()
-
-        cthreshFrame = func.buildInnerLabelFrame(
-            obj=self,
-            root=self.playVideoFrame,
-            label='Contour Temperature Threshold')
-
-        cthreshHint = Descriptors.getHintTextSavePlayFrame('cthreshFrame')
-        ToolTip.createToolTip(cthreshFrame, cthreshHint)
-        cthreshFrame.grid(row=1, column=0, sticky=W + E + N + S)
-
-        play_cthreshInput = func.buildEntry(
-            obj=self,
-            root=cthreshFrame,
-            textvariable=self.play_contourTempThresh)
-        play_cthreshInput.insert(END, 0)
-        play_cthreshInput.pack()
-
-        fcontourFrame = func.buildInnerLabelFrame(
-            obj=self,
-            root=self.playVideoFrame,
-            label='Contour Size (in Pixels)')
-
-        fcontourHint = Descriptors.getHintTextSavePlayFrame('fcontourFrame')
-        ToolTip.createToolTip(fcontourFrame, fcontourHint)
-        fcontourFrame.grid(row=1, column=1, sticky=W + E + N + S)
-
-        play_fcontourInput = func.buildEntry(
-            obj=self,
-            root=fcontourFrame,
-            textvariable=self.play_contourPixelRange)
-        play_fcontourInput.insert(END, False)
-        play_fcontourInput.pack()
-
-        fpsFrame = func.buildInnerLabelFrame(obj=self,
-                                             root=self.playVideoFrame,
-                                             label='FPS (For Saved Video)')
-
-        fpsHint = Descriptors.getHintTextSavePlayFrame('fpsFrame')
-        ToolTip.createToolTip(fpsFrame, fpsHint)
-        fpsFrame.grid(row=1, column=2, sticky=W + E + N + S)
-
-        save_fpsInput = func.buildEntry(obj=self,
-                                        root=fpsFrame,
-                                        textvariable=self.play_frameRate)
-        save_fpsInput.insert(END, 60)
-        save_fpsInput.pack()
-
-        toprefFrame = func.buildInnerLabelFrame(obj=self,
-                                                root=self.playVideoFrame,
-                                                label='Remove Top Reflection')
-        toprefHint = Descriptors.getHintTextSavePlayFrame('toprefFrame')
-        ToolTip.createToolTip(toprefFrame, toprefHint)
-        toprefFrame.grid(row=2, column=0, sticky=W + E + N + S)
-        play_toprefInput = func.buildFlagCheckButton(
-            obj=self, root=toprefFrame, variable=self.play_removeTopReflection)
-        play_toprefInput.pack()
-
-        botrefFrame = func.buildInnerLabelFrame(
-            obj=self,
-            root=self.playVideoFrame,
-            label='Remove Bottom Reflection')
-
-        botrefHint = Descriptors.getHintTextSavePlayFrame('botrefFrame')
-        ToolTip.createToolTip(botrefFrame, botrefHint)
-        botrefFrame.grid(row=2, column=1, sticky=W + E + N + S)
-        play_botrefInput = func.buildFlagCheckButton(
-            obj=self,
-            root=botrefFrame,
-            variable=self.play_removeBottomReflection)
-        play_botrefInput.pack()
-
-        mpFrame = func.buildInnerLabelFrame(obj=self,
-                                            root=self.playVideoFrame,
-                                            label='Display Meltpool Info')
-
-        mpHint = Descriptors.getHintTextSavePlayFrame('mpFrame')
-        ToolTip.createToolTip(mpFrame, mpHint)
-        mpFrame.grid(row=2, column=2, sticky=W + E + N + S)
-
-        play_mpInput = func.buildFlagCheckButton(
-            obj=self, root=mpFrame, variable=self.play_displayMeltPool)
-        play_mpInput.pack()
-
-        frameRangeFrame = func.buildInnerLabelFrame(
-            obj=self,
-            root=self.playVideoFrame,
-            label='Frame Range (For Saved Video)')
-
-        frameRangeHint = Descriptors.getHintTextSavePlayFrame(
-            'frameRangeFrame')
-        ToolTip.createToolTip(frameRangeFrame, frameRangeHint)
-        frameRangeFrame.grid(row=3, column=1, sticky=W + E + N + S)
-
-        frameRangeFrame.columnconfigure(0, weight=1)
-        frameRangeFrame.columnconfigure(1, weight=1)
-        frameRangeFrame.rowconfigure(0, weight=1)
-
-        saveStartFrameInput = func.buildEntry(
-            obj=self,
-            root=frameRangeFrame,
-            textvariable=self.play_saveStartFrame)
-        saveStartFrameInput.insert(END, 0)
-        saveStartFrameInput.grid(row=0, column=0)
-
-        saveEndFrameInput = func.buildEntry(
-            obj=self,
-            root=frameRangeFrame,
-            textvariable=self.play_saveEndFrame)
-        saveEndFrameInput.insert(END, -1)
-        saveEndFrameInput.grid(row=0, column=1)
-
-        contourOnImgFrame = func.buildInnerLabelFrame(obj=self,
-                                                      root=self.playVideoFrame,
-                                                      label='Display Contour')
-        contourOnImgHint = Descriptors.getHintTextSavePlayFrame(
-            'contourOnImgFrame')
-        ToolTip.createToolTip(contourOnImgFrame, contourOnImgHint)
-        contourOnImgFrame.grid(row=3, column=2, sticky=W + E + N + S)
-        contourOnImgInput = func.buildFlagCheckButton(
-            obj=self,
-            root=contourOnImgFrame,
-            variable=self.play_displayContour)
-        contourOnImgInput.pack()
+        gen_threshold_button = Button(self.composite_frame,
+                                      text='Generate Threshold Image',
+                                      command=lambda: self.save_threshold(),
+                                      bg=self.ACTIVEBUTTONBACKGROUND,
+                                      relief=FLAT)
+        gen_threshold_button.pack()
 
     def buildPlotOptionsFrame(self):
         self.plotOptionsFrame = func.buildOuterLabelFrame(
@@ -973,3 +746,12 @@ class GUI:
         self.viewer = Viewer(self.dataset, self.contour_threshold.get(),
                              self.follow.get(), self.follow_size.get(),
                              self.info_pane.get())
+
+    def save_threshold(self):
+        self.grab_dataset()
+        thresh_img = get_threshold_img(self.dataset,
+                                       self.composite_threshold.get(),
+                                       self.start_frame.get(),
+                                       self.end_frame.get())
+        save_threshold_img(self.tempData.get(), thresh_img,
+                           self.composite_threshold.get())
