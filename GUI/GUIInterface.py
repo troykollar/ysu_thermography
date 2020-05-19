@@ -6,6 +6,8 @@ from GUI import helper_functions as func
 from viewer import Viewer
 from dataset import DataSet
 from composite import get_threshold_img, save_threshold_img
+from plot import Plots
+from matplotlib import pyplot as plt
 
 
 class GUI:
@@ -124,7 +126,6 @@ class GUI:
         self.buildFileFrame()
         self.build_dataset_frame()
         self.build_viewer_frame()
-        self.buildFunctionFrame()
         self.build_composite_frame()
         self.buildPlotOptionsFrame()
         self.buildButtonFrame()
@@ -519,11 +520,12 @@ class GUI:
             textvariable=self.composite_threshold)
         threshold_input.pack()
 
-        gen_threshold_button = Button(self.composite_frame,
-                                      text='Generate Threshold Image',
-                                      command=lambda: self.save_threshold(),
-                                      bg=self.ACTIVEBUTTONBACKGROUND,
-                                      relief=FLAT)
+        gen_threshold_button = Button(
+            self.composite_frame,
+            text='Generate Threshold Image',
+            command=lambda: self.save_threshold_img(),
+            bg=self.ACTIVEBUTTONBACKGROUND,
+            relief=FLAT)
         gen_threshold_button.pack()
 
     def buildPlotOptionsFrame(self):
@@ -679,6 +681,14 @@ class GUI:
             command=self.gradSelectAll)
         gradAllCheckButton.pack()
 
+        create_plots_button = Button(self.plotOptionsFrame,
+                                     text='Create Plots',
+                                     command=lambda: self.create_plots(),
+                                     bg=self.ACTIVEBUTTONBACKGROUND,
+                                     relief=FLAT)
+
+        create_plots_button.grid(row=4, column=2)
+
     def buildButtonFrame(self):
         closeButton = Button(self.buttonPanel,
                              text="Close",
@@ -727,7 +737,7 @@ class GUI:
                              self.follow.get(), self.follow_size.get(),
                              self.info_pane.get())
 
-    def save_threshold(self):
+    def save_threshold_img(self):
         self.grab_dataset()
         thresh_img = get_threshold_img(self.dataset,
                                        self.composite_threshold.get(),
@@ -735,3 +745,35 @@ class GUI:
                                        self.end_frame.get())
         save_threshold_img(self.tempData.get(), thresh_img,
                            self.composite_threshold.get())
+
+    def create_plots(self):
+        self.grab_dataset()
+        PLOTS = Plots(temp_data=self.dataset,
+                      pixel=(int(self.plot_PixelLocX.get()),
+                             int(self.plot_PixelLocY.get())),
+                      threshold=int(self.plot_TempThresh.get()),
+                      start_frame=int(self.plot_StartFrame.get()),
+                      end_frame=int(self.plot_EndFrame.get()))
+
+        if self.grad_all.get():
+            PLOTS.all()
+
+        elif self.grad_mag.get():
+            PLOTS.plotMagnitude()
+
+        elif self.grad_angle.get():
+            PLOTS.plotAngle()
+
+        elif self.grad_2dHist.get():
+            PLOTS.plot2DHistogram()
+
+        elif self.grad_scatter.get():
+            PLOTS.plotScatter()
+
+        elif self.grad_hexBin.get():
+            PLOTS.plotHexBin()
+
+        elif self.grad_3d.get():
+            PLOTS.plot3DBubble()
+
+        plt.show()
