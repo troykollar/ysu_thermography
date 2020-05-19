@@ -1,7 +1,11 @@
+
+
 import graphing
 from tkinter import *
 from tkinter import filedialog
+import numpy as np
 
+from GUI.select_pixels import selectPixels
 from np_vid_viewer.np_vid_viewer import NpVidTool
 from plot import Plots
 
@@ -36,27 +40,36 @@ def submit(self):
                           endFrame=int(self.plot_EndFrame.get()))
 
     if self.gradient_plots.get():
-        PLOTS = createPlotTool(self)
-        if self.grad_all.get():
-            PLOTS.all()
 
-        elif self.grad_mag.get():
-            PLOTS.plotMagnitude()
+        if self.select_pixels.get():
+            selectPixels(self=self,
+                         temp_file=self.tempData.get() + "/thermal_cam_temps.npy",
+                         composite_threshold=int(self.plot_TempThresh.get()),
+                         start_frame=int(self.plot_StartFrame.get()),
+                         end_frame=int(self.plot_EndFrame.get()))
+        else:
+            PLOTS = createPlotTool(self)
 
-        elif self.grad_angle.get():
-            PLOTS.plotAngle()
+            if self.grad_all.get():
+                PLOTS.all()
 
-        elif self.grad_2dHist.get():
-            PLOTS.plot2DHistogram()
+            elif self.grad_mag.get():
+                PLOTS.plotMagnitude()
 
-        elif self.grad_scatter.get():
-            PLOTS.plotScatter()
+            elif self.grad_angle.get():
+                PLOTS.plotAngle()
 
-        elif self.grad_hexBin.get():
-            PLOTS.plotHexBin()
+            elif self.grad_2dHist.get():
+                PLOTS.plot2DHistogram()
 
-        elif self.grad_3d.get():
-            PLOTS.plot3DBubble()
+            elif self.grad_scatter.get():
+                PLOTS.plotScatter()
+
+            elif self.grad_hexBin.get():
+                PLOTS.plotHexBin()
+
+            elif self.grad_3d.get():
+                PLOTS.plot3DBubble()
 
 
 def browseFiles(self, entry):
@@ -77,9 +90,8 @@ def createNpVidTool(self):
 
 
 def createPlotTool(self):
-    return Plots(temp_data=self.tempData.get(),
+    return Plots(temp_data=np.load(self.tempData.get() + "/thermal_cam_temps.npy", allow_pickle=True, mmap_mode='r'),
                  pixel=(int(self.plot_PixelLocX.get()), int(self.plot_PixelLocY.get())),
                  threshold=int(self.plot_TempThresh.get()),
                  start_frame=int(self.plot_StartFrame.get()),
                  end_frame=int(self.plot_EndFrame.get()))
-

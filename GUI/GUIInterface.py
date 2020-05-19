@@ -66,6 +66,7 @@ class GUI:
         self.grad_hexBin = BooleanVar()
         self.grad_3D = BooleanVar()
         self.grad_all = BooleanVar()
+        self.select_pixels = BooleanVar()
 
         # Creating Frame Sections
         self.filePanel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
@@ -128,12 +129,11 @@ class GUI:
             func.enableChildren(self.plotOptionsFrame)
         else:
             func.disableChildren(self.plotOptionsFrame)
-        
+
         if self.gradient_plots.get():
             func.enableChildren(self.gradFrame)
         else:
             func.disableChildren(self.gradFrame)
-    
 
     def buildFileFrame(self):
         tempDataLabel = Label(self.filePanel, text="File Path Build Data Folder: ",
@@ -559,9 +559,19 @@ class GUI:
         plotEndFrameInput.insert(END, -1)
         plotEndFrameInput.grid(row=0, column=1)
 
+        self.selectPixelsFrame = func.buildInnerLabelFrame(obj=self,
+                                                           root=self.plotOptionsFrame,
+                                                           label='Create Composite and select pixels')
+        self.selectPixelsFrame.grid(row=1, column=1)
+
+        selectPixelCheckButton = func.buildFlagCheckButton(obj=self,
+                                                           root=self.selectPixelsFrame,
+                                                           variable=self.select_pixels)
+        selectPixelCheckButton.pack()
+
         self.gradFrame = func.buildInnerLabelFrame(obj=self,
-                                              root=self.plotOptionsFrame,
-                                              label='Gradient Plots')
+                                                   root=self.plotOptionsFrame,
+                                                   label='Gradient Plots')
 
         self.gradFrame.grid(row=3, column=0, columnspan=3)
 
@@ -635,8 +645,6 @@ class GUI:
                                                            variable=self.grad_all,
                                                            command=self.gradSelectAll)
         gradAllCheckButton.pack()
-
-
 
     def buildButtonFrame(self):
         closeButton = Button(self.buttonPanel, text="Close", command=self.root.quit,
