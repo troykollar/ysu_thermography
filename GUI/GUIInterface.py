@@ -101,12 +101,12 @@ class GUI:
 
     def gradSelectAll(self):
         if self.grad_all.get():
-            self.grad_mag = TRUE
-            self.grad_angle = TRUE
-            self.grad_2dHist = TRUE
-            self.grad_scatter = TRUE
-            self.grad_hexBin = TRUE
-            self.grad_3D = TRUE
+            self.grad_mag.set(1)
+            self.grad_angle.set(1)
+            self.grad_2dHist.set(1)
+            self.grad_scatter.set(1)
+            self.grad_hexBin.set(1)
+            self.grad_3D.set(1)
 
     def activatePanels(self):
         if self.gen_threshold_img.get():
@@ -128,6 +128,12 @@ class GUI:
             func.enableChildren(self.plotOptionsFrame)
         else:
             func.disableChildren(self.plotOptionsFrame)
+        
+        if self.gradient_plots.get():
+            func.enableChildren(self.gradFrame)
+        else:
+            func.disableChildren(self.gradFrame)
+    
 
     def buildFileFrame(self):
         tempDataLabel = Label(self.filePanel, text="File Path Build Data Folder: ",
@@ -517,11 +523,11 @@ class GUI:
 
         histthreshFrame = func.buildInnerLabelFrame(obj=self,
                                                     root=self.plotOptionsFrame,
-                                                    label='Temp Thresh (For Gradient Plots)')
+                                                    label='Temp Thresh')
 
         histthreshHint = Descriptors.getHintTextPlotOptions('histthreshFrame')
         ToolTip.createToolTip(histthreshFrame, histthreshHint)
-        histthreshFrame.grid(row=1, column=0, sticky=W + E + N + S)
+        histthreshFrame.grid(row=0, column=0, sticky=W + E + N + S)
 
         histthreshInput = func.buildEntry(obj=self,
                                           root=histthreshFrame,
@@ -535,7 +541,7 @@ class GUI:
 
         frameRangeHint = Descriptors.getHintTextPlotOptions('frameRangeFrame')
         ToolTip.createToolTip(frameRangeFrame, frameRangeHint)
-        frameRangeFrame.grid(row=2, column=1, sticky=W + E + N + S)
+        frameRangeFrame.grid(row=0, column=2, sticky=W + E + N + S)
 
         frameRangeFrame.columnconfigure(0, weight=1)
         frameRangeFrame.columnconfigure(1, weight=1)
@@ -553,11 +559,82 @@ class GUI:
         plotEndFrameInput.insert(END, -1)
         plotEndFrameInput.grid(row=0, column=1)
 
-        gradFrame = func.buildInnerLabelFrame(obj=self,
+        self.gradFrame = func.buildInnerLabelFrame(obj=self,
                                               root=self.plotOptionsFrame,
                                               label='Gradient Plots')
 
-        gradFrame.grid(row=3, column=0, columnspan=3)
+        self.gradFrame.grid(row=3, column=0, columnspan=3)
+
+        gradMagFrame = func.buildInnerLabelFrame(obj=self,
+                                                 root=self.gradFrame,
+                                                 label='Gradient Magnitude Plot')
+        gradMagFrame.grid(row=0, column=0)
+
+        gradMagCheckButton = func.buildFlagCheckButton(obj=self,
+                                                       root=gradMagFrame,
+                                                       variable=self.grad_mag)
+        gradMagCheckButton.pack()
+
+        gradAngleFrame = func.buildInnerLabelFrame(obj=self,
+                                                   root=self.gradFrame,
+                                                   label='Gradient Angle Plot')
+        gradAngleFrame.grid(row=0, column=1)
+
+        gradAngleCheckButton = func.buildFlagCheckButton(obj=self,
+                                                         root=gradAngleFrame,
+                                                         variable=self.grad_angle)
+        gradAngleCheckButton.pack()
+
+        grad2dHistFrame = func.buildInnerLabelFrame(obj=self,
+                                                    root=self.gradFrame,
+                                                    label='Gradient 2D Histogram')
+        grad2dHistFrame.grid(row=0, column=2)
+
+        grad2dHistCheckButton = func.buildFlagCheckButton(obj=self,
+                                                          root=grad2dHistFrame,
+                                                          variable=self.grad_2dHist)
+        grad2dHistCheckButton.pack()
+
+        gradScatterFrame = func.buildInnerLabelFrame(obj=self,
+                                                     root=self.gradFrame,
+                                                     label='Gradient Scatter Plot')
+        gradScatterFrame.grid(row=1, column=0)
+
+        gradScatterCheckButton = func.buildFlagCheckButton(obj=self,
+                                                           root=gradScatterFrame,
+                                                           variable=self.grad_scatter)
+        gradScatterCheckButton.pack()
+
+        gradHexBinFrame = func.buildInnerLabelFrame(obj=self,
+                                                    root=self.gradFrame,
+                                                    label='Gradient Hex Bin Plot')
+        gradHexBinFrame.grid(row=1, column=1)
+
+        gradHexBinCheckButton = func.buildFlagCheckButton(obj=self,
+                                                          root=gradHexBinFrame,
+                                                          variable=self.grad_hexBin)
+        gradHexBinCheckButton.pack()
+
+        grad3dFrame = func.buildInnerLabelFrame(obj=self,
+                                                root=self.gradFrame,
+                                                label='3D Plot')
+        grad3dFrame.grid(row=1, column=2)
+
+        grad3dCheckButton = func.buildFlagCheckButton(obj=self,
+                                                      root=grad3dFrame,
+                                                      variable=self.grad_3D)
+        grad3dCheckButton.pack()
+
+        gradAllFrame = func.buildInnerLabelFrame(obj=self,
+                                                 root=self.gradFrame,
+                                                 label='All Plots')
+        gradAllFrame.grid(row=2, column=1)
+
+        gradAllCheckButton = func.buildFunctionCheckButton(obj=self,
+                                                           root=gradAllFrame,
+                                                           variable=self.grad_all,
+                                                           command=self.gradSelectAll)
+        gradAllCheckButton.pack()
 
 
 

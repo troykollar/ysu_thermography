@@ -119,8 +119,8 @@ if len(corner_locations) == 4:
         for pixel in pixel_locations:
             print(temp_data.shape)
             print('\nGenerating 2D plots for: ' + str(pixel))
-            plot = Plots(temp_data,
-                         (pixel_y, pixel_x),
+            plot = Plots(temp_data=temp_data,
+                         pixel=(pixel_y, pixel_x),
                          threshold=composite_threshold,
                          start_frame=start_frame,
                          end_frame=end_frame)

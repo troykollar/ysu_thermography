@@ -15,15 +15,15 @@ def submit(self):
     if self.play_video.get():
         VIEWER = createNpVidTool(self)
 
-        VIEWER.play_video(scale_factor=int(self.scaleFactor.get()),
-                          frame_delay=int(self.frameDelay.get()))
+        VIEWER.play_video(scale_factor=int(self.play_scaleFactor.get()),
+                          frame_delay=int(self.play_frameDelay.get()))
 
     if self.save_video.get():
         VIEWER = createNpVidTool(self)
 
-        VIEWER.save_video(scale_factor=int(self.scaleFactor.get()),
-                          framerate=int(self.frameRate.get()), start=int(self.saveStartFrame.get()),
-                          end=self.saveEndFrame.get())
+        VIEWER.save_video(scale_factor=int(self.play_scaleFactor.get()),
+                          framerate=int(self.play_frameRate.get()), start=int(self.play_saveStartFrame.get()),
+                          end=self.play_saveEndFrame.get())
 
     if self.save_frame.get():
         VIEWER = createNpVidTool(self)
@@ -31,13 +31,32 @@ def submit(self):
 
     if self.pixel_temp_range.get():
         graphing.plotLine(temp_file=self.tempData.get() + "/thermal_cam_temps.npy",
-                          pixel=(int(self.plotPixelLocX.get()), int(self.plotPixelLocY.get())),
-                          startFrame=int(self.plotStartFrame.get()),
-                          endFrame=int(self.plotEndFrame.get()))
+                          pixel=(int(self.plot_PixelLocX.get()), int(self.plot_PixelLocY.get())),
+                          startFrame=int(self.plot_StartFrame.get()),
+                          endFrame=int(self.plot_EndFrame.get()))
 
     if self.gradient_plots.get():
         PLOTS = createPlotTool(self)
+        if self.grad_all.get():
+            PLOTS.all()
 
+        elif self.grad_mag.get():
+            PLOTS.plotMagnitude()
+
+        elif self.grad_angle.get():
+            PLOTS.plotAngle()
+
+        elif self.grad_2dHist.get():
+            PLOTS.plot2DHistogram()
+
+        elif self.grad_scatter.get():
+            PLOTS.plotScatter()
+
+        elif self.grad_hexBin.get():
+            PLOTS.plotHexBin()
+
+        elif self.grad_3d.get():
+            PLOTS.plot3DBubble()
 
 
 def browseFiles(self, entry):
@@ -48,13 +67,13 @@ def browseFiles(self, entry):
 
 def createNpVidTool(self):
     return NpVidTool(data_directory=self.tempData.get(),
-                     r_top_refl=int(self.removeTopReflection.get()),
-                     r_bot_refl=int(self.removeBottomReflection.get()),
-                     mp_data_on_vid=int(self.displayMeltPool.get()),
-                     follow_max_temp=int(self.pixelAroundMax.get()),
-                     contour_threshold=int(self.contourTempThresh.get()),
-                     follow_contour=int(self.contourPixelRange.get()),
-                     contour_data_on_img=int(self.displayContour.get()))
+                     r_top_refl=int(self.play_removeTopReflection.get()),
+                     r_bot_refl=int(self.play_removeBottomReflection.get()),
+                     mp_data_on_vid=int(self.play_displayMeltPool.get()),
+                     follow_max_temp=int(self.play_pixelAroundMax.get()),
+                     contour_threshold=int(self.play_contourTempThresh.get()),
+                     follow_contour=int(self.play_contourPixelRange.get()),
+                     contour_data_on_img=int(self.play_displayContour.get()))
 
 
 def createPlotTool(self):
