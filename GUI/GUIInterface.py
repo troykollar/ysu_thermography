@@ -292,6 +292,31 @@ class GUI:
             textvariable=self.contour_threshold)
         contour_thresh_entry.pack()
 
+        # Radio buttons to determine what to focus frame on
+        follow_buttons_dict = {
+            'Contour': 'contour',
+            'Max Temp': 'max',
+            'None': None
+        }
+
+        follow_buttons_frame = self.build_radio_button_set(
+            self.viewer_frame, 'Frame focus', follow_buttons_dict, self.follow)
+        follow_buttons_frame.grid(row=0, column=1, sticky=W + E + N + S)
+
+        # Frame to hold entry for follow_size
+        follow_size_frame = func.buildInnerLabelFrame(
+            obj=self, root=self.viewer_frame, label='Focused frame size')
+
+        follow_size_hint = 'How many pixels to be shown on either side of the focused pixel.'
+        ToolTip.createToolTip(follow_size_frame, follow_size_hint)
+
+        follow_size_frame.grid(row=0, column=2, sticky=W + E + N + S)
+
+        follow_size_entry = func.buildEntry(obj=self,
+                                            root=follow_size_frame,
+                                            textvariable=self.follow_size)
+        follow_size_entry.pack()
+
     def buildFunctionFrame(self):
         # Main Frame
         functionsFrame = func.buildOuterLabelFrame(obj=self,
@@ -825,3 +850,16 @@ class GUI:
                               bg=self.ACTIVEBUTTONBACKGROUND,
                               relief=FLAT)
         submitButton.pack(side=RIGHT)
+
+    def build_radio_button_set(self, root, label: str, buttons: dict,
+                               variable):
+        radio_frame = func.buildInnerLabelFrame(obj=self,
+                                                root=root,
+                                                label=label)
+        for key in buttons:
+            Radiobutton(radio_frame,
+                        text=key,
+                        variable=variable,
+                        value=buttons[key]).pack()
+
+        return radio_frame
