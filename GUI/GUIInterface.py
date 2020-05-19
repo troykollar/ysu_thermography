@@ -3,11 +3,12 @@ from GUI import Descriptors, ToolTip
 from GUI import GUIHandler as handler
 import GUI.constants as consts
 from GUI import helper_functions as func
-from viewer import Viewer
+from viewer import Viewer, colormap_frame
 from dataset import DataSet
 from composite import get_threshold_img, save_threshold_img
 from plot import Plots
 from matplotlib import pyplot as plt
+from pixel_selector import PixelSelector
 
 
 class GUI:
@@ -119,16 +120,12 @@ class GUI:
         self.optionsPanel.rowconfigure(2, weight=1)
         self.optionsPanel.rowconfigure(3, weight=1)
 
-        self.buttonPanel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
-        self.buttonPanel.pack(side=BOTTOM, fill=X)
-
         # Building  all frames
         self.buildFileFrame()
         self.build_dataset_frame()
         self.build_viewer_frame()
         self.build_composite_frame()
         self.buildPlotOptionsFrame()
-        self.buildButtonFrame()
 
         # Main GUI loop
         self.root.mainloop()
@@ -380,122 +377,6 @@ class GUI:
                                    relief=FLAT)
         save_frame_button.grid(row=2, column=0)
 
-    def buildFunctionFrame(self):
-        # Main Frame
-        functionsFrame = func.buildOuterLabelFrame(obj=self,
-                                                   root=self.optionsPanel,
-                                                   label='Functions')
-
-        functionsFrame.grid(row=0,
-                            column=0,
-                            columnspan=2,
-                            sticky=W + E + N + S,
-                            ipady=5,
-                            pady=5)
-
-        functionsFrame.columnconfigure(0, weight=1)
-        functionsFrame.columnconfigure(1, weight=1)
-        functionsFrame.columnconfigure(2, weight=1)
-        functionsFrame.rowconfigure(0, weight=1)
-        functionsFrame.rowconfigure(1, weight=1)
-
-        # Frame to hold checkbox to create a threshold image
-        genThresholdImgLabel = func.buildInnerLabelFrame(
-            obj=self, root=functionsFrame, label='Gen Thresh Image')
-
-        genThresholdImgHint = Descriptors.getHintTextFunctionFrame(
-            'genThresholdImgLabel')
-        ToolTip.createToolTip(genThresholdImgLabel, genThresholdImgHint)
-        genThresholdImgLabel.grid(row=0, column=0, sticky=W + E + N + S)
-
-        genThresholdImgCheckbox = func.buildFunctionCheckButton(
-            obj=self,
-            root=genThresholdImgLabel,
-            variable=self.gen_threshold_img,
-            command=None)
-        genThresholdImgCheckbox.pack()
-
-        # Frame to hold checkbox to save a frame
-        saveFrameLabel = func.buildInnerLabelFrame(obj=self,
-                                                   root=functionsFrame,
-                                                   label='Save Frame')
-
-        saveFrameHint = Descriptors.getHintTextFunctionFrame('saveFrameLabel')
-        ToolTip.createToolTip(saveFrameLabel, saveFrameHint)
-        saveFrameLabel.grid(row=0, column=1, sticky=W + E + N + S)
-
-        saveFrameCheckbox = func.buildFunctionCheckButton(
-            obj=self,
-            root=saveFrameLabel,
-            variable=self.save_frame,
-            command=None)
-        saveFrameCheckbox.pack()
-
-        # Frame to hold checkbox to play video
-        playVideoLabel = func.buildInnerLabelFrame(obj=self,
-                                                   root=functionsFrame,
-                                                   label='Play Video')
-
-        playVideoHint = Descriptors.getHintTextFunctionFrame('playVideoLabel')
-        ToolTip.createToolTip(playVideoLabel, playVideoHint)
-        playVideoLabel.grid(row=0, column=2, sticky=W + E + N + S)
-
-        playVideoCheckbox = func.buildFunctionCheckButton(
-            obj=self,
-            root=playVideoLabel,
-            variable=self.play_video,
-            command=None)
-        playVideoCheckbox.pack()
-
-        # Frame to Hold Option to Save Video
-        saveVideoLabel = func.buildInnerLabelFrame(obj=self,
-                                                   root=functionsFrame,
-                                                   label='Save Video')
-
-        saveVideoHint = Descriptors.getHintTextFunctionFrame('saveVideoLabel')
-        ToolTip.createToolTip(saveVideoLabel, saveVideoHint)
-        saveVideoLabel.grid(row=1, column=0, sticky=W + E + N + S)
-
-        saveVideoCheckbox = func.buildFunctionCheckButton(
-            obj=self,
-            root=saveVideoLabel,
-            variable=self.save_video,
-            command=None)
-        saveVideoCheckbox.pack()
-
-        # Frame to Hold Option to Plot Gradient Info
-        gradientHistogramLabel = func.buildInnerLabelFrame(
-            obj=self, root=functionsFrame, label='Gradient Plots')
-
-        gradientHistogramHint = Descriptors.getHintTextFunctionFrame(
-            'gradientHistogramLabel')
-        ToolTip.createToolTip(gradientHistogramLabel, gradientHistogramHint)
-        gradientHistogramLabel.grid(row=1, column=1, sticky=W + E + N + S)
-
-        gradientHistogramCheckbox = func.buildFunctionCheckButton(
-            obj=self,
-            root=gradientHistogramLabel,
-            variable=self.gradient_plots,
-            command=None)
-        gradientHistogramCheckbox.pack()
-
-        # Frame to Hold Option to Plot Temporal Data
-        pixelTempRangeLabel = func.buildInnerLabelFrame(obj=self,
-                                                        root=functionsFrame,
-                                                        label='Temp Line Plot')
-
-        pixelTempRangeHint = Descriptors.getHintTextFunctionFrame(
-            'pixelTempRangeLabel')
-        ToolTip.createToolTip(pixelTempRangeLabel, pixelTempRangeHint)
-        pixelTempRangeLabel.grid(row=1, column=2, sticky=W + E + N + S)
-
-        pixelTempRangeCheckbox = func.buildFunctionCheckButton(
-            obj=self,
-            root=pixelTempRangeLabel,
-            variable=self.pixel_temp_range,
-            command=None)
-        pixelTempRangeCheckbox.pack()
-
     def build_composite_frame(self):
         self.composite_frame = func.buildOuterLabelFrame(
             obj=self, root=self.optionsPanel, label='Composite options')
@@ -555,6 +436,7 @@ class GUI:
         pixelLocationFrame.columnconfigure(0, weight=1)
         pixelLocationFrame.columnconfigure(1, weight=1)
         pixelLocationFrame.columnconfigure(2, weight=1)
+        pixelLocationFrame.columnconfigure(3, weight=1)
         pixelLocationFrame.rowconfigure(0, weight=1)
 
         pixelXLocationInput = func.buildEntry(obj=self,
@@ -573,6 +455,14 @@ class GUI:
                                               textvariable=self.plot_PixelLocY)
 
         pixelYLocationInput.grid(row=0, column=2, sticky=W + E + N + S)
+
+        select_pixels_button = Button(pixelLocationFrame,
+                                      text='Select Pixels',
+                                      command=lambda: self.select_pixels(),
+                                      bg=self.ACTIVEBUTTONBACKGROUND,
+                                      relief=FLAT)
+
+        select_pixels_button.grid(row=0, column=3)
 
         histthreshFrame = func.buildInnerLabelFrame(obj=self,
                                                     root=self.plotOptionsFrame,
@@ -683,26 +573,13 @@ class GUI:
 
         create_plots_button = Button(self.plotOptionsFrame,
                                      text='Create Plots',
-                                     command=lambda: self.create_plots(),
+                                     command=lambda: self.create_plots(
+                                         (int(self.plot_PixelLocX.get()),
+                                          int(self.plot_PixelLocY.get()))),
                                      bg=self.ACTIVEBUTTONBACKGROUND,
                                      relief=FLAT)
 
         create_plots_button.grid(row=4, column=2)
-
-    def buildButtonFrame(self):
-        closeButton = Button(self.buttonPanel,
-                             text="Close",
-                             command=self.root.quit,
-                             bg=self.ACTIVEBUTTONBACKGROUND,
-                             relief=FLAT)
-        closeButton.pack(side=LEFT)
-
-        submitButton = Button(self.buttonPanel,
-                              text="Submit",
-                              command=lambda: handler.submit(self=self),
-                              bg=self.ACTIVEBUTTONBACKGROUND,
-                              relief=FLAT)
-        submitButton.pack(side=RIGHT)
 
     def build_radio_button_set(self, root, label: str, buttons: dict,
                                variable):
@@ -746,11 +623,10 @@ class GUI:
         save_threshold_img(self.tempData.get(), thresh_img,
                            self.composite_threshold.get())
 
-    def create_plots(self):
+    def create_plots(self, pixel: tuple):
         self.grab_dataset()
         PLOTS = Plots(temp_data=self.dataset,
-                      pixel=(int(self.plot_PixelLocX.get()),
-                             int(self.plot_PixelLocY.get())),
+                      pixel=pixel,
                       threshold=int(self.plot_TempThresh.get()),
                       start_frame=int(self.plot_StartFrame.get()),
                       end_frame=int(self.plot_EndFrame.get()))
@@ -777,3 +653,18 @@ class GUI:
             PLOTS.plot3DBubble()
 
         plt.show()
+
+    def select_pixels(self):
+        self.grab_dataset()
+        thresh_img = get_threshold_img(dataset=self.dataset,
+                                       threshold=int(
+                                           self.plot_TempThresh.get()),
+                                       start=int(self.plot_StartFrame.get()),
+                                       end=int(self.plot_EndFrame.get()))
+        thresh_img = colormap_frame(thresh_img)
+        pix_sel = PixelSelector()
+        pix_sel.create_window('Select pixels for analysis', thresh_img)
+
+        locations = pix_sel.location_list[2:]
+        for pixel in locations:
+            self.create_plots(pixel)
