@@ -3,6 +3,8 @@ from GUI import Descriptors, ToolTip
 from GUI import GUIHandler as handler
 import GUI.constants as consts
 from GUI import helper_functions as func
+from viewer import Viewer
+from dataset import DataSet
 
 
 class GUI:
@@ -24,17 +26,23 @@ class GUI:
         # root.iconbitmap("images/YSU_Logo")
 
         # Creating variables for checkboxes to change
+        self.dataset = None
+        self.viewer = None
 
         # Dataset related variables
         self.remove_top = BooleanVar(False)
         self.remove_bot = BooleanVar(False)
         self.scale_factor = IntVar(value=1)
+        self.start_frame = IntVar(value=-1)
+        self.end_frame = IntVar(value=-1)
 
         # Viewer related variables
         self.contour_threshold = IntVar(value=None)
         self.follow = StringVar(value=None)
         self.follow_size = IntVar(value=20)
         self.info_pane = StringVar(value=None)
+        self.frame_delay = IntVar(value=1)
+        self.framerate = IntVar(value=60)
 
         self.generate_img = BooleanVar(False)
         self.save_frame = BooleanVar()
@@ -207,6 +215,8 @@ class GUI:
         self.dataset_frame.columnconfigure(0, weight=1)
         self.dataset_frame.columnconfigure(1, weight=1)
         self.dataset_frame.columnconfigure(2, weight=1)
+        self.dataset_frame.columnconfigure(3, weight=1)
+        self.dataset_frame.columnconfigure(4, weight=1)
         self.dataset_frame.rowconfigure(0, weight=1)
 
         # Frame to hold checkbox to remove top reflection
@@ -258,6 +268,36 @@ class GUI:
                                              textvariable=self.scale_factor)
         scale_factor_entry.pack()
 
+        # Frame to hold entry for scale factor
+        start_frame_label = func.buildInnerLabelFrame(obj=self,
+                                                      root=self.dataset_frame,
+                                                      label='Start Frame')
+
+        start_frame_hint = 'Factor used to scale data.'
+        ToolTip.createToolTip(start_frame_label, start_frame_hint)
+
+        start_frame_label.grid(row=0, column=3, sticky=W + E + N + S)
+
+        start_frame_entry = func.buildEntry(obj=self,
+                                            root=start_frame_label,
+                                            textvariable=self.start_frame)
+        start_frame_entry.pack()
+
+        # Frame to hold entry for scale factor
+        end_frame_label = func.buildInnerLabelFrame(obj=self,
+                                                    root=self.dataset_frame,
+                                                    label='End Frame')
+
+        end_frame_hint = 'Factor used to scale data.'
+        ToolTip.createToolTip(end_frame_label, end_frame_hint)
+
+        end_frame_label.grid(row=0, column=4, sticky=W + E + N + S)
+
+        end_frame_entry = func.buildEntry(obj=self,
+                                          root=end_frame_label,
+                                          textvariable=self.end_frame)
+        end_frame_entry.pack()
+
     def build_viewer_frame(self):
         # Main Frame
         self.viewer_frame = func.buildOuterLabelFrame(obj=self,
@@ -275,6 +315,7 @@ class GUI:
         self.viewer_frame.columnconfigure(1, weight=1)
         self.viewer_frame.columnconfigure(2, weight=1)
         self.viewer_frame.columnconfigure(3, weight=1)
+        self.viewer_frame.columnconfigure(4, weight=1)
         self.viewer_frame.rowconfigure(0, weight=1)
 
         # Frame to hold entry for contour threshold
@@ -316,6 +357,55 @@ class GUI:
                                             root=follow_size_frame,
                                             textvariable=self.follow_size)
         follow_size_entry.pack()
+
+        # Radio buttons to determine what info pane to show
+        info_buttons_dict = {
+            'Contour': 'contour',
+            'Meltpool': 'mp',
+            'None': None
+        }
+
+        info_buttons_frame = self.build_radio_button_set(
+            self.viewer_frame, 'Info Pane', info_buttons_dict, self.info_pane)
+        info_buttons_frame.grid(row=0, column=3, sticky=W + E + N + S)
+
+        execute_buttons_frame = func.buildInnerLabelFrame(
+            obj=self, root=self.viewer_frame, label=None)
+        execute_buttons_frame.columnconfigure(0, weight=1)
+        execute_buttons_frame.columnconfigure(1, weight=1)
+        execute_buttons_frame.rowconfigure(0, weight=1)
+        execute_buttons_frame.rowconfigure(1, weight=1)
+        execute_buttons_frame.rowconfigure(2, weight=1)
+        execute_buttons_frame.grid(row=0, column=4, sticky=W + E + N + S)
+
+        play_button = Button(execute_buttons_frame,
+                             text='Play Video',
+                             command=lambda: self.play(),
+                             bg=self.ACTIVEBUTTONBACKGROUND,
+                             relief=FLAT)
+        play_button.grid(row=0, column=0)
+        frame_delay_entry = func.buildEntry(obj=self,
+                                            root=execute_buttons_frame,
+                                            textvariable=self.frame_delay)
+        frame_delay_entry.grid(row=0, column=1)
+
+        save_video_button = Button(execute_buttons_frame,
+                                   text='Save Video',
+                                   command=lambda: self.save(),
+                                   bg=self.ACTIVEBUTTONBACKGROUND,
+                                   relief=FLAT)
+        save_video_button.grid(row=1, column=0)
+        framerate_entry = func.buildEntry(obj=self,
+                                          root=execute_buttons_frame,
+                                          textvariable=self.framerate)
+        framerate_entry.grid(row=1, column=1)
+
+        save_frame_button = Button(execute_buttons_frame,
+                                   text='Save Frames',
+                                   command=lambda: self.save_frames(),
+                                   bg=self.ACTIVEBUTTONBACKGROUND,
+                                   relief=FLAT)
+        save_frame_button.grid(row=2, column=0)
 
     def buildFunctionFrame(self):
         # Main Frame
@@ -863,3 +953,23 @@ class GUI:
                         value=buttons[key]).pack()
 
         return radio_frame
+
+    def play(self):
+        self.grab_dataset()
+        self.grab_viewer()
+        self.viewer.play_video(self.frame_delay.get())
+
+    def save(self):
+        self.grab_dataset()
+        self.grab_viewer()
+        self.viewer.save_video(framerate=self.framerate.get())
+
+    def grab_dataset(self):
+        self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
+                               self.remove_top.get(), self.remove_bot.get(),
+                               self.scale_factor.get())
+
+    def grab_viewer(self):
+        self.viewer = Viewer(self.dataset, self.contour_threshold.get(),
+                             self.follow.get(), self.follow_size.get(),
+                             self.info_pane.get())
