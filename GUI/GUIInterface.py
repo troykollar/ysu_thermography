@@ -129,8 +129,6 @@ class GUI:
         self.buildPlotOptionsFrame()
         self.buildButtonFrame()
 
-        self.activatePanels()
-
         # Main GUI loop
         self.root.mainloop()
 
@@ -142,22 +140,6 @@ class GUI:
             self.grad_scatter.set(1)
             self.grad_hexBin.set(1)
             self.grad_3D.set(1)
-
-    def activatePanels(self):
-        if self.gen_threshold_img.get():
-            func.enableChildren(self.composite_frame)
-        else:
-            func.disableChildren(self.composite_frame)
-
-        if self.gradient_plots.get() or self.pixel_temp_range.get():
-            func.enableChildren(self.plotOptionsFrame)
-        else:
-            func.disableChildren(self.plotOptionsFrame)
-
-        if self.gradient_plots.get():
-            func.enableChildren(self.gradFrame)
-        else:
-            func.disableChildren(self.gradFrame)
 
     def buildFileFrame(self):
         tempDataLabel = Label(self.filePanel,
@@ -220,11 +202,10 @@ class GUI:
 
         remove_top_label.grid(row=0, column=0, sticky=W + E + N + S)
 
-        remove_top_cb = func.buildFunctionCheckButton(
-            obj=self,
-            root=remove_top_label,
-            variable=self.remove_top,
-            command=self.activatePanels)
+        remove_top_cb = func.buildFunctionCheckButton(obj=self,
+                                                      root=remove_top_label,
+                                                      variable=self.remove_top,
+                                                      command=None)
         remove_top_cb.pack()
 
         # Frame to hold checkbox to remove bottom reflection
@@ -238,11 +219,10 @@ class GUI:
 
         remove_bot_label.grid(row=0, column=1, sticky=W + E + N + S)
 
-        remove_bot_cb = func.buildFunctionCheckButton(
-            obj=self,
-            root=remove_bot_label,
-            variable=self.remove_bot,
-            command=self.activatePanels)
+        remove_bot_cb = func.buildFunctionCheckButton(obj=self,
+                                                      root=remove_bot_label,
+                                                      variable=self.remove_bot,
+                                                      command=None)
         remove_bot_cb.pack()
 
         # Frame to hold entry for scale factor
@@ -431,7 +411,7 @@ class GUI:
             obj=self,
             root=genThresholdImgLabel,
             variable=self.gen_threshold_img,
-            command=self.activatePanels)
+            command=None)
         genThresholdImgCheckbox.pack()
 
         # Frame to hold checkbox to save a frame
@@ -447,7 +427,7 @@ class GUI:
             obj=self,
             root=saveFrameLabel,
             variable=self.save_frame,
-            command=self.activatePanels)
+            command=None)
         saveFrameCheckbox.pack()
 
         # Frame to hold checkbox to play video
@@ -463,7 +443,7 @@ class GUI:
             obj=self,
             root=playVideoLabel,
             variable=self.play_video,
-            command=self.activatePanels)
+            command=None)
         playVideoCheckbox.pack()
 
         # Frame to Hold Option to Save Video
@@ -479,7 +459,7 @@ class GUI:
             obj=self,
             root=saveVideoLabel,
             variable=self.save_video,
-            command=self.activatePanels)
+            command=None)
         saveVideoCheckbox.pack()
 
         # Frame to Hold Option to Plot Gradient Info
@@ -495,7 +475,7 @@ class GUI:
             obj=self,
             root=gradientHistogramLabel,
             variable=self.gradient_plots,
-            command=self.activatePanels)
+            command=None)
         gradientHistogramCheckbox.pack()
 
         # Frame to Hold Option to Plot Temporal Data
@@ -512,7 +492,7 @@ class GUI:
             obj=self,
             root=pixelTempRangeLabel,
             variable=self.pixel_temp_range,
-            command=self.activatePanels)
+            command=None)
         pixelTempRangeCheckbox.pack()
 
     def build_composite_frame(self):
