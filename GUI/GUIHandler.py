@@ -5,8 +5,8 @@ from tkinter import *
 from tkinter import filedialog
 import numpy as np
 
-from GUI.select_pixels import selectPixels
-from np_vid_viewer.np_vid_viewer import NpVidTool
+from GUI.select_pixels import select_pixels_and_gen_plots
+from np_vid_viewer import NpVidTool
 from plot import Plots
 
 
@@ -42,11 +42,11 @@ def submit(self):
     if self.gradient_plots.get():
 
         if self.select_pixels.get():
-            selectPixels(self=self,
-                         temp_file=self.tempData.get() + "/thermal_cam_temps.npy",
-                         composite_threshold=int(self.plot_TempThresh.get()),
-                         start_frame=int(self.plot_StartFrame.get()),
-                         end_frame=int(self.plot_EndFrame.get()))
+            select_pixels_and_gen_plots(self.tempData.get() + "/thermal_cam_temps.npy",
+                                        int(self.plot_TempThresh.get()),
+                                        remove_reflections=True,
+                                        start_frame=int(self.plot_StartFrame.get()),
+                                        end_frame=int(self.plot_EndFrame.get()))
         else:
             PLOTS = createPlotTool(self)
 

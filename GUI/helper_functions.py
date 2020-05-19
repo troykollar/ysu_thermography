@@ -26,7 +26,7 @@ def buildOuterLabelFrame(obj, root, label):
 def buildInnerLabelFrame(obj, root, label):
     return LabelFrame(root, text=label,
                       bd=0, highlightthickness=0, bg=obj.ACTIVEBACKGROUND,
-                      labelanchor=N, padx=5, foreground=obj.TEXTCOLOR)
+                      labelanchor=N, padx=5, pady=5, foreground=obj.TEXTCOLOR)
 
 def buildFunctionCheckButton(obj, root, variable, command):
     return Checkbutton(root, variable=variable,

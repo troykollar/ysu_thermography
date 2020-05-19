@@ -82,6 +82,7 @@ class GUI:
         self.optionsPanel.rowconfigure(1, weight=1)
         self.optionsPanel.rowconfigure(2, weight=1)
         self.optionsPanel.rowconfigure(3, weight=1)
+        self.optionsPanel.rowconfigure(4, weight=1)
 
         self.buttonPanel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
         self.buttonPanel.pack(side=BOTTOM, fill=X)
@@ -484,7 +485,6 @@ class GUI:
         self.plotOptionsFrame = func.buildOuterLabelFrame(obj=self,
                                                           root=self.optionsPanel,
                                                           label='Plot Options')
-
         self.plotOptionsFrame.grid(row=3, column=0, columnspan=2, sticky=W + E + N + S)
 
         self.plotOptionsFrame.columnconfigure(0, weight=1)
@@ -570,10 +570,10 @@ class GUI:
         selectPixelCheckButton.pack()
 
         self.gradFrame = func.buildInnerLabelFrame(obj=self,
-                                                   root=self.plotOptionsFrame,
+                                                   root=self.optionsPanel,
                                                    label='Gradient Plots')
 
-        self.gradFrame.grid(row=3, column=0, columnspan=3)
+        self.gradFrame.grid(row=4, column=0, columnspan=3)
 
         gradMagFrame = func.buildInnerLabelFrame(obj=self,
                                                  root=self.gradFrame,

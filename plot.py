@@ -2,13 +2,13 @@ import math
 import plotly.graph_objects as go
 import numpy as np
 import matplotlib.pyplot as plt
-from np_vid_viewer.helper_functions import printProgressBar
+from helper_functions import printProgressBar
+from dataset import DataSet
 
 
 class Plots:
-
     def __init__(self,
-                 temp_data: np.ndarray,
+                 temp_data: DataSet,
                  pixel: tuple,
                  threshold: int,
                  start_frame=0,
@@ -17,12 +17,12 @@ class Plots:
 
         self.grid_lines = True
         self.data = temp_data
-        self.pixel = pixel
+        self.pixel = (pixel[1], pixel[0])
         self.threshold = threshold
         self.start_frame = start_frame
         self.end_frame = end_frame
         self.frame_count = frame_count
-        self.cartesianPixel = (pixel[1], pixel[0])
+        self.cartesianPixel = pixel
 
         self.frames = []
         self.x_magnitude_array = []
@@ -76,20 +76,23 @@ class Plots:
             result_matrix = np.asmatrix(temp)
 
             if temp[self.pixel] > self.threshold:
-                dy, dx = np.gradient(result_matrix)  # Retrieve image gradient data
+                dy, dx = np.gradient(
+                    result_matrix)  # Retrieve image gradient data
                 x_dir = dx[self.pixel]  # Pixel magnitude W.R.T. x-axis
                 y_dir = dy[self.pixel]  # Pixel magnitude W.R.T. y-axis
 
                 # Magnitude Calculation
-                magnitude = math.sqrt((x_dir ** 2) + (y_dir ** 2))
+                magnitude = math.sqrt((x_dir**2) + (y_dir**2))
 
                 # Angle Calculation
-                angle_rad = (np.arctan2(y_dir, x_dir) - (math.pi / 2)
+                angle_rad = (np.arctan2(x_dir, y_dir) - (math.pi / 2)
                              )  # shift -90 deg
                 angle_deg = (angle_rad * (180 / math.pi))  # Convert to degrees
 
-                self.x_magnitude_array.append(x_dir)  # store pixel x-direction for frame in array
-                self.y_magnitude_array.append(y_dir)  # store pixel y-direction for frame in array
+                self.x_magnitude_array.append(
+                    x_dir)  # store pixel x-direction for frame in array
+                self.y_magnitude_array.append(
+                    y_dir)  # store pixel y-direction for frame in array
                 self.magnitude_array.append(
                     magnitude)  # store pixel magnitude for frame in array
                 self.angle_array.append(
@@ -106,21 +109,23 @@ class Plots:
         self.binning2 = int(self.binning1 / 1.5)
 
     def plot3DBubble(self):
-        fig = go.Figure(data=go.Scatter3d(x=np.asarray(self.frames).flatten(),
-                                          y=np.asarray(self.magnitude_array).flatten(),
-                                          z=np.asarray(self.angle_array).flatten(),
-                                          text=np.asarray(self.temperatures_array).flatten(),
-                                          mode="markers",
-                                          marker=dict(color=np.asarray(self.temperatures_array).flatten(),
-                                                      size=5,
-                                                      colorbar_title='Temperature')))
-        fig.update_layout(height=1000,
-                          width=1000,
-                          title='Pixel Temp and Gradient Magnitude and Angle for: ' + str(self.cartesianPixel)
-                                + ' Threshold: ' + str(self.threshold),
-                          scene=dict(xaxis=dict(title='X: Frame'),
-                                     yaxis=dict(title='Y: Gradient Magnitude'),
-                                     zaxis=dict(title='Z: Gradient Angle')))
+        fig = go.Figure(data=go.Scatter3d(
+            x=np.asarray(self.frames).flatten(),
+            y=np.asarray(self.magnitude_array).flatten(),
+            z=np.asarray(self.angle_array).flatten(),
+            text=np.asarray(self.temperatures_array).flatten(),
+            mode="markers",
+            marker=dict(color=np.asarray(self.temperatures_array).flatten(),
+                        size=5,
+                        colorbar_title='Temperature')))
+        fig.update_layout(
+            height=1000,
+            width=1000,
+            title='Pixel Temp and Gradient Magnitude and Angle for: ' +
+            str(self.cartesianPixel) + ' Threshold: ' + str(self.threshold),
+            scene=dict(xaxis=dict(title='X: Frame'),
+                       yaxis=dict(title='Y: Gradient Magnitude'),
+                       zaxis=dict(title='Z: Gradient Angle')))
         fig.show()
 
     def plotMagnitude(self):
@@ -128,8 +133,8 @@ class Plots:
         # Magnitude plot
         fig1, ax1 = plt.subplots()
         fig1.suptitle(
-            'Pixel {} Magnitude Histogram:\n{} Bins, Threshold: {}'.
-            format(self.cartesianPixel, self.binning1, self.threshold))
+            'Pixel {} Magnitude Histogram:\n{} Bins, Threshold: {}'.format(
+                self.cartesianPixel, self.binning1, self.threshold))
         ax1.set_xlabel('Magnitude (sqrt(x^2+y^2))')
         ax1.set_ylabel('Frequency')
         ax1.hist(self.magnitude_array,
@@ -158,8 +163,8 @@ class Plots:
         histgrid = (self.binning1, self.binning2)
         fig3, ax3 = plt.subplots()
         fig3.suptitle(
-            'Pixel {} Magnitude vs Angle Histogram:\nThreshold: {}\n'.
-            format(self.cartesianPixel, self.threshold))
+            'Pixel {} Magnitude vs Angle Histogram:\nThreshold: {}\n'.format(
+                self.cartesianPixel, self.threshold))
         ax3.set_xlabel('Angle (°)')
         ax3.set_ylabel('Magnitude (sqrt(x^2+y^2))')
         histplot = ax3.hist2d(self.angle_array,
@@ -173,8 +178,8 @@ class Plots:
         # Scatterplot - Magnitude vs Angle (degrees)
         fig4, ax4 = plt.subplots()
         fig4.suptitle(
-            'Pixel {} Magnitude vs Angle Scatterplot:\nThreshold: {}\n'.
-                format(self.cartesianPixel, self.threshold))
+            'Pixel {} Magnitude vs Angle Scatterplot:\nThreshold: {}\n'.format(
+                self.cartesianPixel, self.threshold))
         ax4.set_xlabel('Angle (°)')
         ax4.set_ylabel('Magnitude (sqrt(x^2+y^2))')
         ax4.scatter(self.angle_array, self.magnitude_array)
