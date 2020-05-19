@@ -84,13 +84,12 @@ class DataSet:
             temp = frame[y, x]
             if prev_temp < temp:
                 if np.mean(frame[y]) > np.mean(frame[y + 1]):
-                    prev_temp = temp
                     y += 1
                 else:
                     break
             else:
-                prev_temp = temp
                 y += 1
+            prev_temp = temp
 
         frame[y:] = min_value
 
