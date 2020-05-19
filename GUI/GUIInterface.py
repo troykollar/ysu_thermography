@@ -649,7 +649,7 @@ class GUI:
         elif self.grad_hexBin.get():
             PLOTS.plotHexBin()
 
-        elif self.grad_3d.get():
+        elif self.grad_3D.get():
             PLOTS.plot3DBubble()
 
         plt.show()
