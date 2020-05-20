@@ -102,7 +102,7 @@ class Viewer:
             print('\nVideo saved as :', filename)
 
     def generate_frame(self, frame_data: np.ndarray):
-        generated_frame = self.colormap_frame(frame_data)
+        generated_frame = colormap_frame(frame_data)
         if self.contour_threshold is not None:
             contours = self.dataset.find_contours(frame_data,
                                                   self.contour_threshold)
@@ -165,16 +165,6 @@ class Viewer:
             bot_y = center_y + frame_size
 
         return frame[top_y:bot_y, left_x:right_x]
-
-    def colormap_frame(self, frame):
-        frame = cv2.normalize(frame,
-                              frame,
-                              0,
-                              255,
-                              cv2.NORM_MINMAX,
-                              dtype=cv2.CV_8UC1)
-        frame = cv2.applyColorMap(frame, cv2.COLORMAP_INFERNO)
-        return frame
 
     def save_frame16(self, start: int, end=-1):
         # Save only one frame
