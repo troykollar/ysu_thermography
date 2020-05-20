@@ -131,6 +131,10 @@ class Viewer:
         if self.info_pane == 'contour':
             generated_frame = self.add_info_pane(generated_frame,
                                                  contour_geo_dict)
+        elif self.info_pane == 'mp':
+            meltpool_dict = self.dataset.get_meltpool_data(self.cur_frame)
+            generated_frame = self.add_info_pane(generated_frame,
+                                                 meltpool_dict)
 
         return generated_frame
 
@@ -342,6 +346,13 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         help=
         'int specifying the size of the window when following max temp or contour'
     )
+    parser.add_argument(
+        '-info',
+        type=str,
+        default=None,
+        help=
+        "'mp' or 'contour' to display an info pane with relevant info above video"
+    )
 
 
 # TODO: Convert other colormap frame calls to use this one outside of the class
@@ -376,6 +387,8 @@ if __name__ == '__main__':
     follow_arg = args.follow
     fsize = args.fsize
     save_framerate = args.save
+    info_arg = args.info
+    merged_data = args.mp_data
 
     # Validate follow argument
     acceptable_follow_args = ['max', 'contour']
@@ -383,12 +396,22 @@ if __name__ == '__main__':
         if not follow_arg in acceptable_follow_args:
             follow_arg = None
 
-    data = DataSet(temp_data, top, bot, int(scale))
-    thermal_viewer = Viewer(data,
-                            contour,
+    # Validate info argument
+    acceptable_info_args = ['contour', 'mp']
+    if info_arg is not None:
+        if not info_arg in acceptable_info_args:
+            info_arg = None
+
+    data = DataSet(temps_file=temp_data,
+                   meltpool_data=merged_data,
+                   remove_top_reflection=top,
+                   remove_bottom_reflection=bot,
+                   scale_factor=int(scale))
+    thermal_viewer = Viewer(dataset=data,
+                            contour_threshold=contour,
                             follow=follow_arg,
                             follow_size=fsize,
-                            info_pane=None)
+                            info_pane=info_arg)
 
     if save_frame is not None:
         thermal_viewer.save_frame16(int(save_frame))
