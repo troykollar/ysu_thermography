@@ -91,7 +91,7 @@ class Viewer:
             (width, height))
 
         for i, frame in enumerate(self.dataset):
-            printProgressBar(i, self.dataset.shape[0], 'Saving Video...')
+            printProgressBar(i, self.dataset.shape[0] - 1, 'Saving Video...')
             generated_frame = self.generate_frame(frame)
             video_writer.write(generated_frame)
 
