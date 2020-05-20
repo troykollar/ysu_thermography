@@ -92,10 +92,13 @@ class Viewer:
                 filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'),
                 framerate, (width, height))
 
-            for i, frame in enumerate(self.dataset[start:end]):
-                printProgressBar(i, end - start, 'Saving Video...')
+            for i in range(start, end):
+                frame = self.dataset[i]
+                printProgressBar(i - start, end - start, 'Saving Video...')
                 generated_frame = self.generate_frame(frame)
                 video_writer.write(generated_frame)
+
+            video_writer.release()
 
             print('\nVideo saved as :', filename)
 
