@@ -2,6 +2,7 @@ import argparse
 import sys
 import cv2
 import numpy as np
+from helper_functions import get_description_dict
 
 
 class DataSet:
@@ -210,7 +211,9 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
     Added Arguments
     ---------------
     temp_data: required
-        filename (and location) of temp data
+        filename (and location) of thermal cam temps file.
+    mp_data: optional
+        filename (and location) of merged data file.
     top: optional
         0 or 1 specifying whether or not to remove top reflections.
     bot: optional
@@ -220,38 +223,28 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
     range: optional
         start,end specifying frame range to use in dataset.
     """
-    parser.add_argument('temp_data',
-                        type=str,
-                        help='filename (and location) of temp data')
-    parser.add_argument(
-        '-top',
-        type=int,
-        default=False,
-        help=
-        '0 or 1 specifying whether or not to remove top reflections from dataset.'
-    )
-    parser.add_argument(
-        '-bot',
-        type=int,
-        default=False,
-        help=
-        '0 or 1 specifying whether or not to remove bottom reflections from dataset.'
-    )
+    desc_dict = get_description_dict()
+    parser.add_argument('temp_data', type=str, help=desc_dict['temp_data'])
+    parser.add_argument('-top',
+                        type=int,
+                        default=False,
+                        help=desc_dict['remove_top_CLarg'])
+    parser.add_argument('-bot',
+                        type=int,
+                        default=False,
+                        help=desc_dict['remove_bot_CLarg'])
     parser.add_argument('-scale',
                         type=int,
                         default=1,
-                        help='Factor to scale frames by.')
+                        help=desc_dict['scale_factor'])
     parser.add_argument('-mp_data',
                         type=str,
                         default=None,
-                        help='filename (and location) of temp data')
-    parser.add_argument(
-        '-range',
-        default=None,
-        type=str,
-        help=
-        "'start,end' specifying frame range to consider. Or just 'frame' to specify a single frame."
-    )
+                        help=desc_dict['mp_data'])
+    parser.add_argument('-range',
+                        default=None,
+                        type=str,
+                        help=desc_dict['range_CLarg'])
 
 
 def validate_range_arg(range_arg: str):
