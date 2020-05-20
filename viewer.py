@@ -345,7 +345,6 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     )
 
 
-# TODO: Convert other colormap frame calls to use this one outside of the class
 def colormap_frame(frame):
     frame = cv2.normalize(frame,
                           frame,
