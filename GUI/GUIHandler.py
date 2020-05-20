@@ -8,10 +8,10 @@ from plot import Plots
 from matplotlib import pyplot as plt
 from pixel_selector import PixelSelector
 
+
 def browseFiles(self, entry):
     entry.delete(0, END)
-    self.root.filepath = filedialog.askdirectory(
-        initialdir="~/Documents")
+    self.root.filepath = filedialog.askdirectory(initialdir="~/Documents")
     entry.insert(0, self.root.filepath)
 
 
@@ -38,7 +38,8 @@ def save(self):
 
 def grab_dataset(self):
     self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
-                           remove_top_reflection=self.remove_top.get(), remove_bottom_reflection=self.remove_bot.get(),
+                           remove_top_reflection=self.remove_top.get(),
+                           remove_bottom_reflection=self.remove_bot.get(),
                            scale_factor=self.scale_factor.get())
 
 
@@ -48,7 +49,7 @@ def grab_viewer(self):
                          self.info_pane.get())
 
 
-def save_threshold_img(self):
+def save_thresh_img(self):
     grab_dataset(self)
     thresh_img = get_threshold_img(self.dataset,
                                    self.composite_threshold.get(),
@@ -93,8 +94,7 @@ def create_plots(self, pixel: tuple):
 def select_pixels(self):
     grab_dataset(self)
     thresh_img = get_threshold_img(dataset=self.dataset,
-                                   threshold=int(
-                                       self.plot_TempThresh.get()),
+                                   threshold=int(self.plot_TempThresh.get()),
                                    start=int(self.plot_StartFrame.get()),
                                    end=int(self.plot_EndFrame.get()))
     thresh_img = colormap_frame(thresh_img)
