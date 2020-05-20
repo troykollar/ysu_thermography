@@ -5,6 +5,8 @@ import GUI.constants as consts
 import GUI.helper_functions as func
 from helper_functions import get_description_dict
 
+#TODO: Add meltpool data entry
+
 
 class GUI:
     def __init__(self):
@@ -145,8 +147,7 @@ class GUI:
                               pady=0,
                               bg=self.ACTIVEBACKGROUND,
                               foreground=self.TEXTCOLOR)
-        tempDataHint = Descriptors.getHintTextFileFrame('tempDataLabel')
-        ToolTip.createToolTip(tempDataLabel, tempDataHint)
+        ToolTip.createToolTip(tempDataLabel, self.descriptions['temp_data'])
         tempDataLabel.pack(side=LEFT, fill=BOTH)
         tempDataEntry = Entry(self.filePanel,
                               width=75,
@@ -170,7 +171,6 @@ class GUI:
         tempDataBrowse.pack(side=LEFT)
 
     def build_dataset_frame(self):
-        # TODO: Update hints
         # Main Frame
         self.dataset_frame = func.buildOuterLabelFrame(obj=self,
                                                        root=self.dataset_panel,
@@ -189,8 +189,8 @@ class GUI:
         remove_top_label = func.buildInnerLabelFrame(
             obj=self, root=self.dataset_frame, label='Remove Top Reflection')
 
-        remove_top_hint = 'Remove top reflections from data'
-        ToolTip.createToolTip(remove_top_label, remove_top_hint)
+        ToolTip.createToolTip(remove_top_label,
+                              self.descriptions['remove_top'])
 
         remove_top_label.grid(row=0, column=0, sticky=W + E + N + S)
 
@@ -206,8 +206,8 @@ class GUI:
             root=self.dataset_frame,
             label='Remove Bottom Reflection')
 
-        remove_bot_hint = 'Remove top reflections from data'
-        ToolTip.createToolTip(remove_bot_label, remove_bot_hint)
+        ToolTip.createToolTip(remove_bot_label,
+                              self.descriptions['remove_bot'])
 
         remove_bot_label.grid(row=0, column=1, sticky=W + E + N + S)
 
@@ -222,8 +222,8 @@ class GUI:
                                                        root=self.dataset_frame,
                                                        label='Scale Factor')
 
-        scale_factor_hint = 'Factor used to scale data.'
-        ToolTip.createToolTip(scale_factor_label, scale_factor_hint)
+        ToolTip.createToolTip(scale_factor_label,
+                              self.descriptions['scale_factor'])
 
         scale_factor_label.grid(row=0, column=2, sticky=W + E + N + S)
 
@@ -232,13 +232,13 @@ class GUI:
                                              textvariable=self.scale_factor)
         scale_factor_entry.pack()
 
-        # Frame to hold entry for scale factor
+        # Frame to hold entry for start frame
         start_frame_label = func.buildInnerLabelFrame(obj=self,
                                                       root=self.dataset_frame,
                                                       label='Start Frame')
 
-        start_frame_hint = 'Factor used to scale data.'
-        ToolTip.createToolTip(start_frame_label, start_frame_hint)
+        ToolTip.createToolTip(start_frame_label,
+                              self.descriptions['start_frame'])
 
         start_frame_label.grid(row=0, column=3, sticky=W + E + N + S)
 
@@ -247,13 +247,12 @@ class GUI:
                                             textvariable=self.start_frame)
         start_frame_entry.pack()
 
-        # Frame to hold entry for scale factor
+        # Frame to hold entry for end frame
         end_frame_label = func.buildInnerLabelFrame(obj=self,
                                                     root=self.dataset_frame,
                                                     label='End Frame')
 
-        end_frame_hint = 'Factor used to scale data.'
-        ToolTip.createToolTip(end_frame_label, end_frame_hint)
+        ToolTip.createToolTip(end_frame_label, self.descriptions['end_frame'])
 
         end_frame_label.grid(row=0, column=4, sticky=W + E + N + S)
 
@@ -281,8 +280,8 @@ class GUI:
         contour_thresh_label = func.buildInnerLabelFrame(
             obj=self, root=self.viewer_frame, label='Contour Threshold')
 
-        contour_thresh_hint = 'Threshold used for contouring.'
-        ToolTip.createToolTip(contour_thresh_label, contour_thresh_hint)
+        ToolTip.createToolTip(contour_thresh_label,
+                              self.descriptions['contour_threshold'])
 
         contour_thresh_label.grid(row=0, column=0, sticky=W + E + N + S)
 
@@ -307,8 +306,8 @@ class GUI:
         follow_size_frame = func.buildInnerLabelFrame(
             obj=self, root=self.viewer_frame, label='Focused frame size')
 
-        follow_size_hint = 'How many pixels to be shown on either side of the focused pixel.'
-        ToolTip.createToolTip(follow_size_frame, follow_size_hint)
+        ToolTip.createToolTip(follow_size_frame,
+                              self.descriptions['follow_size'])
 
         follow_size_frame.grid(row=0, column=2, sticky=W + E + N + S)
 
@@ -375,8 +374,7 @@ class GUI:
         threshold_frame = func.buildInnerLabelFrame(
             obj=self, root=self.composite_frame, label='Temperature Threshold')
 
-        threshold_hint = 'Threshold used to increment image.'
-        ToolTip.createToolTip(threshold_frame, threshold_hint)
+        ToolTip.createToolTip(threshold_frame, self.descriptions['threshold'])
         threshold_frame.pack(side=LEFT, expand=1)
 
         threshold_input = func.buildEntry(
@@ -409,9 +407,8 @@ class GUI:
         pixelLocationFrame = func.buildInnerLabelFrame(
             obj=self, root=self.plotOptionsFrame, label='Pixel Location')
 
-        pixelLocationHint = Descriptors.getHintTextPlotOptions(
-            'pixelLocationFrame')
-        ToolTip.createToolTip(pixelLocationFrame, pixelLocationHint)
+        ToolTip.createToolTip(pixelLocationFrame,
+                              self.descriptions['plot_pixel_location'])
         pixelLocationFrame.grid(row=0, column=1, sticky=W + E + N + S)
 
         pixelLocationFrame.columnconfigure(0, weight=1)
@@ -450,8 +447,7 @@ class GUI:
                                                     root=self.plotOptionsFrame,
                                                     label='Temp Thresh')
 
-        histthreshHint = Descriptors.getHintTextPlotOptions('histthreshFrame')
-        ToolTip.createToolTip(histthreshFrame, histthreshHint)
+        ToolTip.createToolTip(histthreshFrame, self.descriptions['threshold'])
         histthreshFrame.grid(row=0, column=0, sticky=W + E + N + S)
 
         histthreshInput = func.buildEntry(obj=self,
@@ -464,8 +460,7 @@ class GUI:
                                                     root=self.plotOptionsFrame,
                                                     label='Frame Range')
 
-        frameRangeHint = Descriptors.getHintTextPlotOptions('frameRangeFrame')
-        ToolTip.createToolTip(frameRangeFrame, frameRangeHint)
+        ToolTip.createToolTip(frameRangeFrame, self.descriptions['range'])
         frameRangeFrame.grid(row=0, column=2, sticky=W + E + N + S)
 
         frameRangeFrame.columnconfigure(0, weight=1)
