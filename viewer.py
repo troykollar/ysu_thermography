@@ -391,17 +391,6 @@ if __name__ == '__main__':
         if not info_arg in acceptable_info_args:
             info_arg = None
 
-    data = DataSet(temps_file=temp_data,
-                   meltpool_data=merged_data,
-                   remove_top_reflection=top,
-                   remove_bottom_reflection=bot,
-                   scale_factor=int(scale))
-    thermal_viewer = Viewer(dataset=data,
-                            contour_threshold=contour,
-                            follow=follow_arg,
-                            follow_size=fsize,
-                            info_pane=info_arg)
-
     if framerange is not None:
         comma_index = str(framerange).find(',')
         if comma_index == -1:
@@ -413,6 +402,19 @@ if __name__ == '__main__':
     else:
         start_frame = -1
         end_frame = -1
+
+    data = DataSet(temps_file=temp_data,
+                   meltpool_data=merged_data,
+                   remove_top_reflection=top,
+                   remove_bottom_reflection=bot,
+                   scale_factor=int(scale),
+                   start_frame=start_frame,
+                   end_frame=end_frame)
+    thermal_viewer = Viewer(dataset=data,
+                            contour_threshold=contour,
+                            follow=follow_arg,
+                            follow_size=fsize,
+                            info_pane=info_arg)
 
     if save_frame is not None:
         if framerange is not None:
