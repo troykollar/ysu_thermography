@@ -4,7 +4,7 @@ import argparse
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from dataset import DataSet, get_dataset_CLargs
+from dataset import DataSet, get_dataset_CLargs, validate_range_arg
 from helper_functions import printProgressBar
 
 
@@ -60,6 +60,12 @@ class Viewer:
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         self.cur_frame = 0
         while not self.quit:
+            print('\rFrame: ',
+                  self.cur_frame + self.dataset.start_frame,
+                  '/',
+                  self.dataset.shape[0] + self.dataset.start_frame,
+                  sep='',
+                  end='')
             if self.update_frame:
                 video_frame = self.generate_frame(self.dataset[self.cur_frame])
             if self.quit:
@@ -72,6 +78,7 @@ class Viewer:
             key = cv2.waitKey(frame_delay) & 0xFF
             self.key_handler(key)
         cv2.destroyAllWindows()
+        print('\n')
 
     def save_video(self, framerate: int = 60):
         # Generate the filename based on what frames are used
@@ -278,8 +285,6 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         int specifying the framerate to save the video in using OpenCV.
     frame: optional
         int specifying a frame to save in 16 bit color using matplotlib.
-    range: optional
-        start,end specifying frame range to save in 16 bit color using matplotlib.
     contour: optional
         int specifying the threshold to use if drawing a contour.
     follow: optional
@@ -307,13 +312,6 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         type=int,
         help=
         '0 or 1 specifying whether to save a frame in 16 bit color using matplotlib. Must also use range arg to specify frame numbers.'
-    )
-    parser.add_argument(
-        '-range',
-        default=None,
-        type=str,
-        help=
-        "'start,end' specifying frame range to save in 16 bit color using matplotlib. Or just 'frame' to specify a single frame."
     )
     parser.add_argument(
         '-contour',
@@ -377,6 +375,8 @@ if __name__ == '__main__':
     info_arg = args.info
     merged_data = args.mp_data
 
+    start_frame, end_frame = validate_range_arg(framerange)
+
     # Validate follow argument
     acceptable_follow_args = ['max', 'contour']
     if follow_arg is not None:
@@ -388,18 +388,6 @@ if __name__ == '__main__':
     if info_arg is not None:
         if not info_arg in acceptable_info_args:
             info_arg = None
-
-    if framerange is not None:
-        comma_index = str(framerange).find(',')
-        if comma_index == -1:
-            start_frame = framerange
-            end_frame = -1
-        else:
-            start_frame = int(framerange[:comma_index])
-            end_frame = int(framerange[comma_index + 1:])
-    else:
-        start_frame = -1
-        end_frame = -1
 
     data = DataSet(temps_file=temp_data,
                    meltpool_data=merged_data,
