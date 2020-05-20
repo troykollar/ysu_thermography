@@ -73,33 +73,31 @@ class Viewer:
             self.key_handler(key)
         cv2.destroyAllWindows()
 
-    def save_video(self, start: int = -1, end: int = -1, framerate: int = 60):
-        start, end, valid_inputs = self.dataset.validate_start_end(start, end)
-        if valid_inputs:
-            # Generate the filename based on what frames are used
-            filename = self.dataset.build_folder + 'video'
-            if start != 0 or end != self.dataset.shape[0]:
-                filename += str(start) + '-' + str(end)
+    def save_video(self, framerate: int = 60):
+        # Generate the filename based on what frames are used
+        filename = self.dataset.build_folder + 'video'
+        if self.dataset.start_frame != 0 or self.dataset.end_frame != self.dataset.original_end_frame:
+            filename += str(self.dataset.start_frame) + '-' + str(
+                self.dataset.end_frame)
 
-            filename += '.avi'
+        filename += '.avi'
 
-            # Generate a reference frame to get height and width
-            ref_frame = self.generate_frame(self.dataset[0])
-            height = ref_frame.shape[0]
-            width = ref_frame.shape[1]
-            video_writer = cv2.VideoWriter(
-                filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'),
-                framerate, (width, height))
+        # Generate a reference frame to get height and width
+        ref_frame = self.generate_frame(self.dataset[0])
+        height = ref_frame.shape[0]
+        width = ref_frame.shape[1]
+        video_writer = cv2.VideoWriter(
+            filename, cv2.VideoWriter_fourcc('F', 'M', 'P', '4'), framerate,
+            (width, height))
 
-            for i in range(start, end):
-                frame = self.dataset[i]
-                printProgressBar(i - start, end - start, 'Saving Video...')
-                generated_frame = self.generate_frame(frame)
-                video_writer.write(generated_frame)
+        for i, frame in enumerate(self.dataset):
+            printProgressBar(i, self.dataset.shape[0], 'Saving Video...')
+            generated_frame = self.generate_frame(frame)
+            video_writer.write(generated_frame)
 
-            video_writer.release()
+        video_writer.release()
 
-            print('\nVideo saved as :', filename)
+        print('\nVideo saved as :', filename)
 
     def generate_frame(self, frame_data: np.ndarray):
         generated_frame = colormap_frame(frame_data)
@@ -428,6 +426,4 @@ if __name__ == '__main__':
         thermal_viewer.play_video(play)
 
     if save_framerate is not None:
-        thermal_viewer.save_video(start=start_frame,
-                                  end=end_frame,
-                                  framerate=save_framerate)
+        thermal_viewer.save_video(framerate=save_framerate)
