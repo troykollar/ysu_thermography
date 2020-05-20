@@ -43,8 +43,7 @@ class Viewer:
 
         self.keycodes = {
             'Play/Pause': [ord('p'), 32, ord('k')],
-            # TODO: Add keycode for Esc
-            'Quit': [ord('q')],
+            'Quit': [ord('q'), 27],
             'Save': [ord('s')],
             'Adv 1 Frame': [ord('m')],
             'Adv 10 Frame': [ord('l')],
