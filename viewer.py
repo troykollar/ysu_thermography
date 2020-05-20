@@ -128,8 +128,6 @@ class Viewer:
                     generated_frame = self.center_frame(
                         generated_frame, max_temp_location, frame_size)
 
-        # Change conditional to be specific for mp data or contour data
-        # TODO: Add conditional for meltpool info pane
         if self.info_pane == 'contour':
             generated_frame = self.add_info_pane(generated_frame,
                                                  contour_geo_dict)
@@ -295,16 +293,16 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     framerange: optional
         start,end specifying frame range to save in 16 bit color using matplotlib.
     contour: optional
-        int specifying the threshold to use if drawing a contour
+        int specifying the threshold to use if drawing a contour.
     follow: optional
         str specifying what to focus the frame on.
         follow = 'max' centers the frame on the max temperature.
         follow = 'contour' centers the frame on the center of gravity of the contour (if present).
     fsize: optional
-        int specifying the size of the window when following max temp or contour
+        int specifying the size of the window when following max temp or contour.
+    info: optional
+        'mp' or 'contour' to display an info pane with relevant info above video.
     """
-    # TODO: Add save argument
-    # TODO: Add infopane argument
     parser.add_argument(
         '-play',
         type=int,
