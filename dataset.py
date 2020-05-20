@@ -1,12 +1,12 @@
 import argparse
 import cv2
 import numpy as np
-from helper_functions import printProgressBar
 
 
 class DataSet:
     def __init__(self,
-                 temps_file: str = None,
+                 temps_file: str,
+                 meltpool_data: str = None,
                  remove_top_reflection=False,
                  remove_bottom_reflection=False,
                  scale_factor=1):
@@ -22,6 +22,11 @@ class DataSet:
         self.frame_data = np.load(self.temp_fname,
                                   mmap_mode='c',
                                   allow_pickle=True)
+
+        self.meltpool_data = None
+        if meltpool_data is not None:
+            self.meltpool_data_array = np.load(meltpool_data,
+                                               allow_pickle=True)
 
         self.shape = self.frame_data.shape
 
@@ -173,6 +178,20 @@ class DataSet:
 
         return start, end, validity
 
+    def get_meltpool_data(self, index: int):
+        date_time = self.meltpool_data_array[index][0]
+        formatted_time = str(date_time.month) + '/' + str(
+            date_time.day) + ' ' + str(date_time.hour) + ':' + str(
+                date_time.minute) + ':' + str(date_time.second)
+        meltpool_data = {
+            'timestamp': formatted_time,
+            'x': self.meltpool_data_array[index][1],
+            'y': self.meltpool_data_array[index][2],
+            'z': self.meltpool_data_array[index][3],
+            'area': self.meltpool_data_array[index][4]
+        }
+        return meltpool_data
+
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
     """Add dataset related CL arguments to given parser.
@@ -224,7 +243,10 @@ if __name__ == '__main__':
     bot = bool(args.bot)
     scale = args.scale
 
+    merged_data = '/media/troy/TroyUSB/thermography/4-20_corrected/merged_data.npy'
+
     dset = DataSet(test_file,
+                   meltpool_data=merged_data,
                    remove_top_reflection=top,
                    remove_bottom_reflection=bot,
                    scale_factor=scale)
