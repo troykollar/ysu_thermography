@@ -606,8 +606,11 @@ class GUI:
 
     def grab_dataset(self):
         self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
-                               self.remove_top.get(), self.remove_bot.get(),
-                               self.scale_factor.get())
+                               self.remove_top.get(),
+                               self.remove_bot.get(),
+                               self.scale_factor.get(),
+                               start_frame=self.start_frame.get(),
+                               end_frame=self.end_frame.get())
 
     def grab_viewer(self):
         self.viewer = Viewer(self.dataset, self.contour_threshold.get(),
@@ -617,9 +620,7 @@ class GUI:
     def save_threshold_img(self):
         self.grab_dataset()
         thresh_img = get_threshold_img(self.dataset,
-                                       self.composite_threshold.get(),
-                                       self.start_frame.get(),
-                                       self.end_frame.get())
+                                       self.composite_threshold.get())
         save_threshold_img(self.tempData.get(), thresh_img,
                            self.composite_threshold.get())
 
@@ -658,9 +659,7 @@ class GUI:
         self.grab_dataset()
         thresh_img = get_threshold_img(dataset=self.dataset,
                                        threshold=int(
-                                           self.plot_TempThresh.get()),
-                                       start=int(self.plot_StartFrame.get()),
-                                       end=int(self.plot_EndFrame.get()))
+                                           self.plot_TempThresh.get()))
         thresh_img = colormap_frame(thresh_img)
         pix_sel = PixelSelector()
         pix_sel.create_window('Select pixels for analysis', thresh_img)
