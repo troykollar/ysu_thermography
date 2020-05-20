@@ -42,7 +42,7 @@ def select_pixels_and_gen_plots(temp_file: str,
         print('No pixels selected for analysis!')
     else:
         for pixel in pix_sel.location_list[2:]:
-            plot_maker = Plots(test_data, pixel, threshold, start, end)
+            plot_maker = Plots(test_data, (pixel[1], pixel[0]), threshold, start, end)
             plot_maker.all()
 
 

@@ -1,3 +1,5 @@
 pip:
     opencv-contrib-python
-    matplotlib
+matplotlib~=3.2.1
+plotly~=4.7.1
+numpy~=1.18.3
