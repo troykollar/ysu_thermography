@@ -52,7 +52,7 @@ def get_description_dict():
     desc_filename = 'descriptions.txt'
     with open(desc_filename) as desc_file:
         for line in desc_file:
-            split_line = line.split('-')
+            split_line = line.split('-', 1)
             (key, value) = split_line
             desc_dict[key] = value
 
