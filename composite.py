@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from helper_functions import printProgressBar, get_description_dict
-from dataset import DataSet, get_dataset_CLargs
+from dataset import DataSet, get_dataset_CLargs, validate_range_arg
 
 
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
@@ -110,9 +110,8 @@ if __name__ == '__main__':
 
     destination_folder = args.dst_folder
     frame_cap = args.cap
-    start_frame = args.start
-    end_frame = args.end
-    debug = bool(args.debug)
+
+    start_frame, end_frame = validate_range_arg(args.range)
 
     data_set = DataSet(temp_data,
                        remove_top_reflection=top,
