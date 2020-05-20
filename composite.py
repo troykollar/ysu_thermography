@@ -15,30 +15,17 @@ def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
     img += over_thresh_array
 
 
-def get_threshold_img(dataset: DataSet,
-                      threshold: int,
-                      start=-1,
-                      end=-1,
-                      cap=None):
+def get_threshold_img(dataset: DataSet, threshold: int, cap=None):
     # Get frame size info
     height = dataset[0].shape[0]
     width = dataset[0].shape[1]
 
-    # TODO: Add better validation for start and end frames
-    final_frame = dataset.shape[0]
-    if end < 0 or end > final_frame:
-        end = final_frame
-    else:
-        end = end + 1
-
-    if start < 0 or start > final_frame:
-        start = 0
-
     # Make blank image to increment
     threshold_img = np.zeros((height, width), dtype=np.float32)
 
-    for i in range(start, end):
-        printProgressBar(i - start, end - start,
+    for i, frame in enumerate(dataset):
+        printProgressBar(i - dataset.start_frame,
+                         dataset.end_frame - dataset.start_frame,
                          "Generating threshold image...")
         frame = dataset[i]
         increment_from_thresh(threshold_img, frame, threshold)
@@ -153,11 +140,11 @@ if __name__ == '__main__':
 
     data_set = DataSet(temp_data,
                        remove_top_reflection=top,
-                       remove_bottom_reflection=bot)
+                       remove_bottom_reflection=bot,
+                       start_frame=start_frame,
+                       end_frame=end_frame)
     thresh_img = get_threshold_img(dataset=data_set,
                                    threshold=composite_threshold,
-                                   start=start_frame,
-                                   end=end_frame,
                                    cap=frame_cap)
     save_threshold_img(filename=temp_data,
                        threshold_img=thresh_img,
