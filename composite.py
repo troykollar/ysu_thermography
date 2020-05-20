@@ -3,7 +3,6 @@ import argparse
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 from helper_functions import printProgressBar
 from dataset import DataSet, get_dataset_CLargs
 
@@ -133,33 +132,34 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate a composite image.')
+    arg_parser = argparse.ArgumentParser(
+        description='Generate a composite image.')
 
-    get_dataset_CLargs(parser)
-    get_composite_CLargs(parser)
+    get_dataset_CLargs(arg_parser)
+    get_composite_CLargs(arg_parser)
 
-    args = parser.parse_args()
+    args = arg_parser.parse_args()
 
     temp_data = args.temp_data
     top = bool(args.top)
     bot = bool(args.bot)
-    threshold = args.THRESHOLD
+    composite_threshold = args.THRESHOLD
 
-    dst_folder = args.dst_folder
-    cap = args.cap
-    start = args.start
-    end = args.end
+    destination_folder = args.dst_folder
+    frame_cap = args.cap
+    start_frame = args.start
+    end_frame = args.end
     debug = bool(args.debug)
 
-    dataset = DataSet(temp_data,
-                      remove_top_reflection=top,
-                      remove_bottom_reflection=bot)
-    threshold_img = get_threshold_img(dataset=dataset,
-                                      threshold=threshold,
-                                      start=start,
-                                      end=end,
-                                      cap=cap)
+    data_set = DataSet(temp_data,
+                       remove_top_reflection=top,
+                       remove_bottom_reflection=bot)
+    thresh_img = get_threshold_img(dataset=data_set,
+                                   threshold=composite_threshold,
+                                   start=start_frame,
+                                   end=end_frame,
+                                   cap=frame_cap)
     save_threshold_img(filename=temp_data,
-                       threshold_img=threshold_img,
-                       threshold=threshold,
-                       dst_folder=dst_folder)
+                       threshold_img=thresh_img,
+                       threshold=composite_threshold,
+                       dst_folder=destination_folder)
