@@ -1,5 +1,5 @@
-temp_data-filename (and location) of thermal cam temps file.
-mp_data-filename (and location) of merged data file.
+temp_data-Filename (and location) of thermal cam temps file.
+mp_data-Filename (and location) of merged data file.
 scale_factor-int: number used to scale frame data.
 remove_top-Attempt to remove reflections above the piece.
 remove_top_CLarg-0 or 1 specifying whether or not to attempt to remove reflections from above the piece.
@@ -16,4 +16,8 @@ viewer_main-Play/Save a video or save frames from the given dataset.
 threshold-Minimum temperature for a pixel to be considered.
 thresh_dst_folder-Destination folder to save threshold image.
 thresh_cap-Maximum number of frames to increment.
+range-Start and End frames to consider. -1 for end frame will default to the last frame of the dataset.
 range_CLarg-'start,end' specifying frame range to consider. Or just 'frame' to specify a single frame.
+plot_pixel_location-X and Y coordinates of the pixel to run analysis on.
+start_frame-The first frame of the dataset to be considered. -1 will default to the first frame of the dataset.
+end_frame-The last frame of the dataset to be considered. -1 will default to the last frame of the dataset.
