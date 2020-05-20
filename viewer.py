@@ -421,12 +421,18 @@ if __name__ == '__main__':
         else:
             start_frame = int(framerange[:comma_index])
             end_frame = int(framerange[comma_index + 1:])
+    else:
+        start_frame = -1
+        end_frame = -1
 
     if save_frame is not None:
-        if end_frame == -1:
-            thermal_viewer.save_frame16(int(start_frame))
+        if framerange is not None:
+            if end_frame == -1:
+                thermal_viewer.save_frame16(int(start_frame))
+            else:
+                thermal_viewer.save_frame16(int(start_frame), int(end_frame))
         else:
-            thermal_viewer.save_frame16(int(start_frame), int(end_frame))
+            print("Must specify frames to save using '-range' argument!")
     if play is not None:
         thermal_viewer.play_video(play)
 
