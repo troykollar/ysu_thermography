@@ -228,6 +228,10 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
                         type=int,
                         default=1,
                         help='Factor to scale frames by.')
+    parser.add_argument('-mp_data',
+                        type=str,
+                        default=None,
+                        help='filename (and location) of temp data')
 
 
 if __name__ == '__main__':
