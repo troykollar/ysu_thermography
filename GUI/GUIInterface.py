@@ -605,10 +605,13 @@ class GUI:
         self.viewer.save_video(framerate=self.framerate.get())
 
     def grab_dataset(self):
-        self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
-                               self.remove_top.get(),
-                               self.remove_bot.get(),
-                               self.scale_factor.get(),
+        #TODO: Add meltpool data entry
+        self.dataset = DataSet(temps_file=self.tempData.get() +
+                               '/thermal_cam_temps.npy',
+                               meltpool_data=None,
+                               remove_top_reflection=self.remove_top.get(),
+                               remove_bottom_reflection=self.remove_bot.get(),
+                               scale_factor=self.scale_factor.get(),
                                start_frame=self.start_frame.get(),
                                end_frame=self.end_frame.get())
 
