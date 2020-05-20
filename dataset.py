@@ -250,7 +250,7 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
         default=None,
         type=str,
         help=
-        "'start,end' specifying frame range to save in 16 bit color using matplotlib. Or just 'frame' to specify a single frame."
+        "'start,end' specifying frame range to consider. Or just 'frame' to specify a single frame."
     )
 
 
