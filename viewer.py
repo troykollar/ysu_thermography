@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from dataset import DataSet, get_dataset_CLargs, validate_range_arg
-from helper_functions import printProgressBar
+from helper_functions import printProgressBar, get_description_dict
 
 
 class Viewer:
@@ -25,6 +25,7 @@ class Viewer:
         self.follow = follow
         self.follow_size = follow_size
         self.info_pane = info_pane
+        self.descriptions = get_description_dict()
 
         # Keycodes stored as list so multiple keys can be assigned to a function w/o other changes
         # Could be made simpler using ASCII lookup and keycodes, but apparently keycodes are
@@ -296,49 +297,35 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
     info: optional
         'mp' or 'contour' to display an info pane with relevant info above video.
     """
-    parser.add_argument(
-        '-play',
-        type=int,
-        help='int specifying frame delay in ms to play the video using OpenCV.',
-        default=None)
-    parser.add_argument(
-        '-save',
-        type=int,
-        help='int specifying the framerate to save the video in using OpenCV.',
-        default=None)
-    parser.add_argument(
-        '-frame',
-        default=None,
-        type=int,
-        help=
-        '0 or 1 specifying whether to save a frame in 16 bit color using matplotlib. Must also use range arg to specify frame numbers.'
-    )
-    parser.add_argument(
-        '-contour',
-        type=int,
-        default=None,
-        help='int specifying threshold to use to find contours in dataset.')
-    parser.add_argument(
-        '-follow',
-        type=str,
-        default=None,
-        help=
-        "str, 'max' or 'contour' will center the frame on the max temp or the contour center of gravity, respectively"
-    )
-    parser.add_argument(
-        '-fsize',
-        type=int,
-        default=20,
-        help=
-        'int specifying the size of the window when following max temp or contour'
-    )
-    parser.add_argument(
-        '-info',
-        type=str,
-        default=None,
-        help=
-        "'mp' or 'contour' to display an info pane with relevant info above video"
-    )
+    descriptions = get_description_dict()
+    parser.add_argument('-play',
+                        type=int,
+                        help=descriptions['play_frame_delay'],
+                        default=None)
+    parser.add_argument('-save',
+                        type=int,
+                        help=descriptions['save_framerate'],
+                        default=None)
+    parser.add_argument('-frame',
+                        default=None,
+                        type=int,
+                        help=descriptions['save_frame_CLarg'])
+    parser.add_argument('-contour',
+                        type=int,
+                        default=None,
+                        help=descriptions['contour_threshold'])
+    parser.add_argument('-follow',
+                        type=str,
+                        default=None,
+                        help=descriptions['follow_CLarg'])
+    parser.add_argument('-fsize',
+                        type=int,
+                        default=20,
+                        help=descriptions['follow_size'])
+    parser.add_argument('-info',
+                        type=str,
+                        default=None,
+                        help=descriptions['infopane_CLarg'])
 
 
 def colormap_frame(frame):
@@ -353,8 +340,9 @@ def colormap_frame(frame):
 
 
 if __name__ == '__main__':
+    descriptions = get_description_dict()
     argument_parser = argparse.ArgumentParser(
-        description='Play a video from the given dataset.')
+        description=descriptions['viewer_main'])
 
     get_viewer_CLargs(argument_parser)
     get_dataset_CLargs(argument_parser)
