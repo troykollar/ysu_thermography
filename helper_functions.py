@@ -49,3 +49,15 @@ def printProgressBar(iteration,
     # Print New Line on Complete
     if iteration == total:
         print('\n')
+
+
+def get_description_dict():
+    desc_dict = {}
+    desc_filename = 'descriptions.txt'
+    with open(desc_filename) as desc_file:
+        for line in desc_file:
+            split_line = line.split('-')
+            (key, value) = split_line
+            desc_dict[key] = value
+
+    return desc_dict
