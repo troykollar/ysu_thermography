@@ -19,13 +19,11 @@ def select_pixels_and_gen_plots(temp_file: str,
                                 frame_cap=None):
     test_data = DataSet(temp_file,
                         remove_top_reflection=remove_reflections,
-                        remove_bottom_reflection=remove_reflections)
+                        remove_bottom_reflection=remove_reflections,
+                        start_frame=start_frame,
+                        end_frame=end_frame)
 
-    thresh_img = get_threshold_img(test_data,
-                                   threshold,
-                                   start=start_frame,
-                                   end=end_frame,
-                                   cap=frame_cap)
+    thresh_img = get_threshold_img(test_data, threshold, cap=frame_cap)
     save_threshold_img(temp_file, thresh_img, threshold)
     thresh_img = cv2.normalize(thresh_img,
                                thresh_img,
