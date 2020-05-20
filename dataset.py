@@ -191,6 +191,10 @@ class DataSet:
         }
         return meltpool_data
 
+    def validate_frame_choice(self, start: int, end: int):
+        pass
+        #TODO: Add frame choice validation
+
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
     """Add dataset related CL arguments to given parser.

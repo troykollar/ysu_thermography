@@ -180,7 +180,6 @@ class Viewer:
         return frame
 
     def save_frame16(self, start: int, end=-1):
-        # TODO: Add frame choice validation
         # Save only one frame
         if end < 0:
             savename = self.dataset.build_folder + '/frame' + str(
