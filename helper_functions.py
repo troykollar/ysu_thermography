@@ -1,7 +1,3 @@
-import cv2
-import numpy as np
-
-
 def get_build_folder(temp_filename: str):
     build_folder = temp_filename[:temp_filename.rfind('/')]
     return build_folder
