@@ -51,6 +51,7 @@ class TestThresholdIncrementer(unittest.TestCase):
 
     def test_get_threshold_img_with_start_end(self):
         """Test that a threshold image is properly created with a different start and end frame"""
+        # TODO: Update test to use new dataset start and end validation
         data_array1 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
                                dtype=np.float32)
         data_array2 = np.array(([1, 1, 5, 1, 5, 1], [5, 5, 1, 5, 1, 5]),
