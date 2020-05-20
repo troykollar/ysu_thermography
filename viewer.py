@@ -340,9 +340,9 @@ def colormap_frame(frame):
 
 
 if __name__ == '__main__':
-    descriptions = get_description_dict()
+    description_dict = get_description_dict()
     argument_parser = argparse.ArgumentParser(
-        description=descriptions['viewer_main'])
+        description=description_dict['viewer_main'])
 
     get_viewer_CLargs(argument_parser)
     get_dataset_CLargs(argument_parser)
