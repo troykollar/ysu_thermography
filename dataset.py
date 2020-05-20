@@ -198,6 +198,7 @@ class DataSet:
             valid = False
 
         if not valid:
+            print('Invalid range of frames.')
             sys.exit()
         else:
             self.shape = self.frame_data[self.start_frame:self.end_frame].shape
