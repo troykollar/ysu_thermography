@@ -38,9 +38,10 @@ def get_threshold_img(dataset: DataSet,
     # Make blank image to increment
     threshold_img = np.zeros((height, width), dtype=np.float32)
 
-    for i, frame in enumerate(dataset[start:end]):
+    for i in range(start, end):
         printProgressBar(i - start, end - start,
                          "Generating threshold image...")
+        frame = dataset[i]
         increment_from_thresh(threshold_img, frame, threshold)
 
     if cap is not None:

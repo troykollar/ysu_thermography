@@ -42,7 +42,7 @@ def select_pixels_and_gen_plots(temp_file: str,
         print('No pixels selected for analysis!')
     else:
         for pixel in pix_sel.location_list[2:]:
-            plot_maker = Plots(test_data, (pixel[1], pixel[0]), threshold, start, end)
+            plot_maker = Plots(test_data, pixel, threshold, start, end)
             plot_maker.all()
 
 
@@ -74,6 +74,7 @@ class PixelSelector:
             if len(self.location_list) > 1:
                 draw_img = cv2.rectangle(draw_img, self.location_list[0],
                                          self.location_list[1], yellow, 1)
+                draw_img = self.highlight_rectangle_percents(draw_img)
 
             cv2.imshow(window_name, draw_img)
             key = cv2.waitKey(1) & 0xFF
@@ -90,6 +91,53 @@ class PixelSelector:
                 del self.location_list[-1]
         else:
             self.close_window = False
+
+    def pixel_location_percents(self):
+        if len(self.location_list) > 2:
+            corners = self.location_list[0:2]
+            corners.sort(key=lambda tup: tup[0])
+            left_corner = corners[0]
+            right_corner = corners[1]
+            percent_from_left = []
+            percent_from_left.append(0)  # 0% for left corner
+            percent_from_left.append(1)  # 100% for right corner
+
+            percent_from_right = []
+            percent_from_right.append(1)  # 100% for left corner
+            percent_from_right.append(0)  # 0% for right corner
+
+            for pixel in self.location_list[2:]:
+                piece_length = right_corner[0] - left_corner[
+                    0]  # Total length of the piece
+                percent_from_left.append(
+                    (pixel[0] - left_corner[0]) / piece_length)
+                percent_from_right.append(
+                    (right_corner[0] - pixel[0]) / piece_length)
+
+            return percent_from_left, percent_from_right
+        else:
+            pass
+
+    def highlight_rectangle_percents(self, draw_img: np.ndarray):
+        if len(self.location_list) > 1:
+            corners = self.location_list[0:2]
+            corners.sort(key=lambda tup: tup[1])
+            top_corner = corners[0]
+            bot_corner = corners[1]
+            corners.sort(key=lambda tup: tup[0])
+            left_corner = corners[0]
+            right_corner = corners[1]
+            piece_length = right_corner[0] - left_corner[0]
+
+            highlight_locs = [.25, .5, .75]
+            for location in highlight_locs:
+                x_cord = int(left_corner[0] + location * piece_length)
+                draw_img[top_corner[1]][x_cord] = (255, 0, 0)
+                draw_img[bot_corner[1]][x_cord] = (255, 0, 0)
+        else:
+            pass
+
+        return draw_img
 
 
 if __name__ == '__main__':

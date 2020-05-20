@@ -25,7 +25,7 @@ class NpVidTool:
                  follow_contour=0,
                  contour_data_on_img=False):
 
-        self.dataset = DataSet(data_directory, r_top_refl, r_bot_refl)
+        self.dataset = DataSet(data_directory, remove_top_reflection=r_top_refl, remove_bottom_reflection=r_bot_refl)
         self.mp_data_on_vid = mp_data_on_vid
         self.follow_max_temp = follow_max_temp
         self.framerate = None
@@ -112,9 +112,9 @@ class NpVidTool:
                 shutil.rmtree(frame_range_folder)
             os.mkdir(frame_range_folder)
 
-            total = end - start
+            total = int(end) - int(start)
             progress = 0
-            for i in range(start, end):
+            for i in range(int(start), int(end)):
                 # Display completion percentage
                 printProgressBar(progress + 1,
                                  total,

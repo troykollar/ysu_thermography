@@ -1,0 +1,3 @@
+scale_factor!int: number used to scale frame data.
+remove_top!Attempt to remove reflections above the piece.
+remove_bot!Attempt to remove reflections below the piece.

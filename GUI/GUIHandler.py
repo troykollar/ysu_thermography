@@ -1,5 +1,3 @@
-
-
 import graphing
 from tkinter import *
 from tkinter import filedialog
@@ -79,7 +77,7 @@ def browseFiles(self, entry):
 
 
 def createNpVidTool(self):
-    return NpVidTool(data_directory=self.tempData.get(),
+    return NpVidTool(data_directory=self.tempData.get() + "/thermal_cam_temps.npy",
                      r_top_refl=int(self.play_removeTopReflection.get()),
                      r_bot_refl=int(self.play_removeBottomReflection.get()),
                      mp_data_on_vid=int(self.play_displayMeltPool.get()),
