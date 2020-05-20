@@ -25,8 +25,7 @@ class DataSet:
 
         self.meltpool_data = None
         if meltpool_data is not None:
-            self.meltpool_data_array = np.load(meltpool_data,
-                                               allow_pickle=True)
+            self.meltpool_data_array = np.load(meltpool_data, allow_pickle=True)
 
         self.shape = self.frame_data.shape
 

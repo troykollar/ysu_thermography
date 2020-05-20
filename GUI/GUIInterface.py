@@ -2,13 +2,7 @@ from tkinter import *
 from GUI import Descriptors, ToolTip
 from GUI import GUIHandler as handler
 import GUI.constants as consts
-from GUI import helper_functions as func
-from viewer import Viewer, colormap_frame
-from dataset import DataSet
-from composite import get_threshold_img, save_threshold_img
-from plot import Plots
-from matplotlib import pyplot as plt
-from pixel_selector import PixelSelector
+import GUI.helper_functions as func
 
 
 class GUI:
@@ -126,6 +120,7 @@ class GUI:
         self.build_viewer_frame()
         self.build_composite_frame()
         self.buildPlotOptionsFrame()
+        self.buildGradOptionsFrame()
 
         # Main GUI loop
         self.root.mainloop()
@@ -148,14 +143,14 @@ class GUI:
                               foreground=self.TEXTCOLOR)
         tempDataHint = Descriptors.getHintTextFileFrame('tempDataLabel')
         ToolTip.createToolTip(tempDataLabel, tempDataHint)
-        tempDataLabel.pack(side=LEFT)
+        tempDataLabel.pack(side=LEFT, fill=BOTH)
         tempDataEntry = Entry(self.filePanel,
                               width=75,
                               textvariable=self.tempData,
                               relief=FLAT,
                               bg=self.ACTIVEFIELDBACKGROUND,
                               foreground=self.TEXTCOLOR)
-        tempDataEntry.pack(side=LEFT)
+        tempDataEntry.pack(side=LEFT, fill=BOTH)
 
         tempDataBrowse = Button(
             self.filePanel,
@@ -177,12 +172,7 @@ class GUI:
                                                        root=self.dataset_panel,
                                                        label='Dataset Options')
 
-        self.dataset_frame.grid(row=0,
-                                column=0,
-                                columnspan=2,
-                                sticky=W + E + N + S,
-                                ipady=5,
-                                pady=5)
+        self.dataset_frame.pack(fill=BOTH)
 
         self.dataset_frame.columnconfigure(0, weight=1)
         self.dataset_frame.columnconfigure(1, weight=1)
@@ -274,12 +264,7 @@ class GUI:
                                                       root=self.viewer_panel,
                                                       label='Viewer Options')
 
-        self.viewer_frame.grid(row=0,
-                               column=0,
-                               columnspan=2,
-                               sticky=W + E + N + S,
-                               ipady=5,
-                               pady=5)
+        self.viewer_frame.pack(fill=BOTH)
 
         self.viewer_frame.columnconfigure(0, weight=1)
         self.viewer_frame.columnconfigure(1, weight=1)
@@ -350,7 +335,7 @@ class GUI:
 
         play_button = Button(execute_buttons_frame,
                              text='Play Video',
-                             command=lambda: self.play(),
+                             command=lambda: handler.play(self),
                              bg=self.ACTIVEBUTTONBACKGROUND,
                              relief=FLAT)
         play_button.grid(row=0, column=0)
@@ -361,7 +346,7 @@ class GUI:
 
         save_video_button = Button(execute_buttons_frame,
                                    text='Save Video',
-                                   command=lambda: self.save(),
+                                   command=lambda: handler.save(self),
                                    bg=self.ACTIVEBUTTONBACKGROUND,
                                    relief=FLAT)
         save_video_button.grid(row=1, column=0)
@@ -372,7 +357,7 @@ class GUI:
 
         save_frame_button = Button(execute_buttons_frame,
                                    text='Save Frames',
-                                   command=lambda: self.save_frames(),
+                                   command=lambda: handler.save_frames(self),
                                    bg=self.ACTIVEBUTTONBACKGROUND,
                                    relief=FLAT)
         save_frame_button.grid(row=2, column=0)
@@ -381,12 +366,7 @@ class GUI:
         self.composite_frame = func.buildOuterLabelFrame(
             obj=self, root=self.optionsPanel, label='Composite options')
 
-        self.composite_frame.grid(row=1,
-                                  column=0,
-                                  sticky=W + E + N + S,
-                                  ipady=5,
-                                  pady=5,
-                                  padx=5)
+        self.composite_frame.pack(fill=BOTH)
 
         threshold_frame = func.buildInnerLabelFrame(
             obj=self, root=self.composite_frame, label='Temperature Threshold')
@@ -404,7 +384,7 @@ class GUI:
         gen_threshold_button = Button(
             self.composite_frame,
             text='Generate Threshold Image',
-            command=lambda: self.save_threshold_img(),
+            command=lambda: handler.save_threshold_img(self),
             bg=self.ACTIVEBUTTONBACKGROUND,
             relief=FLAT)
         gen_threshold_button.pack()
@@ -413,10 +393,7 @@ class GUI:
         self.plotOptionsFrame = func.buildOuterLabelFrame(
             obj=self, root=self.optionsPanel, label='Plot Options')
 
-        self.plotOptionsFrame.grid(row=3,
-                                   column=0,
-                                   columnspan=2,
-                                   sticky=W + E + N + S)
+        self.plotOptionsFrame.pack(fill=BOTH)
 
         self.plotOptionsFrame.columnconfigure(0, weight=1)
         self.plotOptionsFrame.columnconfigure(1, weight=1)
@@ -458,7 +435,7 @@ class GUI:
 
         select_pixels_button = Button(pixelLocationFrame,
                                       text='Select Pixels',
-                                      command=lambda: self.select_pixels(),
+                                      command=lambda: handler.select_pixels(self),
                                       bg=self.ACTIVEBUTTONBACKGROUND,
                                       relief=FLAT)
 
@@ -501,14 +478,18 @@ class GUI:
         plotEndFrameInput.insert(END, -1)
         plotEndFrameInput.grid(row=0, column=1)
 
-        self.gradFrame = func.buildInnerLabelFrame(obj=self,
-                                                   root=self.plotOptionsFrame,
+    def buildGradOptionsFrame(self):
+        self.gradFrame = func.buildOuterLabelFrame(obj=self,
+                                                   root=self.optionsPanel,
                                                    label='Gradient Plots')
 
-        self.gradFrame.grid(row=3, column=0, columnspan=3)
+        self.gradFrame.pack(fill=BOTH)
+
+        emptyFrame = Frame(self.gradFrame, bg=self.ACTIVEBACKGROUND)
+        emptyFrame.pack(anchor=CENTER)
 
         gradMagFrame = func.buildInnerLabelFrame(
-            obj=self, root=self.gradFrame, label='Gradient Magnitude Plot')
+            obj=self, root=emptyFrame, label='Gradient Magnitude Plot')
         gradMagFrame.grid(row=0, column=0)
 
         gradMagCheckButton = func.buildFlagCheckButton(obj=self,
@@ -517,7 +498,7 @@ class GUI:
         gradMagCheckButton.pack()
 
         gradAngleFrame = func.buildInnerLabelFrame(obj=self,
-                                                   root=self.gradFrame,
+                                                   root=emptyFrame,
                                                    label='Gradient Angle Plot')
         gradAngleFrame.grid(row=0, column=1)
 
@@ -526,7 +507,7 @@ class GUI:
         gradAngleCheckButton.pack()
 
         grad2dHistFrame = func.buildInnerLabelFrame(
-            obj=self, root=self.gradFrame, label='Gradient 2D Histogram')
+            obj=self, root=emptyFrame, label='Gradient 2D Histogram')
         grad2dHistFrame.grid(row=0, column=2)
 
         grad2dHistCheckButton = func.buildFlagCheckButton(
@@ -534,7 +515,7 @@ class GUI:
         grad2dHistCheckButton.pack()
 
         gradScatterFrame = func.buildInnerLabelFrame(
-            obj=self, root=self.gradFrame, label='Gradient Scatter Plot')
+            obj=self, root=emptyFrame, label='Gradient Scatter Plot')
         gradScatterFrame.grid(row=1, column=0)
 
         gradScatterCheckButton = func.buildFlagCheckButton(
@@ -542,7 +523,7 @@ class GUI:
         gradScatterCheckButton.pack()
 
         gradHexBinFrame = func.buildInnerLabelFrame(
-            obj=self, root=self.gradFrame, label='Gradient Hex Bin Plot')
+            obj=self, root=emptyFrame, label='Gradient Hex Bin Plot')
         gradHexBinFrame.grid(row=1, column=1)
 
         gradHexBinCheckButton = func.buildFlagCheckButton(
@@ -550,7 +531,7 @@ class GUI:
         gradHexBinCheckButton.pack()
 
         grad3dFrame = func.buildInnerLabelFrame(obj=self,
-                                                root=self.gradFrame,
+                                                root=emptyFrame,
                                                 label='3D Plot')
         grad3dFrame.grid(row=1, column=2)
 
@@ -560,7 +541,7 @@ class GUI:
         grad3dCheckButton.pack()
 
         gradAllFrame = func.buildInnerLabelFrame(obj=self,
-                                                 root=self.gradFrame,
+                                                 root=emptyFrame,
                                                  label='All Plots')
         gradAllFrame.grid(row=2, column=1)
 
@@ -573,9 +554,9 @@ class GUI:
 
         create_plots_button = Button(self.plotOptionsFrame,
                                      text='Create Plots',
-                                     command=lambda: self.create_plots(
-                                         (int(self.plot_PixelLocX.get()),
-                                          int(self.plot_PixelLocY.get()))),
+                                     command=lambda: handler.create_plots(self=self,
+                                                                          pixel=(int(self.plot_PixelLocX.get()),
+                                                                                 int(self.plot_PixelLocY.get()))),
                                      bg=self.ACTIVEBUTTONBACKGROUND,
                                      relief=FLAT)
 
@@ -590,81 +571,9 @@ class GUI:
             Radiobutton(radio_frame,
                         text=key,
                         variable=variable,
-                        value=buttons[key]).pack()
+                        value=buttons[key],
+                        bg=self.ACTIVEBACKGROUND,
+                        bd=0,
+                        highlightthickness=0).pack()
 
         return radio_frame
-
-    def play(self):
-        self.grab_dataset()
-        self.grab_viewer()
-        self.viewer.play_video(self.frame_delay.get())
-
-    def save(self):
-        self.grab_dataset()
-        self.grab_viewer()
-        self.viewer.save_video(framerate=self.framerate.get())
-
-    def grab_dataset(self):
-        self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
-                               self.remove_top.get(), self.remove_bot.get(),
-                               self.scale_factor.get())
-
-    def grab_viewer(self):
-        self.viewer = Viewer(self.dataset, self.contour_threshold.get(),
-                             self.follow.get(), self.follow_size.get(),
-                             self.info_pane.get())
-
-    def save_threshold_img(self):
-        self.grab_dataset()
-        thresh_img = get_threshold_img(self.dataset,
-                                       self.composite_threshold.get(),
-                                       self.start_frame.get(),
-                                       self.end_frame.get())
-        save_threshold_img(self.tempData.get(), thresh_img,
-                           self.composite_threshold.get())
-
-    def create_plots(self, pixel: tuple):
-        self.grab_dataset()
-        PLOTS = Plots(temp_data=self.dataset,
-                      pixel=pixel,
-                      threshold=int(self.plot_TempThresh.get()),
-                      start_frame=int(self.plot_StartFrame.get()),
-                      end_frame=int(self.plot_EndFrame.get()))
-
-        if self.grad_all.get():
-            PLOTS.all()
-
-        elif self.grad_mag.get():
-            PLOTS.plotMagnitude()
-
-        elif self.grad_angle.get():
-            PLOTS.plotAngle()
-
-        elif self.grad_2dHist.get():
-            PLOTS.plot2DHistogram()
-
-        elif self.grad_scatter.get():
-            PLOTS.plotScatter()
-
-        elif self.grad_hexBin.get():
-            PLOTS.plotHexBin()
-
-        elif self.grad_3D.get():
-            PLOTS.plot3DBubble()
-
-        plt.show()
-
-    def select_pixels(self):
-        self.grab_dataset()
-        thresh_img = get_threshold_img(dataset=self.dataset,
-                                       threshold=int(
-                                           self.plot_TempThresh.get()),
-                                       start=int(self.plot_StartFrame.get()),
-                                       end=int(self.plot_EndFrame.get()))
-        thresh_img = colormap_frame(thresh_img)
-        pix_sel = PixelSelector()
-        pix_sel.create_window('Select pixels for analysis', thresh_img)
-
-        locations = pix_sel.location_list[2:]
-        for pixel in locations:
-            self.create_plots(pixel)
