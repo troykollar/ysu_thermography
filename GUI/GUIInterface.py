@@ -384,7 +384,7 @@ class GUI:
         gen_threshold_button = Button(
             self.composite_frame,
             text='Generate Threshold Image',
-            command=lambda: handler.save_threshold_img(self),
+            command=lambda: handler.save_thresh_img(self),
             bg=self.ACTIVEBUTTONBACKGROUND,
             relief=FLAT)
         gen_threshold_button.pack()
@@ -433,11 +433,12 @@ class GUI:
 
         pixelYLocationInput.grid(row=0, column=2, sticky=W + E + N + S)
 
-        select_pixels_button = Button(pixelLocationFrame,
-                                      text='Select Pixels',
-                                      command=lambda: handler.select_pixels(self),
-                                      bg=self.ACTIVEBUTTONBACKGROUND,
-                                      relief=FLAT)
+        select_pixels_button = Button(
+            pixelLocationFrame,
+            text='Select Pixels',
+            command=lambda: handler.select_pixels(self),
+            bg=self.ACTIVEBUTTONBACKGROUND,
+            relief=FLAT)
 
         select_pixels_button.grid(row=0, column=3)
 
@@ -554,9 +555,10 @@ class GUI:
 
         create_plots_button = Button(self.plotOptionsFrame,
                                      text='Create Plots',
-                                     command=lambda: handler.create_plots(self=self,
-                                                                          pixel=(int(self.plot_PixelLocX.get()),
-                                                                                 int(self.plot_PixelLocY.get()))),
+                                     command=lambda: handler.create_plots(
+                                         self=self,
+                                         pixel=(int(self.plot_PixelLocX.get(
+                                         )), int(self.plot_PixelLocY.get()))),
                                      bg=self.ACTIVEBUTTONBACKGROUND,
                                      relief=FLAT)
 
