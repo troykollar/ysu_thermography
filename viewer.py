@@ -290,7 +290,7 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         int specifying the framerate to save the video in using OpenCV.
     frame: optional
         int specifying a frame to save in 16 bit color using matplotlib.
-    framerange: optional
+    range: optional
         start,end specifying frame range to save in 16 bit color using matplotlib.
     contour: optional
         int specifying the threshold to use if drawing a contour.
@@ -317,14 +317,15 @@ def get_viewer_CLargs(parser: argparse.ArgumentParser):
         '-frame',
         default=None,
         type=int,
-        help='int specifying a frame to save in 16 bit color using matplotlib.'
+        help=
+        '0 or 1 specifying whether to save a frame in 16 bit color using matplotlib. Must also use range arg to specify frame numbers.'
     )
     parser.add_argument(
-        '-framerange',
+        '-range',
         default=None,
         type=str,
         help=
-        'start,end specifying frame range to save in 16 bit color using matplotlib.'
+        "'start,end' specifying frame range to save in 16 bit color using matplotlib. Or just 'frame' to specify a single frame."
     )
     parser.add_argument(
         '-contour',
@@ -381,7 +382,7 @@ if __name__ == '__main__':
     bot = bool(args.bot)
     scale = args.scale
     save_frame = args.frame
-    framerange = args.framerange
+    framerange = args.range
     contour = args.contour
     follow_arg = args.follow
     fsize = args.fsize
@@ -412,17 +413,24 @@ if __name__ == '__main__':
                             follow_size=fsize,
                             info_pane=info_arg)
 
-    if save_frame is not None:
-        thermal_viewer.save_frame16(int(save_frame))
     if framerange is not None:
-        # TODO: Allow framerange to be used for all functions
         comma_index = str(framerange).find(',')
-        start_frame = int(framerange[:comma_index])
-        end_frame = int(framerange[comma_index + 1:])
-        thermal_viewer.save_frame16(start=start_frame, end=end_frame)
+        if comma_index == -1:
+            start_frame = framerange
+            end_frame = -1
+        else:
+            start_frame = int(framerange[:comma_index])
+            end_frame = int(framerange[comma_index + 1:])
+
+    if save_frame is not None:
+        if end_frame == -1:
+            thermal_viewer.save_frame16(int(start_frame))
+        else:
+            thermal_viewer.save_frame16(int(start_frame), int(end_frame))
     if play is not None:
         thermal_viewer.play_video(play)
 
     if save_framerate is not None:
-        # TODO: Update start and end to use framerange values
-        thermal_viewer.save_video(start=-1, end=-1, framerate=save_framerate)
+        thermal_viewer.save_video(start=start_frame,
+                                  end=end_frame,
+                                  framerate=save_framerate)
