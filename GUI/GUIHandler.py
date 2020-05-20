@@ -1,98 +1,18 @@
 import graphing
 from tkinter import *
 from tkinter import filedialog
-
-from viewer import Viewer
+from viewer import Viewer, colormap_frame
 from dataset import DataSet
+from composite import get_threshold_img, save_threshold_img
 from plot import Plots
-from composite import save_threshold_img, get_threshold_img
-
-
-def submit(self):
-
-    # TODO: Make reflection removing and scaling based on dataset
-    dataset = DataSet(self.tempData.get() + "/thermal_cam_temps.npy",
-                      self.play_removeTopReflection.get(),
-                      self.play_removeBottomReflection.get(), 1)
-
-    # TODO: Make contour threshold based on Viewer itself, and implement other arguments
-    viewer = Viewer(dataset, self.play_contourTempThresh)
-
-    if self.gen_threshold_img.get():
-        # TODO: Include implementation of start, end, and cap
-        print(self.genthreshold_threshold)
-        thresh_img = get_threshold_img(dataset,
-                                       int(self.genthreshold_threshold.get()))
-        save_threshold_img(self.tempData.get() + "/thermal_cam_temps.npy",
-                           thresh_img, self.genthreshold_threshold.get())
-
-    if self.play_video.get():
-        VIEWER = createNpVidTool(self)
-
-        VIEWER.play_video(scale_factor=int(self.play_scaleFactor.get()),
-                          frame_delay=int(self.play_frameDelay.get()))
-
-    if self.save_video.get():
-        VIEWER = createNpVidTool(self)
-
-        VIEWER.save_video(scale_factor=int(self.play_scaleFactor.get()),
-                          framerate=int(self.play_frameRate.get()),
-                          start=int(self.play_saveStartFrame.get()),
-                          end=self.play_saveEndFrame.get())
-
-    if self.save_frame.get():
-        VIEWER = createNpVidTool(self)
-        VIEWER.save_frame16(int(self.saveFrameNumber.get()),
-                            self.saveImageNumber.get())
-
-    if self.pixel_temp_range.get():
-        graphing.plotLine(temp_file=self.tempData.get() +
-                          "/thermal_cam_temps.npy",
-                          pixel=(int(self.plot_PixelLocX.get()),
-                                 int(self.plot_PixelLocY.get())),
-                          startFrame=int(self.plot_StartFrame.get()),
-                          endFrame=int(self.plot_EndFrame.get()))
-
-    if self.gradient_plots.get():
-        PLOTS = createPlotTool(self)
-        if self.grad_all.get():
-            PLOTS.all()
-
-        elif self.grad_mag.get():
-            PLOTS.plotMagnitude()
-
-        elif self.grad_angle.get():
-            PLOTS.plotAngle()
-
-        elif self.grad_2dHist.get():
-            PLOTS.plot2DHistogram()
-
-        elif self.grad_scatter.get():
-            PLOTS.plotScatter()
-
-        elif self.grad_hexBin.get():
-            PLOTS.plotHexBin()
-
-        elif self.grad_3d.get():
-            PLOTS.plot3DBubble()
+from matplotlib import pyplot as plt
+from pixel_selector import PixelSelector
 
 
 def browseFiles(self, entry):
     entry.delete(0, END)
-    self.root.filepath = filedialog.askdirectory(
-        initialdir="/home/rjyarwood/Documents/Research/ResearchData")
+    self.root.filepath = filedialog.askdirectory(initialdir="~/Documents")
     entry.insert(0, self.root.filepath)
-
-
-def createNpVidTool(self):
-    return NpVidTool(data_directory=self.tempData.get(),
-                     r_top_refl=int(self.play_removeTopReflection.get()),
-                     r_bot_refl=int(self.play_removeBottomReflection.get()),
-                     mp_data_on_vid=int(self.play_displayMeltPool.get()),
-                     follow_max_temp=int(self.play_pixelAroundMax.get()),
-                     contour_threshold=int(self.play_contourTempThresh.get()),
-                     follow_contour=int(self.play_contourPixelRange.get()),
-                     contour_data_on_img=int(self.play_displayContour.get()))
 
 
 def createPlotTool(self):
@@ -102,3 +22,83 @@ def createPlotTool(self):
                  threshold=int(self.plot_TempThresh.get()),
                  start_frame=int(self.plot_StartFrame.get()),
                  end_frame=int(self.plot_EndFrame.get()))
+
+
+def play(self):
+    grab_dataset(self)
+    grab_viewer(self)
+    self.viewer.play_video(self.frame_delay.get())
+
+
+def save(self):
+    grab_dataset(self)
+    grab_viewer(self)
+    self.viewer.save_video(framerate=self.framerate.get())
+
+
+def grab_dataset(self):
+    self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
+                           remove_top_reflection=self.remove_top.get(),
+                           remove_bottom_reflection=self.remove_bot.get(),
+                           scale_factor=self.scale_factor.get(),
+                           start_frame=self.start_frame.get(),
+                           end_frame=self.end_frame.get())
+
+
+def grab_viewer(self):
+    self.viewer = Viewer(self.dataset, self.contour_threshold.get(),
+                         self.follow.get(), self.follow_size.get(),
+                         self.info_pane.get())
+
+
+def save_thresh_img(self):
+    grab_dataset(self)
+    thresh_img = get_threshold_img(self.dataset,
+                                   self.composite_threshold.get())
+    save_threshold_img(self.tempData.get(), thresh_img,
+                       self.composite_threshold.get())
+
+
+def create_plots(self, pixel: tuple):
+    grab_dataset(self)
+    PLOTS = Plots(temp_data=self.dataset,
+                  pixel=pixel,
+                  threshold=int(self.plot_TempThresh.get()),
+                  start_frame=int(self.plot_StartFrame.get()),
+                  end_frame=int(self.plot_EndFrame.get()))
+
+    if self.grad_all.get():
+        PLOTS.all()
+
+    elif self.grad_mag.get():
+        PLOTS.plotMagnitude()
+
+    elif self.grad_angle.get():
+        PLOTS.plotAngle()
+
+    elif self.grad_2dHist.get():
+        PLOTS.plot2DHistogram()
+
+    elif self.grad_scatter.get():
+        PLOTS.plotScatter()
+
+    elif self.grad_hexBin.get():
+        PLOTS.plotHexBin()
+
+    elif self.grad_3D.get():
+        PLOTS.plot3DBubble()
+
+    plt.show()
+
+
+def select_pixels(self):
+    grab_dataset(self)
+    thresh_img = get_threshold_img(dataset=self.dataset,
+                                   threshold=int(self.plot_TempThresh.get()))
+    thresh_img = colormap_frame(thresh_img)
+    pix_sel = PixelSelector()
+    pix_sel.create_window('Select pixels for analysis', thresh_img)
+
+    locations = pix_sel.location_list[2:]
+    for pixel in locations:
+        create_plots(self, pixel)
