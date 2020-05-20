@@ -3,7 +3,7 @@ import argparse
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from helper_functions import printProgressBar
+from helper_functions import printProgressBar, get_description_dict
 from dataset import DataSet, get_dataset_CLargs
 
 
@@ -84,38 +84,14 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
         str specifying where to save the composite image. Defaults to build folder.
     cap: optional
         int specifying the max number of frames to use for composite.
-    start: optional
-        int specifying the first frame to consider for the composite.
-    end: optional
-        int specifying the last frame to consider for the composite.
-    debug: optional
-        0 or 1 specifying whether to show each frame being used for the composite.
     """
-    parser.add_argument('THRESHOLD',
-                        type=int,
-                        help='temperature theshold of the image')
+    desc_dict = get_description_dict()
+    parser.add_argument('THRESHOLD', type=int, help=desc_dict['threshold'])
     parser.add_argument('-dst_folder',
                         type=str,
                         default=None,
-                        help='Destination folder to save composite image.')
-    parser.add_argument('-cap',
-                        type=int,
-                        help='Maximum number of frames to increment')
-    parser.add_argument('-start',
-                        type=int,
-                        default=-1,
-                        required=False,
-                        help='First frame to consider.')
-    parser.add_argument('-end',
-                        type=int,
-                        default=-1,
-                        required=False,
-                        help='Last frame to consider.')
-    parser.add_argument(
-        '-debug',
-        type=int,
-        default=False,
-        help='Show each frame composite is using to generate from.')
+                        help=desc_dict['thresh_dst_folder'])
+    parser.add_argument('-cap', type=int, help=desc_dict['thresh_cap'])
 
 
 if __name__ == '__main__':
