@@ -1,4 +1,5 @@
 import argparse
+import sys
 import cv2
 import numpy as np
 
@@ -7,9 +8,11 @@ class DataSet:
     def __init__(self,
                  temps_file: str,
                  meltpool_data: str = None,
-                 remove_top_reflection=False,
-                 remove_bottom_reflection=False,
-                 scale_factor=1):
+                 remove_top_reflection: bool = False,
+                 remove_bottom_reflection: bool = False,
+                 scale_factor: int = 1,
+                 start_frame: int = -1,
+                 end_frame: int = -1):
 
         self.remove_top_reflection = remove_top_reflection
         self.remove_bottom_reflection = remove_bottom_reflection
@@ -25,10 +28,17 @@ class DataSet:
 
         self.meltpool_data = None
         if meltpool_data is not None:
-            self.meltpool_data_array = np.load(meltpool_data,
-                                               allow_pickle=True)
+            self.meltpool_data = np.load(meltpool_data, allow_pickle=True)
 
         self.shape = self.frame_data.shape
+        self.start_frame = start_frame
+        self.end_frame = end_frame
+        self.validate_frame_choice()
+
+        self.frame_data = self.frame_data[self.start_frame:self.end_frame]
+        if self.meltpool_data is not None:
+            self.meltpool_data = self.meltpool_data[self.start_frame:self.
+                                                    end_frame + 1]
 
     def __len__(self):
         return len(self.frame_data)
@@ -158,42 +168,38 @@ class DataSet:
 
         return max_temp, (max_temp_x, max_temp_y)
 
-    def validate_start_end(self, start: int, end: int):
-        """Checks if start and end are valid values. 
-    
-        If they are invalid and cannot be fixed, return False
-        Otherwise, return True
-        """
-
-        validity = True
-        if start < 0:
-            start = 0
-
-        if end < 0 or end > self.shape[0]:
-            end = self.shape[0]
-
-        if start > end:
-            validity = False
-
-        return start, end, validity
-
     def get_meltpool_data(self, index: int):
-        date_time = self.meltpool_data_array[index][0]
+        date_time = self.meltpool_data[index][0]
         formatted_time = str(date_time.month) + '/' + str(
             date_time.day) + ' ' + str(date_time.hour) + ':' + str(
                 date_time.minute) + ':' + str(date_time.second)
         meltpool_data = {
             'timestamp': formatted_time,
-            'x': self.meltpool_data_array[index][1],
-            'y': self.meltpool_data_array[index][2],
-            'z': self.meltpool_data_array[index][3],
-            'area': self.meltpool_data_array[index][4]
+            'x': self.meltpool_data[index][1],
+            'y': self.meltpool_data[index][2],
+            'z': self.meltpool_data[index][3],
+            'area': self.meltpool_data[index][4]
         }
         return meltpool_data
 
-    def validate_frame_choice(self, start: int, end: int):
-        pass
-        #TODO: Add frame choice validation
+    def validate_frame_choice(self):
+        valid = True
+        if self.start_frame <= 0:
+            self.start_frame = 0
+
+        if self.end_frame <= 0:
+            self.end_frame = self.shape[0]
+
+        if self.end_frame >= self.shape[0]:
+            self.end_frame = self.shape[0]
+
+        if self.start_frame > self.end_frame:
+            valid = False
+
+        if not valid:
+            sys.exit()
+        else:
+            self.shape = self.frame_data[self.start_frame:self.end_frame].shape
 
 
 def get_dataset_CLargs(parser: argparse.ArgumentParser):
