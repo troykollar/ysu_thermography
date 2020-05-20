@@ -217,6 +217,8 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
         0 or 1 specifying whether or not to remove bottom reflections.
     scale: optional
         int specifying the factor to scale frames by.
+    range: optional
+        start,end specifying frame range to use in dataset.
     """
     parser.add_argument('temp_data',
                         type=str,
@@ -243,6 +245,29 @@ def get_dataset_CLargs(parser: argparse.ArgumentParser):
                         type=str,
                         default=None,
                         help='filename (and location) of temp data')
+    parser.add_argument(
+        '-range',
+        default=None,
+        type=str,
+        help=
+        "'start,end' specifying frame range to save in 16 bit color using matplotlib. Or just 'frame' to specify a single frame."
+    )
+
+
+def validate_range_arg(range_arg: str):
+    if range_arg is not None:
+        comma_index = str(range_arg).find(',')
+        if comma_index == -1:
+            start_frame = range_arg
+            end_frame = -1
+        else:
+            start_frame = int(range_arg[:comma_index])
+            end_frame = int(range_arg[comma_index + 1:])
+    else:
+        start_frame = -1
+        end_frame = -1
+
+    return start_frame, end_frame
 
 
 if __name__ == '__main__':
