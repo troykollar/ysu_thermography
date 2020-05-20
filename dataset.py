@@ -31,6 +31,7 @@ class DataSet:
             self.meltpool_data = np.load(meltpool_data, allow_pickle=True)
 
         self.shape = self.frame_data.shape
+        self.original_end_frame = self.frame_data.shape[0]
         self.start_frame = start_frame
         self.end_frame = end_frame
         self.validate_frame_choice()
