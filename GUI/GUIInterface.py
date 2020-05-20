@@ -3,6 +3,7 @@ from GUI import Descriptors, ToolTip
 from GUI import GUIHandler as handler
 import GUI.constants as consts
 import GUI.helper_functions as func
+from helper_functions import get_description_dict
 
 
 class GUI:
@@ -22,6 +23,9 @@ class GUI:
         self.root.title("YSU Thermography")
         self.root['bg'] = self.ACTIVEBACKGROUND
         # root.iconbitmap("images/YSU_Logo")
+
+        # Get description dictionary
+        self.descriptions = get_description_dict()
 
         # Creating variables for checkboxes to change
         self.dataset = None
