@@ -139,6 +139,9 @@ class Viewer:
                                                  contour_geo_dict)
         elif self.info_pane == 'mp':
             meltpool_dict = self.dataset.get_meltpool_data(self.cur_frame)
+            meltpool_dict['Frame'] = str(self.cur_frame) + '/' + str(
+                self.dataset.shape[0])
+
             generated_frame = self.add_info_pane(generated_frame,
                                                  meltpool_dict)
 
