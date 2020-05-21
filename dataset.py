@@ -23,6 +23,8 @@ class DataSet:
         # Load thermal cam temp data
         self.temp_fname = temps_file
         self.build_folder = self.get_build_folder()
+        self.build_folder_name = self.build_folder[self.build_folder.
+                                                   rfind('/') + 1:]
         self.frame_data = np.load(self.temp_fname,
                                   mmap_mode='c',
                                   allow_pickle=True)
@@ -180,7 +182,9 @@ class DataSet:
             'x': self.meltpool_data[index][1],
             'y': self.meltpool_data[index][2],
             'z': self.meltpool_data[index][3],
-            'area': self.meltpool_data[index][4]
+            'area': self.meltpool_data[index][4],
+            'Build:': self.build_folder_name,
+            'Max Temp': str(np.amax(self.frame_data[index]))
         }
         return meltpool_data
 
