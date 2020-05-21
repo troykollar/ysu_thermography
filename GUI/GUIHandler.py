@@ -38,7 +38,8 @@ def save(self):
 
 def grab_dataset(self):
     self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
-                           self.tempData.get() + '/merged_data.npy' if self.info_pane else None,
+                           self.tempData.get() +
+                           '/merged_data.npy' if self.info_pane else None,
                            remove_top_reflection=self.remove_top.get(),
                            remove_bottom_reflection=self.remove_bot.get(),
                            scale_factor=self.scale_factor.get(),
@@ -60,13 +61,14 @@ def save_thresh_img(self):
                        self.composite_threshold.get())
 
 
-def create_plots(self, pixel: tuple):
+def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
     grab_dataset(self)
     PLOTS = Plots(temp_data=self.dataset,
                   pixel=pixel,
                   threshold=int(self.plot_TempThresh.get()),
                   start_frame=int(self.plot_StartFrame.get()),
-                  end_frame=int(self.plot_EndFrame.get()))
+                  end_frame=int(self.plot_EndFrame.get()),
+                  relativeLoc=relativeLoc)
 
     if self.grad_all.get():
         PLOTS.all()
@@ -101,5 +103,7 @@ def select_pixels(self):
     pix_sel.create_window('Select pixels for analysis', thresh_img)
 
     locations = pix_sel.location_list[2:]
-    for pixel in locations:
-        create_plots(self, pixel)
+    right_percents = pix_sel.percents_from_right[2:]
+    bot_percents = pix_sel.percents_from_bot[2:]
+    for pixel, right, bot in zip(locations, right_percents, bot_percents):
+        create_plots(self, pixel, (right * 100, bot * 100))
