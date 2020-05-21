@@ -120,6 +120,8 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
         str specifying where to save the composite image. Defaults to build folder.
     cap: optional
         int specifying the max number of frames to use for composite.
+    max: optional
+        0 or 1 specifying whether or not to generate a max temperature composite image.
     """
     desc_dict = get_description_dict()
     parser.add_argument('-threshold',
