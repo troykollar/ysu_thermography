@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from composite import increment_from_thresh
+from composite import increment_from_thresh, get_avg_temp_img
 from composite import get_threshold_img, get_max_temp_img
 from dataset import DataSet
 
