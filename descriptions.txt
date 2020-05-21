@@ -10,7 +10,7 @@ save_framerate-int specifying the framerate to save the video in using OpenCV.
 save_frame_CLarg-0 or 1 specifying whether to save a frame in 16 bit color using matplotlib. Must also use range arg to specify frame numbers.
 contour_threshold-int specifying threshold to use to find contours in dataset.
 follow_CLarg-str, 'max' or 'contour' will center the frame on the max temp or the contour center of gravity, respectively.
-follow_size-int specifying the size of the window when following max temp or contour.
+follow_size-int specifying the number of pixels in the original image (unscaled) that are captured above, below, left, and right of the focus point.
 infopane_CLarg-'mp' or 'contour' to display an info pane with relevant info above video.
 viewer_main-Play/Save a video or save frames from the given dataset.
 threshold-Minimum temperature for a pixel to be considered.
