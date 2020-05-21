@@ -48,6 +48,8 @@ class PixelSelector:
     def __init__(self):
         self.location_list = []
         self.close_window = False
+        self.percents_from_right = []
+        self.percents_from_bot = []
 
     def create_window(self, window_name: str, img: np.ndarray):
         yellow = (0, 255, 255)
@@ -79,6 +81,9 @@ class PixelSelector:
 
             self.key_handler(key)
 
+        self.percents_from_right, self.percents_from_bot = self.pixel_location_percents(
+        )
+
         cv2.destroyAllWindows()
 
     def key_handler(self, key):
@@ -96,9 +101,12 @@ class PixelSelector:
             corners.sort(key=lambda tup: tup[0])
             left_corner = corners[0]
             right_corner = corners[1]
-            percent_from_left = []
-            percent_from_left.append(0)  # 0% for left corner
-            percent_from_left.append(1)  # 100% for right corner
+            corners.sort(key=lambda tup: tup[1])
+            top_corner = corners[0]
+            bot_corner = corners[1]
+            percent_from_bot = []
+            percent_from_bot.append(0)  # 0% for left corner
+            percent_from_bot.append(1)  # 100% for right corner
 
             percent_from_right = []
             percent_from_right.append(1)  # 100% for left corner
@@ -107,12 +115,14 @@ class PixelSelector:
             for pixel in self.location_list[2:]:
                 piece_length = right_corner[0] - left_corner[
                     0]  # Total length of the piece
-                percent_from_left.append(
-                    (pixel[0] - left_corner[0]) / piece_length)
-                percent_from_right.append(
-                    (right_corner[0] - pixel[0]) / piece_length)
+                piece_height = bot_corner[1] - top_corner[
+                    1]  # Total height of the piece
+                bot_percent = (bot_corner[1] - pixel[1]) / piece_height
+                percent_from_bot.append(round(bot_percent, 2))
+                right_percent = (right_corner[0] - pixel[0]) / piece_length
+                percent_from_right.append(round(right_percent, 2))
 
-            return percent_from_left, percent_from_right
+            return percent_from_right, percent_from_bot
         else:
             pass
 
