@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from composite import increment_from_thresh
-from composite import get_threshold_img
+from composite import get_threshold_img, get_max_temp_img
 from dataset import DataSet
 
 
@@ -48,6 +48,15 @@ class TestThresholdIncrementer(unittest.TestCase):
         theoretical_threshold_img = np.array(
             ([0, 0, 5, 0, 0, 0], [5, 5, 5, 0, 5, 5]), dtype=np.float32)
         np.testing.assert_array_equal(threshold_img, theoretical_threshold_img)
+
+    def test_get_max_temp_img(self):
+        """Test that a max temp composite can be correctly generated"""
+        dataset = DataSet(temps_file='test_dataset.npy')
+
+        max_temp_img = get_max_temp_img(dataset)
+        theoretical_max_temp_img = np.array(
+            ([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]), dtype=np.float32)
+        np.testing.assert_array_equal(max_temp_img, theoretical_max_temp_img)
 
 
 def create_test_dataset():
