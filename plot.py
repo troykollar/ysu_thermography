@@ -13,7 +13,8 @@ class Plots:
                  threshold: int,
                  start_frame=0,
                  end_frame=-1,
-                 frame_count=-1):
+                 frame_count=-1,
+                 relativeLoc: tuple = None):
 
         self.grid_lines = True
         self.data = temp_data
@@ -23,6 +24,7 @@ class Plots:
         self.end_frame = end_frame
         self.frame_count = frame_count
         self.cartesianPixel = pixel
+        self.relativeLoc = relativeLoc
 
         self.frames = []
         self.x_magnitude_array = []
