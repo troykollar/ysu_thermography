@@ -1,4 +1,5 @@
 import os
+import time
 import shutil
 import argparse
 import cv2
@@ -21,6 +22,7 @@ class Viewer:
         self.cur_frame = None
         self.pause = False
         self.update_frame = True
+        self.framerate = 0
         self.contour_threshold = contour_threshold
         self.follow = follow
         self.follow_size = follow_size
@@ -61,6 +63,7 @@ class Viewer:
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
         self.cur_frame = 0
         while not self.quit:
+            render_start = time.time()
             print('\rFrame: ',
                   self.cur_frame + self.dataset.start_frame,
                   '/',
@@ -78,10 +81,13 @@ class Viewer:
                 self.update_frame = False
             key = cv2.waitKey(frame_delay) & 0xFF
             self.key_handler(key)
+            render_end = time.time()
+            self.framerate = int(1 / (render_end - render_start))
         cv2.destroyAllWindows()
         print('\n')
 
     def save_video(self, framerate: int = 60):
+        self.framerate = framerate
         # Generate the filename based on what frames are used
         filename = self.dataset.build_folder + 'video'
         if self.dataset.start_frame != 0 or self.dataset.end_frame != self.dataset.original_end_frame:
@@ -141,6 +147,7 @@ class Viewer:
             meltpool_dict = self.dataset.get_meltpool_data(self.cur_frame)
             meltpool_dict['Frame'] = str(self.cur_frame) + '/' + str(
                 self.dataset.shape[0])
+            meltpool_dict['FPS'] = str(self.framerate)
 
             generated_frame = self.add_info_pane(generated_frame,
                                                  meltpool_dict)
