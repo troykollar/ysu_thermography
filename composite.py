@@ -73,6 +73,26 @@ def save_threshold_img(filename: str,
     print('Threshold img saved as: ' + filename)
 
 
+def save_max_temp_colorbar(dataset: DataSet,
+                           img: np.ndarray,
+                           dst_folder: str = None):
+    if dst_folder is None:
+        dst_folder = dataset.build_folder
+
+    save_filename = dst_folder + '/' + dataset.build_folder_name + 'max_temp_composite.png'
+    raw_filename = dst_folder + '/' + dataset.build_folder_name + 'max_temp_composite_raw.png'
+    fig, ax = plt.subplots()
+    fig.suptitle('Build: ' + str(dataset.build_folder_name) +
+                 ' Maximum temperatures')
+    im = ax.imshow(img, cmap='inferno')
+    cbar = ax.figure.colorbar(im, ax=ax, label='Max temp of pixel')
+
+    plt.imsave(raw_filename, img, cmap='inferno')
+
+    plt.savefig(save_filename)
+    plt.close()
+
+
 def get_max_temp_img(dataset: DataSet):
     # Get frame size info
     height = dataset[0].shape[0]
@@ -81,11 +101,10 @@ def get_max_temp_img(dataset: DataSet):
     # Make blank image to update
     max_temp_img = np.zeros((height, width), dtype=np.float32)
 
-    for frame in dataset:
-        for row_num, row in enumerate(frame):
-            for col_num, temp in enumerate(row):
-                if temp > max_temp_img[row_num, col_num]:
-                    max_temp_img[row_num, col_num] = temp
+    for i, frame in enumerate(dataset):
+        printProgressBar(i, dataset.end_frame,
+                         'Creating max temp composite...')
+        max_temp_img = np.maximum(max_temp_img, frame)
 
     return max_temp_img
 
@@ -156,3 +175,4 @@ if __name__ == '__main__':
     if max_composite:
         # TODO: Made max composite also save image using matplotlib
         max_temp_composite = get_max_temp_img(data_set)
+        save_max_temp_colorbar(data_set, max_temp_composite)
