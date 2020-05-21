@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from helper_functions import printProgressBar, get_description_dict
 from dataset import DataSet, get_dataset_CLargs, validate_range_arg
 
+# TODO: Implement more complex test data
+
 
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
                           threshold: int):
@@ -109,6 +111,28 @@ def get_max_temp_img(dataset: DataSet):
     return max_temp_img
 
 
+def get_avg_temp_img(dataset: DataSet):
+    # Get frame size info
+    height = dataset[0].shape[0]
+    width = dataset[0].shape[1]
+
+    # Make blank image to update
+    avg_temp_img = np.zeros((height, width), dtype=np.float32)
+
+    num_pixels = (height + 1) * (width + 1)
+
+    cur_pix_num = 0
+    for row_num, _ in enumerate(avg_temp_img):
+        for col_num, _ in enumerate(avg_temp_img[row_num]):
+            printProgressBar(cur_pix_num, num_pixels,
+                             'Generating avg temp composite...')
+            avg_temp_img[row_num, col_num] = np.mean(dataset[:, row_num,
+                                                             col_num])
+            cur_pix_num += 1
+
+    return avg_temp_img
+
+
 def get_composite_CLargs(parser: argparse.ArgumentParser):
     """Add composite related CL arguments to given parser.
 
@@ -175,6 +199,5 @@ if __name__ == '__main__':
                            dst_folder=destination_folder)
 
     if max_composite:
-        # TODO: Made max composite also save image using matplotlib
         max_temp_composite = get_max_temp_img(data_set)
         save_max_temp_colorbar(data_set, max_temp_composite)
