@@ -118,7 +118,9 @@ class Plots:
             height=1000,
             width=1000,
             title='Pixel Temp and Gradient Magnitude and Angle for: ' +
-            str(self.cartesianPixel) + ' Threshold: ' + str(self.threshold),
+            str(self.cartesianPixel) + ' Threshold: ' + str(self.threshold) + str(self.relativeLoc[0] + '% From Right, '
+            + str(self.relativeLoc[1]) + '% From Bottom'),
+
             scene=dict(xaxis=dict(title='X: Frame'),
                        yaxis=dict(title='Y: Gradient Magnitude'),
                        zaxis=dict(title='Z: Gradient Angle')))
