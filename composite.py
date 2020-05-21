@@ -95,7 +95,7 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
 
     Added Arguments
     ---------------
-    THRESHOLD: required
+    threshold: optional
         int specifying the threshold to be used for the composite image.
     dst_folder: optional
         str specifying where to save the composite image. Defaults to build folder.
@@ -103,12 +103,19 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
         int specifying the max number of frames to use for composite.
     """
     desc_dict = get_description_dict()
-    parser.add_argument('THRESHOLD', type=int, help=desc_dict['threshold'])
+    parser.add_argument('-threshold',
+                        type=int,
+                        help=desc_dict['threshold'],
+                        default=None)
     parser.add_argument('-dst_folder',
                         type=str,
                         default=None,
                         help=desc_dict['thresh_dst_folder'])
     parser.add_argument('-cap', type=int, help=desc_dict['thresh_cap'])
+    parser.add_argument('-max',
+                        type=int,
+                        help=desc_dict['max_temp_composite_CLarg'],
+                        default=0)
 
 
 if __name__ == '__main__':
@@ -123,10 +130,12 @@ if __name__ == '__main__':
     temp_data = args.temp_data
     top = bool(args.top)
     bot = bool(args.bot)
-    composite_threshold = args.THRESHOLD
+    composite_threshold = args.threshold
 
     destination_folder = args.dst_folder
     frame_cap = args.cap
+
+    max_composite = bool(args.max)
 
     start_frame, end_frame = validate_range_arg(args.range)
 
@@ -135,10 +144,15 @@ if __name__ == '__main__':
                        remove_bottom_reflection=bot,
                        start_frame=start_frame,
                        end_frame=end_frame)
-    thresh_img = get_threshold_img(dataset=data_set,
-                                   threshold=composite_threshold,
-                                   cap=frame_cap)
-    save_threshold_img(filename=temp_data,
-                       threshold_img=thresh_img,
-                       threshold=composite_threshold,
-                       dst_folder=destination_folder)
+    if composite_threshold is not None:
+        thresh_img = get_threshold_img(dataset=data_set,
+                                       threshold=composite_threshold,
+                                       cap=frame_cap)
+        save_threshold_img(filename=temp_data,
+                           threshold_img=thresh_img,
+                           threshold=composite_threshold,
+                           dst_folder=destination_folder)
+
+    if max_composite:
+        # TODO: Made max composite also save image using matplotlib
+        max_temp_composite = get_max_temp_img(data_set)
