@@ -58,6 +58,15 @@ class TestThresholdIncrementer(unittest.TestCase):
             ([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]), dtype=np.float32)
         np.testing.assert_array_equal(max_temp_img, theoretical_max_temp_img)
 
+    def test_avg_temp_img(self):
+        """Test that an average temp composite can be correctly generated"""
+        dataset = DataSet(temps_file='test_dataset.npy')
+
+        avg_temp_img = get_avg_temp_img(dataset)
+        theoretical_avg_temp_img = np.array(
+            ([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]), dtype=np.float32)
+        np.testing.assert_array_equal(avg_temp_img, theoretical_avg_temp_img)
+
 
 def create_test_dataset():
     data_frame = np.array(([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]),
