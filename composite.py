@@ -73,6 +73,23 @@ def save_threshold_img(filename: str,
     print('Threshold img saved as: ' + filename)
 
 
+def get_max_temp_img(dataset: DataSet):
+    # Get frame size info
+    height = dataset[0].shape[0]
+    width = dataset[0].shape[1]
+
+    # Make blank image to update
+    max_temp_img = np.zeros((height, width), dtype=np.float32)
+
+    for frame in dataset:
+        for row_num, row in enumerate(frame):
+            for col_num, temp in enumerate(row):
+                if temp > max_temp_img[row_num, col_num]:
+                    max_temp_img[row_num, col_num] = temp
+
+    return max_temp_img
+
+
 def get_composite_CLargs(parser: argparse.ArgumentParser):
     """Add composite related CL arguments to given parser.
 
