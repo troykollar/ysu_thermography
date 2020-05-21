@@ -38,6 +38,7 @@ def save(self):
 
 def grab_dataset(self):
     self.dataset = DataSet(self.tempData.get() + '/thermal_cam_temps.npy',
+                           self.tempData.get() + '/merged_data.npy' if self.info_pane else None,
                            remove_top_reflection=self.remove_top.get(),
                            remove_bottom_reflection=self.remove_bot.get(),
                            scale_factor=self.scale_factor.get(),
