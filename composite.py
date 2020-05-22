@@ -40,59 +40,20 @@ def get_threshold_img(dataset: DataSet, threshold: int, cap=None):
     return threshold_img
 
 
-def save_threshold_img(filename: str,
-                       threshold_img: np.ndarray,
-                       threshold: int,
-                       dst_folder=None):
-    # Get temp data info
-    build_folder = filename[:filename.rfind('/')]
-    build_number = build_folder[:build_folder.find('_')]
-    build_number = build_number[(build_number.rfind('/') + 1):]
+def save_threshold_img(dataset: DataSet, threshold: int, cap=None):
+    img = get_threshold_img(dataset, threshold, cap)
+    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_threshold' + str(
+        threshold)
+    title = 'Build: ' + dataset.build_folder_name + ' Threshold: ' + str(
+        threshold)
+    colorbar_label = '# frames above ' + str(threshold)
+    get_fig(img, title, colorbar_label)
 
-    # If a dst folder is not entered, dst folder is the build folder
-    if dst_folder is None:
-        dst_folder = build_folder
+    plt.savefig(filename + '.png')
+    plt.imsave(filename + '_raw.png', img, cmap='inferno')
 
-    # Generate a filename based on build_number and threshold used
-    save_filename = filename = dst_folder + '/' + build_number + '_threshold' + str(
-        threshold) + '.png'
-    raw_filename = filename = dst_folder + '/' + build_number + '_threshold' + str(
-        threshold) + '_raw.png'
-
-    fig, ax = plt.subplots()
-    fig.suptitle('Build: ' + str(build_number) + ' Threshold: ' +
-                 str(threshold))
-    im = ax.imshow(threshold_img, cmap='inferno')
-    cbar = ax.figure.colorbar(im,
-                              ax=ax,
-                              label='Number of frames above ' + str(threshold))
-
-    plt.imsave(raw_filename, threshold_img, cmap='inferno')
-
-    plt.savefig(save_filename)
     plt.close()
-    print('\n')
-    print('Threshold img saved as: ' + filename)
-
-
-def save_max_temp_colorbar(dataset: DataSet,
-                           img: np.ndarray,
-                           dst_folder: str = None):
-    if dst_folder is None:
-        dst_folder = dataset.build_folder
-
-    save_filename = dst_folder + '/' + dataset.build_folder_name + 'max_temp_composite.png'
-    raw_filename = dst_folder + '/' + dataset.build_folder_name + 'max_temp_composite_raw.png'
-    fig, ax = plt.subplots()
-    fig.suptitle('Build: ' + str(dataset.build_folder_name) +
-                 ' Maximum temperatures')
-    im = ax.imshow(img, cmap='inferno')
-    cbar = ax.figure.colorbar(im, ax=ax, label='Max temp of pixel')
-
-    plt.imsave(raw_filename, img, cmap='inferno')
-
-    plt.savefig(save_filename)
-    plt.close()
+    print_success_msg(filename)
 
 
 def get_max_temp_img(dataset: DataSet):
@@ -109,6 +70,21 @@ def get_max_temp_img(dataset: DataSet):
         max_temp_img = np.maximum(max_temp_img, frame)
 
     return max_temp_img
+
+
+def save_max_temp_img(dataset: DataSet):
+    img = get_max_temp_img(dataset)
+    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_max_temps'
+    title = 'Build: ' + dataset.build_folder_name + ' Maximum temperatures'
+    colorbar_label = 'Max temp (C) '
+    get_fig(img, title, colorbar_label)
+
+    plt.savefig(filename + '.png')
+    plt.imsave(filename + '_raw.png', img, cmap='inferno')
+
+    plt.close()
+
+    print_success_msg(filename)
 
 
 def get_avg_temp_img(dataset: DataSet):
@@ -131,6 +107,32 @@ def get_avg_temp_img(dataset: DataSet):
             cur_pix_num += 1
 
     return avg_temp_img
+
+
+def save_avg_temp_img(dataset: DataSet):
+    img = get_avg_temp_img(dataset)
+    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_avg_temps'
+    title = 'Build: ' + dataset.build_folder_name + ' Average temperatures'
+    colorbar_label = 'Avg temp (C) '
+    get_fig(img, title, colorbar_label)
+
+    plt.savefig(filename + '.png')
+    plt.imsave(filename + '_raw.png', img, cmap='inferno')
+
+    plt.close()
+
+    print_success_msg(filename)
+
+
+def get_fig(img: np.ndarray, title: str, colorbar_label: str):
+    fig, ax = plt.subplots()
+    fig.suptitle(title)
+    im = ax.imshow(img, cmap='inferno')
+    _ = ax.figure.colorbar(im, ax=ax, label=colorbar_label)
+
+
+def print_success_msg(filename):
+    print('Saved to: ' + str(filename))
 
 
 def get_composite_CLargs(parser: argparse.ArgumentParser):
@@ -161,6 +163,10 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
                         type=int,
                         help=desc_dict['max_temp_composite_CLarg'],
                         default=0)
+    parser.add_argument('-avg',
+                        type=int,
+                        help=desc_dict['avg_composite_CLarg'],
+                        default=0)
 
 
 if __name__ == '__main__':
@@ -181,6 +187,7 @@ if __name__ == '__main__':
     frame_cap = args.cap
 
     max_composite = bool(args.max)
+    avg_composite = bool(args.avg)
 
     start_frame, end_frame = validate_range_arg(args.range)
 
@@ -190,14 +197,10 @@ if __name__ == '__main__':
                        start_frame=start_frame,
                        end_frame=end_frame)
     if composite_threshold is not None:
-        thresh_img = get_threshold_img(dataset=data_set,
-                                       threshold=composite_threshold,
-                                       cap=frame_cap)
-        save_threshold_img(filename=temp_data,
-                           threshold_img=thresh_img,
-                           threshold=composite_threshold,
-                           dst_folder=destination_folder)
+        save_threshold_img(data_set, composite_threshold, frame_cap)
 
     if max_composite:
-        max_temp_composite = get_max_temp_img(data_set)
-        save_max_temp_colorbar(data_set, max_temp_composite)
+        save_max_temp_img(data_set)
+
+    if avg_composite:
+        save_avg_temp_img(data_set)
