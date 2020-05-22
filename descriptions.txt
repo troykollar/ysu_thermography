@@ -22,3 +22,4 @@ plot_pixel_location-X and Y coordinates of the pixel to run analysis on.
 start_frame-The first frame of the dataset to be considered. -1 will default to the first frame of the dataset.
 end_frame-The last frame of the dataset to be considered. -1 will default to the last frame of the dataset.
 max_temp_composite_CLarg-0 or 1 specifying whether or not to generate a max temperature composite image.
+avg_composite_CLarg-0 or 1 specifying whether or not to generate an avg temperature composite image.
