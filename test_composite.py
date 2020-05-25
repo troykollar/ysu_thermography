@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from composite import increment_from_thresh, get_avg_temp_img
-from composite import get_threshold_img, get_max_temp_img
+from composite import get_threshold_img, get_max_temp_img, get_integration_img
 from dataset import DataSet
 
 
@@ -66,6 +66,16 @@ class TestThresholdIncrementer(unittest.TestCase):
         theoretical_avg_temp_img = np.array(
             ([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]), dtype=np.float32)
         np.testing.assert_array_equal(avg_temp_img, theoretical_avg_temp_img)
+
+    def test_integration_img(self):
+        """Test that a temperature integration image can be correctly generated"""
+        dataset = DataSet(temps_file='test_dataset.npy')
+
+        integration_img = get_integration_img(dataset, threshold=3)
+        theoretical_integration_img = np.array(
+            ([0, 0, 10, 0, 0, 0], [10, 10, 10, 0, 10, 10]), dtype=np.float32)
+        np.testing.assert_array_equal(integration_img,
+                                      theoretical_integration_img)
 
 
 def create_test_dataset():
