@@ -124,6 +124,40 @@ def save_avg_temp_img(dataset: DataSet):
     print_success_msg(filename)
 
 
+def get_integration_img(dataset: DataSet, threshold: int):
+    # Get frame size info
+    height = dataset[0].shape[0]
+    width = dataset[0].shape[1]
+
+    # Make blank image to update
+    integration_img = np.zeros((height, width), dtype=np.float32)
+
+    for i, frame in enumerate(dataset):
+        printProgressBar(i, dataset.end_frame - 1,
+                         'Generating integration image...')
+        integration_img = np.where(frame > threshold,
+                                   integration_img + (frame - threshold),
+                                   integration_img)
+
+    return integration_img
+
+
+def save_integration_img(dataset: DataSet, threshold: int):
+    img = get_integration_img(dataset, threshold)
+    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_threshold' + str(
+        threshold) + '_integration'
+    title = 'Build: ' + dataset.build_folder_name + ' total degrees above threshold per pixel.'
+    colorbar_label = 'Degrees above threshold (C) '
+    get_fig(img, title, colorbar_label)
+
+    plt.savefig(filename + '.png')
+    plt.imsave(filename + '_raw.png', img, cmap='inferno')
+
+    plt.close()
+
+    print_success_msg(filename)
+
+
 def get_fig(img: np.ndarray, title: str, colorbar_label: str):
     fig, ax = plt.subplots()
     fig.suptitle(title)
@@ -148,6 +182,10 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
         int specifying the max number of frames to use for composite.
     max: optional
         0 or 1 specifying whether or not to generate a max temperature composite image.
+    avg: optional
+        0 or 1 specifying whether or not to generate an average temperature composite image.
+    int: optional
+        int specifying threshold to be used to generate a temperature integration composite image.
     """
     desc_dict = get_description_dict()
     parser.add_argument('-threshold',
@@ -167,6 +205,10 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
                         type=int,
                         help=desc_dict['avg_composite_CLarg'],
                         default=0)
+    parser.add_argument('-int',
+                        type=int,
+                        help=desc_dict['int_composite'],
+                        default=None)
 
 
 if __name__ == '__main__':
@@ -188,6 +230,7 @@ if __name__ == '__main__':
 
     max_composite = bool(args.max)
     avg_composite = bool(args.avg)
+    int_composite = int(args.int)
 
     start_frame, end_frame = validate_range_arg(args.range)
 
@@ -204,3 +247,6 @@ if __name__ == '__main__':
 
     if avg_composite:
         save_avg_temp_img(data_set)
+
+    if int_composite is not None:
+        save_integration_img(data_set, int_composite)
