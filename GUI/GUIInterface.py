@@ -10,6 +10,7 @@ from helper_functions import get_description_dict
 
 class GUI:
     def __init__(self):
+        self.WINDOWBACKGROUND = consts.WINDOWBACKGROUND
         self.ACTIVEBACKGROUND = consts.ACTIVEBACKGROUND
         self.ACTIVEBUTTONBACKGROUND = consts.ACTIVEBUTTONBACKGROUND
         self.ACTIVEFIELDBACKGROUND = consts.ACTIVEFIELDBACKGROUND
@@ -23,7 +24,7 @@ class GUI:
 
         self.root = Tk()
         self.root.title("YSU Thermography")
-        self.root['bg'] = self.ACTIVEBACKGROUND
+        self.root['bg'] = self.WINDOWBACKGROUND
         # root.iconbitmap("images/YSU_Logo")
 
         # Get description dictionary
@@ -94,8 +95,13 @@ class GUI:
         self.grad_all = BooleanVar()
 
         # Creating Frame Sections
-        self.filePanel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
-        self.filePanel.pack(side=TOP, fill=BOTH, pady=10)
+        self.filePanelCanvas = Canvas(self.root, bg=self.INACTIVEBACKGROUND)
+        self.filePanelCanvas.pack(side=TOP, fill=BOTH, pady=10, padx=10)
+        func.rounded_rect(self.filePanelCanvas, 20, 20, 60, 40, 10)
+        self.filePanel = Frame(self.filePanelCanvas, bg=self.INACTIVEBACKGROUND)
+        self.filePanel.pack(side=TOP, fill=BOTH, pady=10, padx=10)
+        self.filePanelCanvas.create_window(0, 0, window=self.filePanel)
+
 
         self.dataset_panel = Frame(self.root, bg=self.ACTIVEBACKGROUND)
         self.dataset_panel.pack(side=TOP, fill=BOTH, pady=10)

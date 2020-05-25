@@ -11,6 +11,7 @@ class MainPalette(QPalette):
         self.setColor(QPalette.Base, QColor(const.BASE))
         self.setColor(QPalette.Button, QColor(const.BUTTON))
         self.setColor(QPalette.ButtonText, QColor(const.BUTTONTEXT))
+        self.setColor(QPalette.AlternateBase, QColor(const.ALTERNATEBASE))
 
 class TabPalette(QPalette):
     def __init__(self):
