@@ -40,7 +40,7 @@ class Composite(ABC):
         pass
 
 
-class Threshold(Composite):
+class ThresholdImg(Composite):
     def __init__(self, dataset: DataSet, threshold: int):
         super().__init__(dataset)
         self.threshold = threshold
@@ -88,8 +88,47 @@ class MaxImg(Composite):
         return max_temp_img
 
 
-class Integration(Composite):
-    pass
+class AvgImg(Composite):
+    def __init__(self, dataset: DataSet):
+        super().__init__(dataset)
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Average Temperatures'
+        self.colorbar_label = 'Temperature (C)'
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_avg_temps'
+
+    def get_img(self):
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
+
+        # Make blank image to update
+        avg_temp_img = np.zeros((height, width), dtype=np.float32)
+
+        num_pixels = (height + 1) * (width + 1)
+
+        cur_pix_num = 0
+        for row_num, _ in enumerate(avg_temp_img):
+            for col_num, _ in enumerate(avg_temp_img[row_num]):
+                printProgressBar(cur_pix_num, num_pixels,
+                                 'Generating avg temp composite...')
+                avg_temp_img[row_num,
+                             col_num] = np.mean(self.dataset[:, row_num,
+                                                             col_num])
+                cur_pix_num += 1
+
+        return avg_temp_img
+
+
+class IntegrationImg(Composite):
+    def __init__(self, dataset: DataSet, threshold: int):
+        super().__init__(dataset)
+        self.threshold = threshold
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
+            self.threshold)
+        self.colorbar_label = 'total degrees above ' + str(self.threshold)
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_integration' + str(
+            self.threshold)
+
+    def get_img(self):
+        pass
 
 
 """ Deprecated threshold image functions
@@ -217,10 +256,6 @@ def get_fig(img: np.ndarray, title: str, colorbar_label: str):
     fig.suptitle(title)
     im = ax.imshow(img, cmap='inferno')
     _ = ax.figure.colorbar(im, ax=ax, label=colorbar_label)
-
-
-def print_success_msg(filename):
-    print('Saved to: ' + str(filename))
 
 
 def get_composite_CLargs(parser: argparse.ArgumentParser):
