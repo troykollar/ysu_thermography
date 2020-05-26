@@ -35,7 +35,7 @@ class TestThresholdIncrementer(unittest.TestCase):
         np.testing.assert_array_equal(avg_img, theoretical_avg_img)
 
     def test_integration_img(self):
-        int_img = IntegrationImg(self.simple_dataset).img
+        int_img = IntegrationImg(self.simple_dataset, 3).img
         theoretical_integration_img = np.array(
             ([0, 0, 10, 0, 0, 0], [10, 10, 10, 0, 10, 10]), dtype=np.float32)
 
