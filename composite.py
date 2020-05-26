@@ -142,6 +142,27 @@ class IntegrationImg(Composite):
         return integration_img
 
 
+class HotspotImg(Composite):
+    def __init__(self, dataset: DataSet):
+        super().__init__(dataset)
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Hotspots'
+        self.colorbar_label = 'Temperatue (C)'
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_hotspot'
+
+    def get_img(self):
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
+
+        # Make blank image to update
+        hotspot_img = np.zeros((height, width), dtype=np.float32)
+
+        for i, frame in enumerate(self.dataset):
+            max_temp = np.amax(frame)
+            hotspot_img = np.where(frame == max_temp, max_temp, hotspot_img)
+
+        return hotspot_img
+
+
 def get_composite_CLargs(parser: argparse.ArgumentParser):
     """Add composite related CL arguments to given parser.
 
@@ -159,6 +180,8 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
         0 or 1 specifying whether or not to generate an average temperature composite image.
     int: optional
         int specifying threshold to be used to generate a temperature integration composite image.
+    hotspot: optional
+        0 or 1 specifying whether or not to generate a hotspot composite image.
     """
     desc_dict = get_description_dict()
     parser.add_argument('-threshold',
@@ -181,6 +204,10 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
     parser.add_argument('-int',
                         type=int,
                         help=desc_dict['int_composite'],
+                        default=None)
+    parser.add_argument('-hotspot',
+                        type=int,
+                        help=desc_dict['hotspot_CLarg'],
                         default=None)
 
 
@@ -205,7 +232,8 @@ if __name__ == '__main__':
 
     max_composite = bool(args.max)
     avg_composite = bool(args.avg)
-    int_composite = int(args.int)
+    int_composite = args.int
+    hotspot_composite = bool(args.hotspot)
 
     start_frame, end_frame = validate_range_arg(args.range)
 
@@ -226,3 +254,6 @@ if __name__ == '__main__':
 
     if integration_threshold is not None:
         IntegrationImg(data_set, integration_threshold).save_img()
+
+    if hotspot_composite:
+        HotspotImg(data_set).save_img()
