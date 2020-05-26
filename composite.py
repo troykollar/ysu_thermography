@@ -1,172 +1,145 @@
 """Functions to generate composite images and videos for thermal data analysis"""
+from abc import ABC, abstractmethod
 import argparse
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from helper_functions import printProgressBar, get_description_dict
 from dataset import DataSet, get_dataset_CLargs, validate_range_arg
 
-# TODO: Implement more complex test data
+
+class Composite(ABC):
+    def __init__(self, dataset: DataSet):
+        self.dataset = dataset
+        self._img = None
+        self.plot_title = None
+        self.colorbar_label = None
+        self.filename = None
+
+    @property
+    def img(self):
+        if self._img is None:
+            self._img = self.get_img()
+        return self._img
+
+    def save_img(self):
+        fig, ax = plt.subplots()
+        fig.suptitle(self.plot_title)
+        im = ax.imshow(self.img, cmap='inferno')
+        _ = ax.figure.colorbar(im, ax=ax, label=self.colorbar_label)
+
+        plt.savefig(self.filename + '.png')
+        plt.imsave(self.filename + '_raw.png', self.img, cmap='inferno')
+
+        plt.close()
+        print('Saved to: ' + str(self.filename))
+
+    @abstractmethod
+    def get_img(self):
+        pass
 
 
-def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
-                          threshold: int):
-    over_thresh_array = cv2.threshold(data_frame, threshold, 1,
-                                      cv2.THRESH_BINARY)
-    over_thresh_array = over_thresh_array[1]
-    img += over_thresh_array
+class ThresholdImg(Composite):
+    def __init__(self, dataset: DataSet, threshold: int):
+        super().__init__(dataset)
+        self.threshold = threshold
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
+            self.threshold)
+        self.colorbar_label = '# frames above ' + str(self.threshold)
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_threshold' + str(
+            self.threshold)
+
+    def get_img(self):
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
+
+        # Make blank image to increment
+        img = np.zeros((height, width), dtype=np.float32)
+
+        for i, frame in enumerate(self.dataset):
+            printProgressBar(i - self.dataset.start_frame,
+                             self.dataset.end_frame - self.dataset.start_frame,
+                             "Generating threshold image...")
+            img = np.where(frame > self.threshold, img + 1, img)
+
+        return img
 
 
-def get_threshold_img(dataset: DataSet, threshold: int, cap=None):
-    # Get frame size info
-    height = dataset[0].shape[0]
-    width = dataset[0].shape[1]
+class MaxImg(Composite):
+    def __init__(self, dataset: DataSet):
+        super().__init__(dataset)
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Maximum Temperatures'
+        self.colorbar_label = 'Temperature (C)'
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_max_temps'
 
-    # Make blank image to increment
-    threshold_img = np.zeros((height, width), dtype=np.float32)
+    def get_img(self):
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
 
-    for i, frame in enumerate(dataset):
-        printProgressBar(i - dataset.start_frame,
-                         dataset.end_frame - dataset.start_frame,
-                         "Generating threshold image...")
-        frame = dataset[i]
-        increment_from_thresh(threshold_img, frame, threshold)
+        # Make blank image to update
+        max_temp_img = np.zeros((height, width), dtype=np.float32)
 
-    if cap is not None:
-        over_cap = np.where(threshold_img > cap)
-        for y, x in zip(over_cap[0], over_cap[1]):
-            threshold_img[y, x] = cap
+        for i, frame in enumerate(self.dataset):
+            printProgressBar(i, self.dataset.end_frame,
+                             'Creating max temp composite...')
+            max_temp_img = np.maximum(max_temp_img, frame)
 
-    return threshold_img
-
-
-def save_threshold_img(dataset: DataSet, threshold: int, cap=None):
-    img = get_threshold_img(dataset, threshold, cap)
-    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_threshold' + str(
-        threshold)
-    title = 'Build: ' + dataset.build_folder_name + ' Threshold: ' + str(
-        threshold)
-    colorbar_label = '# frames above ' + str(threshold)
-    get_fig(img, title, colorbar_label)
-
-    plt.savefig(filename + '.png')
-    plt.imsave(filename + '_raw.png', img, cmap='inferno')
-
-    plt.close()
-    print_success_msg(filename)
+        return max_temp_img
 
 
-def get_max_temp_img(dataset: DataSet):
-    # Get frame size info
-    height = dataset[0].shape[0]
-    width = dataset[0].shape[1]
+class AvgImg(Composite):
+    def __init__(self, dataset: DataSet):
+        super().__init__(dataset)
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Average Temperatures'
+        self.colorbar_label = 'Temperature (C)'
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_avg_temps'
 
-    # Make blank image to update
-    max_temp_img = np.zeros((height, width), dtype=np.float32)
+    def get_img(self):
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
 
-    for i, frame in enumerate(dataset):
-        printProgressBar(i, dataset.end_frame,
-                         'Creating max temp composite...')
-        max_temp_img = np.maximum(max_temp_img, frame)
+        # Make blank image to update
+        avg_temp_img = np.zeros((height, width), dtype=np.float32)
 
-    return max_temp_img
+        num_pixels = (height + 1) * (width + 1)
 
-
-def save_max_temp_img(dataset: DataSet):
-    img = get_max_temp_img(dataset)
-    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_max_temps'
-    title = 'Build: ' + dataset.build_folder_name + ' Maximum temperatures'
-    colorbar_label = 'Max temp (C) '
-    get_fig(img, title, colorbar_label)
-
-    plt.savefig(filename + '.png')
-    plt.imsave(filename + '_raw.png', img, cmap='inferno')
-
-    plt.close()
-
-    print_success_msg(filename)
-
-
-def get_avg_temp_img(dataset: DataSet):
-    # Get frame size info
-    height = dataset[0].shape[0]
-    width = dataset[0].shape[1]
-
-    # Make blank image to update
-    avg_temp_img = np.zeros((height, width), dtype=np.float32)
-
-    num_pixels = (height + 1) * (width + 1)
-
-    cur_pix_num = 0
-    for row_num, _ in enumerate(avg_temp_img):
-        for col_num, _ in enumerate(avg_temp_img[row_num]):
-            printProgressBar(cur_pix_num, num_pixels,
-                             'Generating avg temp composite...')
-            avg_temp_img[row_num, col_num] = np.mean(dataset[:, row_num,
+        cur_pix_num = 0
+        for row_num, _ in enumerate(avg_temp_img):
+            for col_num, _ in enumerate(avg_temp_img[row_num]):
+                printProgressBar(cur_pix_num, num_pixels,
+                                 'Generating avg temp composite...')
+                avg_temp_img[row_num,
+                             col_num] = np.mean(self.dataset[:, row_num,
                                                              col_num])
-            cur_pix_num += 1
+                cur_pix_num += 1
 
-    return avg_temp_img
-
-
-def save_avg_temp_img(dataset: DataSet):
-    img = get_avg_temp_img(dataset)
-    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_avg_temps'
-    title = 'Build: ' + dataset.build_folder_name + ' Average temperatures'
-    colorbar_label = 'Avg temp (C) '
-    get_fig(img, title, colorbar_label)
-
-    plt.savefig(filename + '.png')
-    plt.imsave(filename + '_raw.png', img, cmap='inferno')
-
-    plt.close()
-
-    print_success_msg(filename)
+        return avg_temp_img
 
 
-def get_integration_img(dataset: DataSet, threshold: int):
-    # Get frame size info
-    height = dataset[0].shape[0]
-    width = dataset[0].shape[1]
+class IntegrationImg(Composite):
+    def __init__(self, dataset: DataSet, threshold: int):
+        super().__init__(dataset)
+        self.threshold = threshold
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
+            self.threshold)
+        self.colorbar_label = 'Total degrees above ' + str(self.threshold)
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_integration' + str(
+            self.threshold)
 
-    # Make blank image to update
-    integration_img = np.zeros((height, width), dtype=np.float32)
+    def get_img(self):
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
 
-    for i, frame in enumerate(dataset):
-        printProgressBar(i, dataset.end_frame - 1,
-                         'Generating integration image...')
-        integration_img = np.where(frame > threshold,
-                                   integration_img + (frame - threshold),
-                                   integration_img)
+        # Make blank image to update
+        integration_img = np.zeros((height, width), dtype=np.float32)
 
-    return integration_img
+        for i, frame in enumerate(self.dataset):
+            printProgressBar(i, self.dataset.end_frame - 1,
+                             'Generating integration image...')
+            integration_img = np.where(
+                frame > self.threshold,
+                integration_img + (frame - self.threshold), integration_img)
 
-
-def save_integration_img(dataset: DataSet, threshold: int):
-    img = get_integration_img(dataset, threshold)
-    filename = dataset.build_folder + '/' + dataset.build_folder_name + '_threshold' + str(
-        threshold) + '_integration'
-    title = 'Build: ' + dataset.build_folder_name + ' total degrees above threshold per pixel.'
-    colorbar_label = 'Degrees above threshold (C) '
-    get_fig(img, title, colorbar_label)
-
-    plt.savefig(filename + '.png')
-    plt.imsave(filename + '_raw.png', img, cmap='inferno')
-
-    plt.close()
-
-    print_success_msg(filename)
-
-
-def get_fig(img: np.ndarray, title: str, colorbar_label: str):
-    fig, ax = plt.subplots()
-    fig.suptitle(title)
-    im = ax.imshow(img, cmap='inferno')
-    _ = ax.figure.colorbar(im, ax=ax, label=colorbar_label)
-
-
-def print_success_msg(filename):
-    print('Saved to: ' + str(filename))
+        return integration_img
 
 
 def get_composite_CLargs(parser: argparse.ArgumentParser):
@@ -223,7 +196,9 @@ if __name__ == '__main__':
     temp_data = args.temp_data
     top = bool(args.top)
     bot = bool(args.bot)
+
     composite_threshold = args.threshold
+    integration_threshold = args.int
 
     destination_folder = args.dst_folder
     frame_cap = args.cap
@@ -239,14 +214,15 @@ if __name__ == '__main__':
                        remove_bottom_reflection=bot,
                        start_frame=start_frame,
                        end_frame=end_frame)
+
     if composite_threshold is not None:
-        save_threshold_img(data_set, composite_threshold, frame_cap)
+        ThresholdImg(data_set, composite_threshold).save_img()
 
     if max_composite:
-        save_max_temp_img(data_set)
+        MaxImg(data_set).save_img()
 
     if avg_composite:
-        save_avg_temp_img(data_set)
+        AvgImg(data_set).save_img()
 
-    if int_composite is not None:
-        save_integration_img(data_set, int_composite)
+    if integration_threshold is not None:
+        IntegrationImg(data_set, integration_threshold).save_img()
