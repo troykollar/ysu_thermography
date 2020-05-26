@@ -3,11 +3,18 @@ import numpy as np
 from composite import increment_from_thresh, get_avg_temp_img
 from composite import get_threshold_img, get_max_temp_img
 from dataset import DataSet
+from composite import Threshold, MaxImg
 
 # TODO: Implement more complex test data
 
 
 class TestThresholdIncrementer(unittest.TestCase):
+    def setUp(self):
+        self.simple_dataset = DataSet('test_dataset.npy')
+
+    def tearDown(self):
+        pass
+
     def test_zero_img_creation(self):
         """Test that a zero image is created properly"""
         dataset = DataSet('test_dataset.npy')
@@ -68,6 +75,31 @@ class TestThresholdIncrementer(unittest.TestCase):
         theoretical_avg_temp_img = np.array(
             ([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]), dtype=np.float32)
         np.testing.assert_array_equal(avg_temp_img, theoretical_avg_temp_img)
+
+    def test_threshold_img(self):
+        threshold = Threshold(self.simple_dataset, 3)
+        theoretical_threshold_img = np.array(
+            ([0, 0, 5, 0, 0, 0], [5, 5, 5, 0, 5, 5]), dtype=np.float32)
+
+        np.testing.assert_array_equal(threshold.img, theoretical_threshold_img)
+
+    def test_max_img(self):
+        max_img = MaxImg(self.simple_dataset).img
+        theoretical_max_img = np.array(
+            ([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]), dtype=np.float32)
+
+        np.testing.assert_array_equal(max_img, theoretical_max_img)
+
+    def test_avg_img(self):
+        avg_img = AvgImg(self.simple_dataset).img
+        theoretical_avg_img = np.array(
+            ([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]), dtype=np.float32)
+
+        np.testing.assert_array_equal(avg_img, theoretical_avg_img)
+
+    def test_integration_img(self):
+        int_img = IntImg(self.simple_dataset).img
+        theoretical_int_img
 
 
 def create_test_dataset():
