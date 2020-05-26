@@ -1,5 +1,6 @@
 """Functions to generate composite images and videos for thermal data analysis"""
 from abc import ABC, abstractmethod
+import time
 import argparse
 import cv2
 import numpy as np
@@ -14,12 +15,25 @@ class Composite(ABC):
         self._img = None
         self.plot_title = None
         self.colorbar_label = None
+        self.filename = None
 
     @property
     def img(self):
-        if self._img == None:
+        if self._img is None:
             self._img = self.get_img()
         return self._img
+
+    def save_img(self):
+        fig, ax = plt.subplots()
+        fig.suptitle(self.plot_title)
+        im = ax.imshow(self.img, cmap='inferno')
+        _ = ax.figure.colorbar(im, ax=ax, label=self.colorbar_label)
+
+        plt.savefig(self.filename + '.png')
+        plt.imsave(self.filename + '_raw.png', self.img, cmap='inferno')
+
+        plt.close()
+        print('Saved to: ' + str(self.filename))
 
     @abstractmethod
     def get_img(self):
@@ -28,16 +42,57 @@ class Composite(ABC):
 
 class Threshold(Composite):
     def __init__(self, dataset: DataSet, threshold: int):
-        super().__init__(self, dataset)
+        super().__init__(dataset)
         self.threshold = threshold
         self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
             self.threshold)
         self.colorbar_label = '# frames above ' + str(self.threshold)
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_threshold' + str(
+            self.threshold)
 
     def get_img(self):
-        pass
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
+
+        # Make blank image to increment
+        img = np.zeros((height, width), dtype=np.float32)
+
+        for i, frame in enumerate(self.dataset):
+            printProgressBar(i - self.dataset.start_frame,
+                             self.dataset.end_frame - self.dataset.start_frame,
+                             "Generating threshold image...")
+            img = np.where(frame > self.threshold, img + 1, img)
+
+        return img
 
 
+class MaxImg(Composite):
+    def __init__(self, dataset: DataSet):
+        super().__init__(dataset)
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Maximum Temperatures'
+        self.colorbar_label = 'Temperature (C)'
+        self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_max_temps'
+
+    def get_img(self):
+        # Get frame size info
+        height, width = self.dataset[0].shape[0], self.dataset[0].shape[1]
+
+        # Make blank image to update
+        max_temp_img = np.zeros((height, width), dtype=np.float32)
+
+        for i, frame in enumerate(self.dataset):
+            printProgressBar(i, self.dataset.end_frame,
+                             'Creating max temp composite...')
+            max_temp_img = np.maximum(max_temp_img, frame)
+
+        return max_temp_img
+
+
+class Integration(Composite):
+    pass
+
+
+""" Deprecated threshold image functions
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
                           threshold: int):
     over_thresh_array = cv2.threshold(data_frame, threshold, 1,
@@ -47,6 +102,7 @@ def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
 
 
 def get_threshold_img(dataset: DataSet, threshold: int, cap=None):
+    start_time = time.time()
     # Get frame size info
     height = dataset[0].shape[0]
     width = dataset[0].shape[1]
@@ -66,6 +122,8 @@ def get_threshold_img(dataset: DataSet, threshold: int, cap=None):
         for y, x in zip(over_cap[0], over_cap[1]):
             threshold_img[y, x] = cap
 
+    end_time = time.time()
+    print('Og Run time:', end_time - start_time)
     return threshold_img
 
 
@@ -83,6 +141,7 @@ def save_threshold_img(dataset: DataSet, threshold: int, cap=None):
 
     plt.close()
     print_success_msg(filename)
+"""
 
 
 def get_max_temp_img(dataset: DataSet):
@@ -226,7 +285,8 @@ if __name__ == '__main__':
                        start_frame=start_frame,
                        end_frame=end_frame)
     if composite_threshold is not None:
-        save_threshold_img(data_set, composite_threshold, frame_cap)
+        #save_threshold_img(data_set, composite_threshold, frame_cap)
+        Threshold(data_set, composite_threshold).save_img()
 
     if max_composite:
         save_max_temp_img(data_set)
