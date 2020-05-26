@@ -4,6 +4,8 @@ from composite import increment_from_thresh, get_avg_temp_img
 from composite import get_threshold_img, get_max_temp_img
 from dataset import DataSet
 
+# TODO: Implement more complex test data
+
 
 class TestThresholdIncrementer(unittest.TestCase):
     def test_zero_img_creation(self):

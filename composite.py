@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from helper_functions import printProgressBar, get_description_dict
 from dataset import DataSet, get_dataset_CLargs, validate_range_arg
 
-# TODO: Implement more complex test data
 
 
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
