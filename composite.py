@@ -155,6 +155,10 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
         int specifying the max number of frames to use for composite.
     max: optional
         0 or 1 specifying whether or not to generate a max temperature composite image.
+    avg: optional
+        0 or 1 specifying whether or not to generate an average temperature composite image.
+    int: optional
+        int specifying threshold to be used to generate a temperature integration composite image.
     """
     desc_dict = get_description_dict()
     parser.add_argument('-threshold',
@@ -174,6 +178,10 @@ def get_composite_CLargs(parser: argparse.ArgumentParser):
                         type=int,
                         help=desc_dict['avg_composite_CLarg'],
                         default=0)
+    parser.add_argument('-int',
+                        type=int,
+                        help=desc_dict['int_composite'],
+                        default=None)
 
 
 if __name__ == '__main__':
@@ -188,7 +196,9 @@ if __name__ == '__main__':
     temp_data = args.temp_data
     top = bool(args.top)
     bot = bool(args.bot)
+
     composite_threshold = args.threshold
+    integration_threshold = args.int
 
     destination_folder = args.dst_folder
     frame_cap = args.cap
@@ -203,8 +213,8 @@ if __name__ == '__main__':
                        remove_bottom_reflection=bot,
                        start_frame=start_frame,
                        end_frame=end_frame)
+
     if composite_threshold is not None:
-        #save_threshold_img(data_set, composite_threshold, frame_cap)
         ThresholdImg(data_set, composite_threshold).save_img()
 
     if max_composite:
@@ -212,3 +222,6 @@ if __name__ == '__main__':
 
     if avg_composite:
         AvgImg(data_set).save_img()
+
+    if integration_threshold is not None:
+        IntegrationImg(data_set, integration_threshold).save_img()
