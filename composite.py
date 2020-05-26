@@ -1,4 +1,5 @@
 """Functions to generate composite images and videos for thermal data analysis"""
+from abc import ABC, abstractmethod
 import argparse
 import cv2
 import numpy as np
@@ -6,6 +7,35 @@ import matplotlib.pyplot as plt
 from helper_functions import printProgressBar, get_description_dict
 from dataset import DataSet, get_dataset_CLargs, validate_range_arg
 
+
+class Composite(ABC):
+    def __init__(self, dataset: DataSet):
+        self.dataset = dataset
+        self._img = None
+        self.plot_title = None
+        self.colorbar_label = None
+
+    @property
+    def img(self):
+        if self._img == None:
+            self._img = self.get_img()
+        return self._img
+
+    @abstractmethod
+    def get_img(self):
+        pass
+
+
+class Threshold(Composite):
+    def __init__(self, dataset: DataSet, threshold: int):
+        super().__init__(self, dataset)
+        self.threshold = threshold
+        self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
+            self.threshold)
+        self.colorbar_label = '# frames above ' + str(self.threshold)
+
+    def get_img(self):
+        pass
 
 
 def increment_from_thresh(img: np.ndarray, data_frame: np.ndarray,
