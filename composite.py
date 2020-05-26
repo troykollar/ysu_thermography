@@ -208,7 +208,7 @@ if __name__ == '__main__':
         ThresholdImg(data_set, composite_threshold).save_img()
 
     if max_composite:
-        save_max_temp_img(data_set)
+        MaxImg(data_set).save_img()
 
     if avg_composite:
-        save_avg_temp_img(data_set)
+        AvgImg(data_set).save_img()
