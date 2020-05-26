@@ -157,6 +157,8 @@ class HotspotImg(Composite):
         hotspot_img = np.zeros((height, width), dtype=np.float32)
 
         for i, frame in enumerate(self.dataset):
+            printProgressBar(i, self.dataset.end_frame - 1,
+                             'Generating hotspot image...')
             max_temp = np.amax(frame)
             hotspot_img = np.where(frame == max_temp, max_temp, hotspot_img)
 
