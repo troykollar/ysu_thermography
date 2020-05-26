@@ -24,3 +24,4 @@ end_frame-The last frame of the dataset to be considered. -1 will default to the
 max_temp_composite_CLarg-0 or 1 specifying whether or not to generate a max temperature composite image.
 avg_composite_CLarg-0 or 1 specifying whether or not to generate an avg temperature composite image.
 int_composite-int specifying threshold to be used to generate a temperature integration composite image.
+hotspot_CLarg-0 or 1 specifying whether or not to generate a hotspot composite image.
