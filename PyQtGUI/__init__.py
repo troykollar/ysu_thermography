@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPalette, QColor
 
 from PyQtGUI.file_path import FileFrame
 from PyQtGUI.helper_functions import FileBrowser, createCheckButton, createEntry, createRadioGroup, play, save, \
-    saveFrames, genThresh
+    saveFrames, genThresh, createRangeEntry, selectPixels, createPlots
 from PyQtGUI.palette import MainPalette
 
 
@@ -28,6 +28,12 @@ class MainWindow(QMainWindow):
 
         self.comp_temp_thresh = "CompTempThresh"
 
+        self.pixelx = "pixelx"
+        self.pixely = "pixely"
+
+        self.start_frame_plot = "PlotFrameStart"
+        self.end_frame_plot = "PlotFrameEnd"
+
         self.setWindowTitle('YSU Thermography')
 
         layout = QVBoxLayout()
@@ -36,11 +42,13 @@ class MainWindow(QMainWindow):
         DataSetOptionsFrame = self.buildDataSetFrame()
         viewerOptionsFrame = self.buildViewerOptions()
         compositeOptions = self.buildCompositeOptions()
+        plotOptions = self.buildPlotOptions()
 
         layout.addLayout(FileFrame)
         layout.addWidget(DataSetOptionsFrame)
         layout.addWidget(viewerOptionsFrame)
         layout.addWidget(compositeOptions)
+        layout.addWidget(plotOptions)
 
         widget = QWidget()
         widget.setLayout(layout)
@@ -116,13 +124,13 @@ class MainWindow(QMainWindow):
         layout.addLayout(contour_thresh)
 
         frame_focus = createRadioGroup("Frame Focus", ['Contour', 'Max Temp', 'None'])
-        layout.addWidget(frame_focus)
+        layout.addWidget(frame_focus, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         focused_frame_size = createEntry("Focused Frame Size", self.focused_frame_size, 20)
         layout.addLayout(focused_frame_size)
 
         info_pane = createRadioGroup("Info Pane", ['Contour', 'Meltpool', 'None'])
-        layout.addWidget(info_pane)
+        layout.addWidget(info_pane, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         frame_delay = createEntry("Frame Delay (For Play)", self.frame_delay, 1)
         layout.addLayout(frame_delay)
@@ -138,7 +146,7 @@ class MainWindow(QMainWindow):
         PlayVid.setFlat(True)
         PlayVid.animateClick(2)
         PlayVid.clicked.connect(play)
-        buttonLayout.addWidget(PlayVid)
+        buttonLayout.addWidget(PlayVid, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         SaveVid = QPushButton()
         SaveVid.setText('Save Build')
@@ -146,7 +154,7 @@ class MainWindow(QMainWindow):
         SaveVid.setFlat(True)
         SaveVid.animateClick(2)
         SaveVid.clicked.connect(save)
-        buttonLayout.addWidget(SaveVid)
+        buttonLayout.addWidget(SaveVid, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         SaveFrames = QPushButton()
         SaveFrames.setText('Save Frames')
@@ -154,7 +162,7 @@ class MainWindow(QMainWindow):
         SaveFrames.setFlat(True)
         SaveFrames.animateClick(2)
         SaveFrames.clicked.connect(saveFrames)
-        buttonLayout.addWidget(SaveFrames)
+        buttonLayout.addWidget(SaveFrames, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         layout.addLayout(buttonLayout)
 
@@ -182,6 +190,32 @@ class MainWindow(QMainWindow):
         gen_thresh.animateClick(2)
         gen_thresh.clicked.connect(genThresh)
         layout.addWidget(gen_thresh)
+
+        frame.setLayout(layout)
+
+        return frame
+
+    def buildPlotOptions(self):
+        frame = QGroupBox()
+        frame.setAlignment(Qt.AlignCenter)
+        frame.setTitle("Plot Options")
+        frame.setToolTip("Panel to Select Plot Options")
+        frame.autoFillBackground()
+        frame.setBackgroundRole(QPalette.AlternateBase)
+
+        layout = QHBoxLayout()
+
+        temp_thresh = createEntry("Temperature Threshold", self.comp_temp_thresh, 200)
+        layout.addLayout(temp_thresh)
+
+        entries = createRangeEntry('Pixel Location', [self.pixelx, self.pixely], ['',''], 'Select Pixels', selectPixels)
+
+        layout.addLayout(entries)
+
+        framerange = createRangeEntry('Frame Range', [self.start_frame_plot, self.end_frame_plot], [str(0), str(-1)],
+                                      'Create Plots', createPlots)
+
+        layout.addLayout(framerange)
 
         frame.setLayout(layout)
 
