@@ -41,16 +41,6 @@ class TestThresholdIncrementer(unittest.TestCase):
 
         np.testing.assert_array_equal(int_img, theoretical_integration_img)
 
-    def test_integration_img(self):
-        """Test that a temperature integration image can be correctly generated"""
-        dataset = DataSet(temps_file='test_dataset.npy')
-
-        integration_img = get_integration_img(dataset, threshold=3)
-        theoretical_integration_img = np.array(
-            ([0, 0, 10, 0, 0, 0], [10, 10, 10, 0, 10, 10]), dtype=np.float32)
-        np.testing.assert_array_equal(integration_img,
-                                      theoretical_integration_img)
-
 
 def create_test_dataset():
     data_frame = np.array(([1, 1, 5, 1, 1, 1], [5, 5, 5, 1, 5, 5]),
