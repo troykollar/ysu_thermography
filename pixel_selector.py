@@ -5,6 +5,8 @@ from composite import get_threshold_img, save_threshold_img, get_composite_CLarg
 from dataset import DataSet, get_dataset_CLargs
 from plot import Plots
 
+#TODO: Update to work with plot changes
+
 
 def on_click(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
