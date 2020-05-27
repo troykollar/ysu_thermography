@@ -47,9 +47,7 @@ def createCheckButton(text, name):
     label.setText(text)
     layout.addWidget(label, alignment=Qt.AlignCenter | Qt.AlignTop)
 
-    checkbutton = QCheckBox()
-    checkbutton.setObjectName(name)
-    layout.addWidget(checkbutton, alignment=Qt.AlignCenter | Qt.AlignTop)
+    layout.addWidget(name, alignment=Qt.AlignCenter | Qt.AlignTop)
 
     return layout
 
@@ -61,11 +59,9 @@ def createEntry(text, name, default, size=3):
     label.setText(text)
     layout.addWidget(label, alignment=Qt.AlignCenter | Qt.AlignTop)
 
-    Entry = QLineEdit()
-    Entry.setObjectName(name)
-    Entry.setAlignment(Qt.AlignCenter)
-    Entry.setText(str(default))
-    layout.addWidget(Entry, alignment=Qt.AlignCenter | Qt.AlignTop)
+    name.setAlignment(Qt.AlignCenter)
+    name.setText(str(default))
+    layout.addWidget(name, alignment=Qt.AlignCenter | Qt.AlignTop)
 
     return layout
 
@@ -97,17 +93,15 @@ def createRangeEntry(text, names, defaults, buttonText, function):
 
     entrylayout = QHBoxLayout()
 
-    Entry0 = QLineEdit()
-    Entry0.setObjectName(names[0])
-    Entry0.setText(defaults[0])
-    Entry0.setAlignment(Qt.AlignCenter)
-    entrylayout.addWidget(Entry0, alignment=Qt.AlignCenter | Qt.AlignTop)
+    names[0] = QLineEdit()
+    names[0].setText(defaults[0])
+    names[0].setAlignment(Qt.AlignCenter)
+    entrylayout.addWidget(names[0], alignment=Qt.AlignCenter | Qt.AlignTop)
 
-    Entry1 = QLineEdit()
-    Entry1.setObjectName(names[1])
-    Entry1.setText(defaults[1])
-    Entry1.setAlignment(Qt.AlignCenter)
-    entrylayout.addWidget(Entry1, alignment=Qt.AlignCenter | Qt.AlignTop)
+    names[1] = QLineEdit()
+    names[1].setText(defaults[1])
+    names[1].setAlignment(Qt.AlignCenter)
+    entrylayout.addWidget(names[1], alignment=Qt.AlignCenter | Qt.AlignTop)
 
     layout.addLayout(entrylayout)
 

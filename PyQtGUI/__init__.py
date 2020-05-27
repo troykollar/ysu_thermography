@@ -13,40 +13,40 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         palette = MainPalette()
 
-        self.remove_top_reflection = "TopReflectBool"
-        self.remove_bot_reflection = "BotReflectBool"
-        self.scale_factor = "ScaleFactorEntry"
-        self.start_frame = "StartFrameEntry"
-        self.end_frame = "EndFrameEntry"
+        self.remove_top_reflection = QCheckBox()
+        self.remove_bot_reflection = QCheckBox()
+        self.scale_factor = QLineEdit()
+        self.start_frame = QLineEdit()
+        self.end_frame = QLineEdit()
 
-        self.contour_threshold = "ContourThresh"
-        self.frame_focus = "FrameFocus"
-        self.focus_contour = "FocusContour"
-        self.focus_max_temp = "FocusMaxTemp"
-        self.focus_none = "FocusNone"
-        self.focused_frame_size = "FocusFrameSize"
-        self.info_pane = "Info Pane"
-        self.disp_contour = "DispContour"
-        self.disp_meltpool = "DispMP"
-        self.disp_none = "DispNone"
-        self.fps = "fps"
-        self.frame_delay = "FrameDelay"
+        self.contour_threshold = QLineEdit()
+        self.frame_focus = None
+        self.focus_contour = QRadioButton()
+        self.focus_max_temp = QRadioButton()
+        self.focus_none = QRadioButton()
+        self.focused_frame_size = QLineEdit()
+        self.info_pane = None
+        self.disp_contour = QRadioButton()
+        self.disp_meltpool = QRadioButton()
+        self.disp_none = QRadioButton()
+        self.fps = QLineEdit()
+        self.frame_delay = QLineEdit()
 
-        self.comp_temp_thresh = "CompTempThresh"
+        self.comp_temp_thresh = QLineEdit()
 
-        self.pixelx = "pixelx"
-        self.pixely = "pixely"
+        self.pixelx = QLineEdit()
+        self.pixely = QLineEdit()
 
-        self.start_frame_plot = "PlotFrameStart"
-        self.end_frame_plot = "PlotFrameEnd"
+        self.start_frame_plot = QLineEdit()
+        self.end_frame_plot = QLineEdit()
 
-        self.plot_angle = "PlotGradAngle"
-        self.plot_mag = "PlotGradMag"
-        self.plot_scatter = "PlotGradScatter"
-        self.plot_hex_bin = "PlotGradHexBin"
-        self.plot_2d_hist = "Plot2DHist"
-        self.plot_3d_bubble = "Plot3DBubble"
-        self.all = "PlotAllGrad"
+        self.plot_angle = QCheckBox()
+        self.plot_mag = QCheckBox()
+        self.plot_scatter = QCheckBox()
+        self.plot_hex_bin = QCheckBox()
+        self.plot_2d_hist = QCheckBox()
+        self.plot_3d_bubble = QCheckBox()
+        self.all = QCheckBox()
 
         self.setWindowTitle('YSU Thermography')
 
