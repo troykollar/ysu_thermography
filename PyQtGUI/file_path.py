@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from PyQtGUI.helper_functions import FileBrowser
+from PyQtGUI.gui_helper_functions import FileBrowser
 
 
 class FileFrame(QWidget):

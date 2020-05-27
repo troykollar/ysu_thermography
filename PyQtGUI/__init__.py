@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtGui import QPalette
 
 from PyQtGUI.file_path import FileFrame
-from PyQtGUI.helper_functions import FileBrowser, createCheckButton, createEntry, createRadioGroup, play, save, \
+from PyQtGUI.gui_helper_functions import FileBrowser, createCheckButton, createEntry, createRadioGroup, play, save, \
     saveFrames, genThresh, createRangeEntry, selectPixels, createPlots
 from PyQtGUI.palette import MainPalette
 
@@ -21,8 +21,14 @@ class MainWindow(QMainWindow):
 
         self.contour_threshold = "ContourThresh"
         self.frame_focus = "FrameFocus"
+        self.focus_contour = "FocusContour"
+        self.focus_max_temp = "FocusMaxTemp"
+        self.focus_none = "FocusNone"
         self.focused_frame_size = "FocusFrameSize"
         self.info_pane = "Info Pane"
+        self.disp_contour = "DispContour"
+        self.disp_meltpool = "DispMP"
+        self.disp_none = "DispNone"
         self.fps = "fps"
         self.frame_delay = "FrameDelay"
 
@@ -34,6 +40,14 @@ class MainWindow(QMainWindow):
         self.start_frame_plot = "PlotFrameStart"
         self.end_frame_plot = "PlotFrameEnd"
 
+        self.plot_angle = "PlotGradAngle"
+        self.plot_mag = "PlotGradMag"
+        self.plot_scatter = "PlotGradScatter"
+        self.plot_hex_bin = "PlotGradHexBin"
+        self.plot_2d_hist = "Plot2DHist"
+        self.plot_3d_bubble = "Plot3DBubble"
+        self.all = "PlotAllGrad"
+
         self.setWindowTitle('YSU Thermography')
 
         layout = QVBoxLayout()
@@ -43,12 +57,16 @@ class MainWindow(QMainWindow):
         viewerOptionsFrame = self.buildViewerOptions()
         compositeOptions = self.buildCompositeOptions()
         plotOptions = self.buildPlotOptions()
+        plotSelect = self.buildPlotSelection()
+        ProgressBar = self.buildProgressBar()
 
         layout.addLayout(FileFrame)
         layout.addWidget(DataSetOptionsFrame)
         layout.addWidget(viewerOptionsFrame)
         layout.addWidget(compositeOptions)
         layout.addWidget(plotOptions)
+        layout.addWidget(plotSelect)
+        layout.addWidget(ProgressBar)
 
         widget = QWidget()
         widget.setLayout(layout)
@@ -123,13 +141,13 @@ class MainWindow(QMainWindow):
         contour_thresh = createEntry("Contour Threshold", self.contour_threshold, 0)
         layout.addLayout(contour_thresh)
 
-        frame_focus = createRadioGroup("Frame Focus", ['Contour', 'Max Temp', 'None'])
+        frame_focus = createRadioGroup("Frame Focus", ['Contour', 'Max Temp', 'None'], [self.focus_contour, self.focus_max_temp, self.focus_none])
         layout.addWidget(frame_focus, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         focused_frame_size = createEntry("Focused Frame Size", self.focused_frame_size, 20)
         layout.addLayout(focused_frame_size)
 
-        info_pane = createRadioGroup("Info Pane", ['Contour', 'Meltpool', 'None'])
+        info_pane = createRadioGroup("Info Pane", ['Contour', 'Meltpool', 'None'], [self.disp_contour, self.disp_meltpool, self.disp_none])
         layout.addWidget(info_pane, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         frame_delay = createEntry("Frame Delay (For Play)", self.frame_delay, 1)
@@ -145,7 +163,7 @@ class MainWindow(QMainWindow):
         PlayVid.setAutoFillBackground(True)
         PlayVid.setFlat(True)
         PlayVid.animateClick(2)
-        PlayVid.clicked.connect(play)
+        PlayVid.clicked.connect(play(self))
         buttonLayout.addWidget(PlayVid, alignment=Qt.AlignCenter | Qt.AlignTop)
 
         SaveVid = QPushButton()
@@ -221,6 +239,51 @@ class MainWindow(QMainWindow):
 
         return frame
 
+    def buildPlotSelection(self):
+        frame = QGroupBox()
+        frame.setAlignment(Qt.AlignCenter)
+        frame.setTitle("Gradient Plots")
+        frame.setToolTip("Panel to Select Which Gradient Representations to Plot")
+        frame.setAutoFillBackground(True)
+
+        layout = QGridLayout()
+
+        plotAngle = createCheckButton("Plot Angle", self.plot_angle)
+        layout.addLayout(plotAngle, 0, 0)
+
+        plotMagnitude = createCheckButton("Plot Magnitude", self.plot_mag)
+        layout.addLayout(plotMagnitude, 0, 1)
+
+        plotScatter = createCheckButton("Plot Scatter", self.plot_scatter)
+        layout.addLayout(plotScatter, 0, 2)
+
+        plotHexBin = createCheckButton("Plot Hex Bin", self.plot_hex_bin)
+        layout.addLayout(plotHexBin, 1, 0)
+
+        plot2dHist = createCheckButton("Plot 2D Hist", self.plot_2d_hist)
+        layout.addLayout(plot2dHist, 1, 1)
+
+        plot3DBub = createCheckButton("Plot 3D Bubble", self.plot_3d_bubble)
+        layout.addLayout(plot3DBub, 1, 2)
+
+        plotAll = createCheckButton("Plot All", self.all)
+        layout.addLayout(plotAll, 2, 1)
+
+        frame.setLayout(layout)
+
+        return frame
+
+    def buildProgressBar(self):
+        frame = QGroupBox()
+
+        layout = QHBoxLayout()
+
+        self.progress_bar = QProgressBar()
+        layout.addWidget(self.progress_bar)
+
+        frame.setLayout(layout)
+
+        return frame
 
 if __name__ == '__main__':
     app = QApplication([])
