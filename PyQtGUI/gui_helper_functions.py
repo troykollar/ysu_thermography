@@ -170,3 +170,8 @@ def selectPixels():
 
 def createPlots():
     pass
+
+def updateProgressBar(gui, current, total):
+    gui.progressBar.setMaximum(total)
+    gui.progressBar.setMinimum(0)
+    gui.progressBar.setValue(current)
