@@ -65,17 +65,17 @@ def save_integration_img(self):
 
 def save_avg_composite(self):
     grab_dataset(self)
-    AvgImg(self.dataset)
+    AvgImg(self.dataset).save_img()
 
 
 def save_max_composite(self):
     grab_dataset(self)
-    MaxImg(self.dataset)
+    MaxImg(self.dataset).save_img()
 
 
 def save_hotspot_composite(self):
     grab_dataset(self)
-    HotspotImg(self.dataset)
+    HotspotImg(self.dataset).save_img()
 
 
 def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
