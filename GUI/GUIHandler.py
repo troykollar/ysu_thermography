@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import filedialog
 from viewer import Viewer, colormap_frame
 from dataset import DataSet
-from composite import get_threshold_img, save_threshold_img
+from composite import *
 from plot import Plots
 from matplotlib import pyplot as plt
 from pixel_selector import PixelSelector
@@ -55,10 +55,7 @@ def grab_viewer(self):
 
 def save_thresh_img(self):
     grab_dataset(self)
-    thresh_img = get_threshold_img(self.dataset,
-                                   self.composite_threshold.get())
-    save_threshold_img(self.tempData.get(), thresh_img,
-                       self.composite_threshold.get())
+    ThresholdImg(self.dataset, self.composite_threshold.get()).save_img()
 
 
 def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
@@ -96,8 +93,8 @@ def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
 
 def select_pixels(self):
     grab_dataset(self)
-    thresh_img = get_threshold_img(dataset=self.dataset,
-                                   threshold=int(self.plot_TempThresh.get()))
+    thresh_img = ThresholdImg(self.dataset,
+                              threshold=int(self.plot_TempThresh.get())).img
     thresh_img = colormap_frame(thresh_img)
     pix_sel = PixelSelector()
     pix_sel.create_window('Select pixels for analysis', thresh_img)
