@@ -58,6 +58,26 @@ def save_thresh_img(self):
     ThresholdImg(self.dataset, self.composite_threshold.get()).save_img()
 
 
+def save_integration_img(self):
+    grab_dataset(self)
+    IntegrationImg(self.dataset, self.composite_threshold.get()).save_img()
+
+
+def save_avg_composite(self):
+    grab_dataset(self)
+    AvgImg(self.dataset)
+
+
+def save_max_composite(self):
+    grab_dataset(self)
+    MaxImg(self.dataset)
+
+
+def save_hotspot_composite(self):
+    grab_dataset(self)
+    HotspotImg(self.dataset)
+
+
 def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
     grab_dataset(self)
     PLOTS = Plots(temp_data=self.dataset,
