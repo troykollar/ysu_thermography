@@ -55,7 +55,7 @@ def grab_viewer(self):
 
 def save_thresh_img(self):
     grab_dataset(self)
-    ThresholdImg(self.dataset, self.composite_threshold.get()).save_img()
+    ThresholdImg(self.dataset, self.composite_threshold.get(), self).save_img()
 
 
 def save_integration_img(self):
