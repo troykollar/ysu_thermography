@@ -8,12 +8,13 @@ from dataset import DataSet, get_dataset_CLargs, validate_range_arg
 
 
 class Composite(ABC):
-    def __init__(self, dataset: DataSet):
+    def __init__(self, dataset: DataSet, gui_instance=None):
         self.dataset = dataset
         self._img = None
         self.plot_title = None
         self.colorbar_label = None
         self.filename = None
+        self.gui_instance = gui_instance
 
     @property
     def img(self):
@@ -39,8 +40,8 @@ class Composite(ABC):
 
 
 class ThresholdImg(Composite):
-    def __init__(self, dataset: DataSet, threshold: int):
-        super().__init__(dataset)
+    def __init__(self, dataset: DataSet, threshold: int, gui_instance=None):
+        super().__init__(dataset, gui_instance)
         self.threshold = threshold
         self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
             self.threshold)
@@ -55,18 +56,27 @@ class ThresholdImg(Composite):
         # Make blank image to increment
         img = np.zeros((height, width), dtype=np.float32)
 
+        if self.gui_instance is not None:
+            self.gui_instance.create_progress_bar()
+
         for i, frame in enumerate(self.dataset):
+            if self.gui_instance is not None:
+                self.gui_instance.update_progress_bar(
+                    i - self.dataset.start_frame,
+                    self.dataset.end_frame - self.dataset.start_frame)
             printProgressBar(i - self.dataset.start_frame,
                              self.dataset.end_frame - self.dataset.start_frame,
                              "Generating threshold image...")
             img = np.where(frame > self.threshold, img + 1, img)
 
+        if self.gui_instance is not None:
+            self.gui_instance.remove_progress_bar()
         return img
 
 
 class MaxImg(Composite):
-    def __init__(self, dataset: DataSet):
-        super().__init__(dataset)
+    def __init__(self, dataset: DataSet, gui_instance=None):
+        super().__init__(dataset, gui_instance)
         self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Maximum Temperatures'
         self.colorbar_label = 'Temperature (C)'
         self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_max_temps'
@@ -87,8 +97,8 @@ class MaxImg(Composite):
 
 
 class AvgImg(Composite):
-    def __init__(self, dataset: DataSet):
-        super().__init__(dataset)
+    def __init__(self, dataset: DataSet, gui_instance=None):
+        super().__init__(dataset, gui_instance)
         self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Average Temperatures'
         self.colorbar_label = 'Temperature (C)'
         self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_avg_temps'
@@ -116,8 +126,8 @@ class AvgImg(Composite):
 
 
 class IntegrationImg(Composite):
-    def __init__(self, dataset: DataSet, threshold: int):
-        super().__init__(dataset)
+    def __init__(self, dataset: DataSet, threshold: int, gui_instance=None):
+        super().__init__(dataset, gui_instance)
         self.threshold = threshold
         self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
             self.threshold)
@@ -143,8 +153,8 @@ class IntegrationImg(Composite):
 
 
 class HotspotImg(Composite):
-    def __init__(self, dataset: DataSet):
-        super().__init__(dataset)
+    def __init__(self, dataset: DataSet, gui_instance=None):
+        super().__init__(dataset, gui_instance)
         self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Hotspots'
         self.colorbar_label = 'Temperatue (C)'
         self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_hotspot'
