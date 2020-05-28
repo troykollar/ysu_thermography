@@ -394,19 +394,21 @@ class GUI:
         integration_composite_button = Button(
             self.composite_frame,
             text='Integration Composite',
-            command=lambda: handler.save_thresh_img(self),
+            command=lambda: handler.save_integration_img(self),
             bg=self.ACTIVEBUTTONBACKGROUND,
             relief=FLAT)
         integration_composite_button.pack(side=LEFT, padx=40)
 
-        other_composite_frame = func.buildInnerLabelFrame(obj=self, root=self.composite_frame,
-                                                          label='Other Composite Images')
+        other_composite_frame = func.buildInnerLabelFrame(
+            obj=self,
+            root=self.composite_frame,
+            label='Other Composite Images')
         other_composite_frame.pack(side=RIGHT, padx=40)
 
         average_composite_button = Button(
             other_composite_frame,
             text='Average Composite',
-            command=lambda: handler.save_thresh_img(self),
+            command=lambda: handler.save_avg_composite(self),
             bg=self.ACTIVEBUTTONBACKGROUND,
             relief=FLAT)
         average_composite_button.pack()
@@ -414,7 +416,7 @@ class GUI:
         max_temp_composite_button = Button(
             other_composite_frame,
             text='Max Temp Composite',
-            command=lambda: handler.save_thresh_img(self),
+            command=lambda: handler.save_max_composite(self),
             bg=self.ACTIVEBUTTONBACKGROUND,
             relief=FLAT)
         max_temp_composite_button.pack()
@@ -422,11 +424,10 @@ class GUI:
         hotspot_composite_button = Button(
             other_composite_frame,
             text='Hot Spot Composite',
-            command=lambda: handler.save_thresh_img(self),
+            command=lambda: handler.save_hotspot_composite(self),
             bg=self.ACTIVEBUTTONBACKGROUND,
             relief=FLAT)
         hotspot_composite_button.pack()
-
 
     def buildPlotOptionsFrame(self):
         self.plotOptionsFrame = func.buildOuterLabelFrame(
