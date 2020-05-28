@@ -383,6 +383,14 @@ class GUI:
             textvariable=self.composite_threshold)
         threshold_input.pack()
 
+        normal_composite_button = Button(
+            self.composite_frame,
+            text='Create Composite Image',
+            command=lambda: handler.save_thresh_img(self),
+            bg=self.ACTIVEBUTTONBACKGROUND,
+            relief=FLAT)
+        normal_composite_button.pack(side=LEFT, padx=40)
+
         integration_composite_button = Button(
             self.composite_frame,
             text='Integration Composite',
