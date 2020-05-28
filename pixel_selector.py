@@ -1,7 +1,7 @@
 import argparse
 import cv2
 import numpy as np
-from composite import get_threshold_img, save_threshold_img, get_composite_CLargs
+from composite import *
 from dataset import DataSet, get_dataset_CLargs
 from plot import Plots
 
@@ -25,8 +25,9 @@ def select_pixels_and_gen_plots(temp_file: str,
                         start_frame=start_frame,
                         end_frame=end_frame)
 
-    thresh_img = get_threshold_img(test_data, threshold, cap=frame_cap)
-    save_threshold_img(temp_file, thresh_img, threshold)
+    thresh = ThresholdImg(test_data, threshold)
+    thresh.save_img()
+    thresh_img = thresh.img
     thresh_img = cv2.normalize(thresh_img,
                                thresh_img,
                                0,
