@@ -14,8 +14,10 @@ class Plots:
                  start_frame=0,
                  end_frame=-1,
                  frame_count=-1,
-                 relativeLoc: tuple = None):
+                 relativeLoc: tuple = None,
+                 gui_instance=None):
 
+        self.gui_instance = gui_instance
         self.grid_lines = True
         self.data = temp_data
         self.pixel = (pixel[1], pixel[0])
@@ -71,9 +73,13 @@ class Plots:
 
     def gradientMath(self):
 
+        if self.gui_instance is not None:
+            self.gui_instance.create_progress_bar()
         for frame_index in range(self.frame_count):
             printProgressBar(frame_index, self.frame_count)
-
+            if self.gui_instance is not None:
+                self.gui_instance.update_progress_bar(frame_index,
+                                                      self.frame_count)
             temp = self.data[frame_index + self.start_frame]
             result_matrix = np.asmatrix(temp)
 
@@ -101,6 +107,9 @@ class Plots:
                     angle_deg)  # store pixel angle for frame in array
                 self.temperatures_array.append(temp[self.pixel])
                 self.frames.append(frame_index + self.start_frame)
+
+        if self.gui_instance is not None:
+            self.gui_instance.remove_progress_bar()
 
     def calculateBins(self):
         self.angle_deg_minimum = np.amin(self.angle_array)

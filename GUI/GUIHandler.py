@@ -21,7 +21,8 @@ def createPlotTool(self):
                         int(self.plot_PixelLocY.get())),
                  threshold=int(self.plot_TempThresh.get()),
                  start_frame=int(self.plot_StartFrame.get()),
-                 end_frame=int(self.plot_EndFrame.get()))
+                 end_frame=int(self.plot_EndFrame.get()),
+                 gui_instance=self)
 
 
 def play(self):
