@@ -375,7 +375,7 @@ class GUI:
             obj=self, root=self.composite_frame, label='Temperature Threshold')
 
         ToolTip.createToolTip(threshold_frame, self.descriptions['threshold'])
-        threshold_frame.pack(side=LEFT, expand=1)
+        threshold_frame.pack(side=LEFT, padx=10)
 
         threshold_input = func.buildEntry(
             obj=self,
@@ -383,13 +383,42 @@ class GUI:
             textvariable=self.composite_threshold)
         threshold_input.pack()
 
-        gen_threshold_button = Button(
+        integration_composite_button = Button(
             self.composite_frame,
-            text='Generate Threshold Image',
+            text='Integration Composite',
             command=lambda: handler.save_thresh_img(self),
             bg=self.ACTIVEBUTTONBACKGROUND,
             relief=FLAT)
-        gen_threshold_button.pack()
+        integration_composite_button.pack(side=LEFT, padx=40)
+
+        other_composite_frame = func.buildInnerLabelFrame(obj=self, root=self.composite_frame,
+                                                          label='Other Composite Images')
+        other_composite_frame.pack(side=RIGHT, padx=40)
+
+        average_composite_button = Button(
+            other_composite_frame,
+            text='Average Composite',
+            command=lambda: handler.save_thresh_img(self),
+            bg=self.ACTIVEBUTTONBACKGROUND,
+            relief=FLAT)
+        average_composite_button.pack()
+
+        max_temp_composite_button = Button(
+            other_composite_frame,
+            text='Max Temp Composite',
+            command=lambda: handler.save_thresh_img(self),
+            bg=self.ACTIVEBUTTONBACKGROUND,
+            relief=FLAT)
+        max_temp_composite_button.pack()
+
+        hotspot_composite_button = Button(
+            other_composite_frame,
+            text='Hot Spot Composite',
+            command=lambda: handler.save_thresh_img(self),
+            bg=self.ACTIVEBUTTONBACKGROUND,
+            relief=FLAT)
+        hotspot_composite_button.pack()
+
 
     def buildPlotOptionsFrame(self):
         self.plotOptionsFrame = func.buildOuterLabelFrame(

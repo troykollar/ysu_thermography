@@ -285,7 +285,7 @@ class MainWindow(QMainWindow):
 
         return frame
 
-if __name__ == '__main__':
+def run():
     app = QApplication([])
     window = MainWindow()
     window.show()
