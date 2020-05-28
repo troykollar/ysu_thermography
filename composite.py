@@ -88,10 +88,19 @@ class MaxImg(Composite):
         # Make blank image to update
         max_temp_img = np.zeros((height, width), dtype=np.float32)
 
+        if self.gui_instance is not None:
+            self.gui_instance.create_progress_bar()
+
         for i, frame in enumerate(self.dataset):
+            if self.gui_instance is not None:
+                self.gui_instance.update_progress_bar(i,
+                                                      self.dataset.end_frame)
             printProgressBar(i, self.dataset.end_frame,
                              'Creating max temp composite...')
             max_temp_img = np.maximum(max_temp_img, frame)
+
+        if self.gui_instance is not None:
+            self.gui_instance.remove_progress_bar()
 
         return max_temp_img
 
@@ -112,15 +121,24 @@ class AvgImg(Composite):
 
         num_pixels = (height + 1) * (width + 1)
 
+        if self.gui_instance is not None:
+            self.gui_instance.create_progress_bar()
+
         cur_pix_num = 0
         for row_num, _ in enumerate(avg_temp_img):
             for col_num, _ in enumerate(avg_temp_img[row_num]):
+                if self.gui_instance is not None:
+                    self.gui_instance.update_progress_bar(
+                        cur_pix_num, num_pixels)
                 printProgressBar(cur_pix_num, num_pixels,
                                  'Generating avg temp composite...')
                 avg_temp_img[row_num,
                              col_num] = np.mean(self.dataset[:, row_num,
                                                              col_num])
                 cur_pix_num += 1
+
+        if self.gui_instance is not None:
+            self.gui_instance.remove_progress_bar()
 
         return avg_temp_img
 
@@ -142,13 +160,21 @@ class IntegrationImg(Composite):
         # Make blank image to update
         integration_img = np.zeros((height, width), dtype=np.float32)
 
+        if self.gui_instance is not None:
+            self.gui_instance.create_progress_bar()
+
         for i, frame in enumerate(self.dataset):
+            if self.gui_instance is not None:
+                self.gui_instance.update_progress_bar(
+                    i, self.dataset.end_frame - 1)
             printProgressBar(i, self.dataset.end_frame - 1,
                              'Generating integration image...')
             integration_img = np.where(
                 frame > self.threshold,
                 integration_img + (frame - self.threshold), integration_img)
 
+        if self.gui_instance is not None:
+            self.gui_instance.remove_progress_bar()
         return integration_img
 
 
@@ -166,12 +192,19 @@ class HotspotImg(Composite):
         # Make blank image to update
         hotspot_img = np.zeros((height, width), dtype=np.float32)
 
+        if self.gui_instance is not None:
+            self.gui_instance.create_progress_bar()
         for i, frame in enumerate(self.dataset):
+            if self.gui_instance is not None:
+                self.gui_instance.update_progress_bar(
+                    i, self.dataset.end_frame - 1)
             printProgressBar(i, self.dataset.end_frame - 1,
                              'Generating hotspot image...')
             max_temp = np.amax(frame)
             hotspot_img = np.where(frame == max_temp, max_temp, hotspot_img)
 
+        if self.gui_instance is not None:
+            self.gui_instance.remove_progress_bar()
         return hotspot_img
 
 

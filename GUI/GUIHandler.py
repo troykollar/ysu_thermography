@@ -60,22 +60,23 @@ def save_thresh_img(self):
 
 def save_integration_img(self):
     grab_dataset(self)
-    IntegrationImg(self.dataset, self.composite_threshold.get()).save_img()
+    IntegrationImg(self.dataset, self.composite_threshold.get(),
+                   self).save_img()
 
 
 def save_avg_composite(self):
     grab_dataset(self)
-    AvgImg(self.dataset).save_img()
+    AvgImg(self.dataset, self).save_img()
 
 
 def save_max_composite(self):
     grab_dataset(self)
-    MaxImg(self.dataset).save_img()
+    MaxImg(self.dataset, self).save_img()
 
 
 def save_hotspot_composite(self):
     grab_dataset(self)
-    HotspotImg(self.dataset).save_img()
+    HotspotImg(self.dataset, self).save_img()
 
 
 def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
@@ -114,7 +115,8 @@ def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
 def select_pixels(self):
     grab_dataset(self)
     thresh_img = ThresholdImg(self.dataset,
-                              threshold=int(self.plot_TempThresh.get())).img
+                              threshold=int(self.plot_TempThresh.get()),
+                              gui_instance=self).img
     thresh_img = colormap_frame(thresh_img)
     pix_sel = PixelSelector()
     pix_sel.create_window('Select pixels for analysis', thresh_img)
