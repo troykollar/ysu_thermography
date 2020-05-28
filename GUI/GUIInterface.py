@@ -4,6 +4,7 @@ from GUI import GUIHandler as handler
 import GUI.constants as consts
 import GUI.helper_functions as func
 from helper_functions import get_description_dict
+from tkinter.ttk import Progressbar
 
 #TODO: Add meltpool data entry
 
@@ -25,6 +26,8 @@ class GUI:
         self.root.title("YSU Thermography")
         self.root['bg'] = self.ACTIVEBACKGROUND
         # root.iconbitmap("images/YSU_Logo")
+
+        self.progressbar = None
 
         # Get description dictionary
         self.descriptions = get_description_dict()
@@ -616,3 +619,19 @@ class GUI:
                         highlightthickness=0).pack()
 
         return radio_frame
+
+    def create_progress_bar(self):
+        self.progressbar = Progressbar(self.root,
+                                       orient=HORIZONTAL,
+                                       length=500,
+                                       mode='determinate')
+        self.progressbar.pack(pady=10)
+
+    def remove_progress_bar(self):
+        self.progressbar.pack_forget()
+        self.progressbar = None
+
+    def update_progress_bar(self, iteration: int, total: int):
+        progress = int(100 * (iteration / total))
+        self.progressbar['value'] = progress
+        self.root.update_idletasks()
