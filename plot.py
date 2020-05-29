@@ -9,7 +9,7 @@ from dataset import DataSet
 class Plots:
     def __init__(self,
                  temp_data: DataSet,
-                 pixel: tuple,
+                 pixels: list,
                  threshold: int,
                  start_frame=0,
                  end_frame=-1,
@@ -20,7 +20,13 @@ class Plots:
         self.gui_instance = gui_instance
         self.grid_lines = True
         self.data = temp_data
-        self.pixel = (pixel[1], pixel[0])
+
+        self.pixels = []
+        for pixel in pixels:
+            self.pixels.append((pixel[1], pixel[0]))
+
+        self.plotted_pixels = []
+        self.temp_data = temp_data
         self.threshold = threshold
         self.start_frame = start_frame
         self.end_frame = end_frame
@@ -35,14 +41,14 @@ class Plots:
         self.angle_array = []
         self.temperatures_array = []
 
-        self.angle_deg_minimum = None
-        self.angle_deg_maximum = None
-        self.mag_minimum = None
-        self.mag_maximum = None
-        self.binning1 = None
-        self.binning2 = None
+        self.angle_deg_minimum = []
+        self.angle_deg_maximum = []
+        self.mag_minimum = []
+        self.mag_maximum = []
+        self.binning1 = []
+        self.binning2 = []
 
-        self.fixFrameCounts()
+        #self.fixFrameCounts()
         self.gradientMath()
         self.calculateBins()
 
@@ -54,7 +60,6 @@ class Plots:
         self.plotHexBin()
         self.plot2DHistogram()
         self.plotLine()
-
 
     def fixFrameCounts(self):
         if self.start_frame == 0:
@@ -77,6 +82,54 @@ class Plots:
 
         if self.gui_instance is not None:
             self.gui_instance.create_progress_bar()
+
+        for pixel in self.pixels:
+            cur_pixel_x_mags = []
+            cur_pixel_y_mags = []
+            cur_pixel_mags = []
+            cur_pixel_angles = []
+            cur_pixel_temps = []
+            cur_pixel_frames = []
+            for i, frame in enumerate(self.temp_data):
+                # Show progress bars
+                printProgressBar(i, self.temp_data.end_frame)
+                if self.gui_instance is not None:
+                    self.gui_instance.update_progress_bar(
+                        i, self.temp_data.end_frame)
+
+                result_matrix = np.asmatrix(frame)
+
+                # Retrieve image gradient data
+                if frame[pixel] > self.threshold:
+                    dy, dx = np.gradient(result_matrix)
+                    x_dir = dx[pixel]
+                    y_dir = dy[pixel]
+
+                    # Magnitude Calculation
+                    magnitude = math.sqrt((x_dir**2) + (y_dir**2))
+
+                    # Angle Calculation
+                    angle_rad = (np.arctan2(x_dir, y_dir) - (math.pi / 2)
+                                 )  # shift -90 deg
+                    angle_deg = (angle_rad * (180 / math.pi)
+                                 )  # Convert to degrees
+
+                    cur_pixel_x_mags.append(x_dir)
+                    cur_pixel_y_mags.append(y_dir)
+                    cur_pixel_mags.append(magnitude)
+                    cur_pixel_angles.append(angle_deg)
+                    cur_pixel_frames.append(i + self.temp_data.start_frame)
+                    cur_pixel_temps.append(frame[pixel])
+
+            if cur_pixel_frames:
+                self.x_magnitude_array.append(cur_pixel_x_mags)
+                self.y_magnitude_array.append(cur_pixel_y_mags)
+                self.magnitude_array.append(cur_pixel_mags)
+                self.angle_array.append(cur_pixel_angles)
+                self.frames.append(cur_pixel_frames)
+                self.temperatures_array.append(cur_pixel_temps)
+                self.plotted_pixels.append(pixel)
+        """
         for frame_index in range(self.frame_count):
             printProgressBar(frame_index, self.frame_count)
             if self.gui_instance is not None:
@@ -109,17 +162,22 @@ class Plots:
                     angle_deg)  # store pixel angle for frame in array
                 self.temperatures_array.append(temp[self.pixel])
                 self.frames.append(frame_index + self.start_frame)
+        """
 
         if self.gui_instance is not None:
             self.gui_instance.remove_progress_bar()
 
     def calculateBins(self):
-        self.angle_deg_minimum = np.amin(self.angle_array)
-        self.angle_deg_maximum = np.amax(self.angle_array)
-        self.mag_minimum = np.amin(self.magnitude_array)
-        self.mag_maximum = np.amax(self.magnitude_array)
-        self.binning1 = int((abs(self.mag_maximum - self.mag_minimum)) / 5)
-        self.binning2 = int(self.binning1 / 1.5)
+        for i, _ in enumerate(self.plotted_pixels):
+            if self.angle_array[i]:
+                self.angle_deg_maximum.append(np.amax(self.angle_array[i]))
+                self.angle_deg_minimum.append(np.amin(self.angle_array[i]))
+            if self.magnitude_array[i]:
+                self.mag_minimum.append(np.amin(self.magnitude_array[i]))
+                self.mag_maximum.append(np.amax(self.magnitude_array[i]))
+                self.binning1.append(
+                    int((abs(self.mag_maximum[i] - self.mag_minimum[i])) / 5))
+                self.binning2.append(int(self.binning1[i] / 1.5))
 
     def plot3DBubble(self):
         fig = go.Figure(data=go.Scatter3d(
@@ -146,6 +204,29 @@ class Plots:
     def plotMagnitude(self):
         # Plotting
         # Magnitude plot
+
+        fig = []
+        ax = []
+
+        for i, pixel in enumerate(self.plotted_pixels):
+            fig.append(None)
+            ax.append(None)
+            fig[i], ax[i] = plt.subplots()
+
+            fig[i].suptitle(
+                'Pixel {} Magnitude Histogram:\n{} Bins, Threshold: {}'.format(
+                    (pixel[1], pixel[0]), self.binning1[i], self.threshold))
+
+            ax[i].set_xlabel('Magnitude (sqrt(x^2+y^2))')
+            ax[i].set_ylabel('Frequency')
+            ax[i].hist(self.magnitude_array,
+                       bins=self.binning1[i],
+                       range=(self.mag_minimum[i], self.mag_maximum[i]),
+                       edgecolor='black')
+            ax[i].grid(b=self.grid_lines, which='major', alpha=0.3)
+
+        plt.show()
+        """
         fig1, ax1 = plt.subplots()
         fig1.suptitle(
             'Pixel {} Magnitude Histogram:\n{} Bins, Threshold: {}'.format(
@@ -157,6 +238,7 @@ class Plots:
                  range=(self.mag_minimum, self.mag_maximum),
                  edgecolor='black')
         ax1.grid(b=self.grid_lines, which='major', alpha=0.3)
+        """
 
     def plotAngle(self):
         # Angle plot - degrees
@@ -216,7 +298,6 @@ class Plots:
         ax5.grid(b=self.grid_lines, which='major', alpha=0.3)
         plt.colorbar(hexplot)
 
-
     def plotLine(self):
 
         pixelTempHistory = []
@@ -228,11 +309,17 @@ class Plots:
             pixelTempHistory.append(tempdata[self.pixel])
 
         fig6, ax6 = plt.subplots()
-        fig6.suptitle(
-            'Pixel {} Temperature History:\n'.format(
-                self.cartesianPixel))
+        fig6.suptitle('Pixel {} Temperature History:\n'.format(
+            self.cartesianPixel))
         ax6.set_xlabel('Frame')
         ax6.set_ylabel('Temperature')
         hexplot = ax6.plot(frame, pixelTempHistory)
 
         plt.show()
+
+
+if __name__ == '__main__':
+    dataset = DataSet(
+        '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy')
+    plotter = Plots(dataset, [(50, 100), (123, 99), (1, 1)], threshold=500)
+    plotter.plotMagnitude()
