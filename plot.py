@@ -219,7 +219,7 @@ class Plots:
 
             ax[i].set_xlabel('Magnitude (sqrt(x^2+y^2))')
             ax[i].set_ylabel('Frequency')
-            ax[i].hist(self.magnitude_array,
+            ax[i].hist(self.magnitude_array[i],
                        bins=self.binning1[i],
                        range=(self.mag_minimum[i], self.mag_maximum[i]),
                        edgecolor='black')
