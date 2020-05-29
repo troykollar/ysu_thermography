@@ -224,8 +224,6 @@ class Plots:
                        range=(self.mag_minimum[i], self.mag_maximum[i]),
                        edgecolor='black')
             ax[i].grid(b=self.grid_lines, which='major', alpha=0.3)
-
-        plt.show()
         """
         fig1, ax1 = plt.subplots()
         fig1.suptitle(
@@ -241,6 +239,28 @@ class Plots:
         """
 
     def plotAngle(self):
+
+        fig = []
+        ax = []
+
+        for i, pixel in enumerate(self.plotted_pixels):
+            fig.append(None)
+            ax.append(None)
+            fig[i], ax[i] = plt.subplots()
+
+            fig[i].suptitle(
+                'Pixel {} Angle Histogram:\n{} Bins, Threshold: {}\n'.format(
+                    (pixel[1], pixel[0]), self.binning2[i], self.threshold))
+
+            ax[i].set_xlabel('Angle (°)')
+            ax[i].set_ylabel('Frequency')
+            ax[i].hist(self.angle_array[i],
+                       bins=self.binning2[i],
+                       range=(self.angle_deg_minimum[i],
+                              self.angle_deg_maximum[i]),
+                       edgecolor='black')
+            ax[i].grid(b=self.grid_lines, which='major', alpha=0.3)
+        """
         # Angle plot - degrees
         fig2, ax2 = plt.subplots()
         fig2.suptitle(
@@ -254,6 +274,7 @@ class Plots:
                                              self.angle_deg_maximum),
                                       edgecolor='black')
         ax2.grid(b=self.grid_lines, which='major', alpha=0.3)
+        """
 
     def plot2DHistogram(self):
         #2D Histogram - Magnitude vs Angle (degrees)
@@ -323,3 +344,5 @@ if __name__ == '__main__':
         '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy')
     plotter = Plots(dataset, [(50, 100), (123, 99), (1, 1)], threshold=500)
     plotter.plotMagnitude()
+    plotter.plotAngle()
+    plt.show()
