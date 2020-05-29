@@ -94,6 +94,7 @@ class GUI:
         self.grad_scatter = BooleanVar()
         self.grad_hexBin = BooleanVar()
         self.grad_3D = BooleanVar()
+        self.plot_line = BooleanVar()
         self.grad_all = BooleanVar()
 
         # Creating Frame Sections
@@ -580,6 +581,14 @@ class GUI:
                                                       root=grad3dFrame,
                                                       variable=self.grad_3D)
         grad3dCheckButton.pack()
+
+        tempHistoryFrame = func.buildInnerLabelFrame(
+            obj=self, root=emptyFrame, label='Temperature History')
+        tempHistoryFrame.grid(row=2, column=0)
+
+        tempHistoryButton = func.buildFlagCheckButton(
+            obj=self, root=tempHistoryFrame, variable=self.plot_line)
+        tempHistoryButton.pack()
 
         gradAllFrame = func.buildInnerLabelFrame(obj=self,
                                                  root=emptyFrame,

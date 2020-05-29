@@ -110,6 +110,9 @@ def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
     elif self.grad_3D.get():
         PLOTS.plot3DBubble()
 
+    elif self.plot_line.get():
+        PLOTS.plotLine()
+
     plt.show()
 
 

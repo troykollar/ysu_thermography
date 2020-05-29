@@ -53,6 +53,8 @@ class Plots:
         self.plotScatter()
         self.plotHexBin()
         self.plot2DHistogram()
+        self.plotLine()
+
 
     def fixFrameCounts(self):
         if self.start_frame == 0:
@@ -213,5 +215,24 @@ class Plots:
                              cmap='gnuplot')
         ax5.grid(b=self.grid_lines, which='major', alpha=0.3)
         plt.colorbar(hexplot)
+
+
+    def plotLine(self):
+
+        pixelTempHistory = []
+        frame = []
+
+        for frameindex in range(self.frame_count):
+            frame.append(frameindex + self.start_frame)
+            tempdata = self.data[frameindex + self.start_frame]
+            pixelTempHistory.append(tempdata[self.pixel])
+
+        fig6, ax6 = plt.subplots()
+        fig6.suptitle(
+            'Pixel {} Temperature History:\n'.format(
+                self.cartesianPixel))
+        ax6.set_xlabel('Frame')
+        ax6.set_ylabel('Temperature')
+        hexplot = ax6.plot(frame, pixelTempHistory)
 
         plt.show()
