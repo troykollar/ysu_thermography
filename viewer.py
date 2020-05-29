@@ -180,11 +180,6 @@ class Viewer:
             top_y = center_y - frame_size
             bot_y = center_y + frame_size
 
-        print('\n')
-        print(center_x, center_y, frame.shape[0])
-        print(top_y, bot_y)
-        print(left_x, right_x)
-
         return frame[top_y:bot_y, left_x:right_x]
 
     def save_frame16(self, start: int, end=-1):
