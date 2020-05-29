@@ -149,7 +149,8 @@ class IntegrationImg(Composite):
         self.threshold = threshold
         self.plot_title = 'Build: ' + self.dataset.build_folder_name + ' Threshold: ' + str(
             self.threshold)
-        self.colorbar_label = 'Total degrees above ' + str(self.threshold)
+        self.colorbar_label = 'Accumulation of temperature of threshold: ' + str(
+            self.threshold)
         self.filename = self.dataset.build_folder + '/' + self.dataset.build_folder_name + '_integration' + str(
             self.threshold)
 
