@@ -14,7 +14,7 @@ class Plots:
                  start_frame=0,
                  end_frame=-1,
                  frame_count=-1,
-                 relativeLoc: tuple = None,
+                 relativeLoc: list = [],
                  gui_instance=None):
 
         self.gui_instance = gui_instance
@@ -180,26 +180,38 @@ class Plots:
                 self.binning2.append(int(self.binning1[i] / 1.5))
 
     def plot3DBubble(self):
-        fig = go.Figure(data=go.Scatter3d(
-            x=np.asarray(self.frames).flatten(),
-            y=np.asarray(self.magnitude_array).flatten(),
-            z=np.asarray(self.angle_array).flatten(),
-            text=np.asarray(self.temperatures_array).flatten(),
-            mode="markers",
-            marker=dict(color=np.asarray(self.temperatures_array).flatten(),
-                        size=5,
-                        colorbar_title='Temperature')))
-        fig.update_layout(
-            height=1000,
-            width=1000,
-            title='Pixel Temp and Gradient Magnitude and Angle for: ' +
-            str(self.cartesianPixel) + ' Threshold: ' + str(self.threshold) +
-            ' ' + str(self.relativeLoc[0]) + '% From Right, ' +
-            str(self.relativeLoc[1]) + '% From Bottom',
-            scene=dict(xaxis=dict(title='X: Frame'),
-                       yaxis=dict(title='Y: Gradient Magnitude'),
-                       zaxis=dict(title='Z: Gradient Angle')))
-        fig.show()
+        for i, pixel in enumerate(self.plotted_pixels):
+            relativeLoc = self.relativeLoc
+            print(relativeLoc)
+            if relativeLoc:
+                title = 'Pixel Temp and Gradient Magnitude and Angle for: (' + str(
+                    pixel[1]) + ',' + str(pixel[0]) + ') Threshold: ' + str(
+                        self.threshold) + ' ' + str(
+                            self.relativeLoc[0][i]) + '% From Right, ' + str(
+                                self.relativeLoc[1][i]) + '% From Bottom'
+            else:
+                title = 'Pixel Temp and Gradient Magnitude and Angle for: (' + str(
+                    pixel[1]) + ',' + str(pixel[0]) + ') Threshold: ' + str(
+                        self.threshold)
+
+            fig = go.Figure(data=go.Scatter3d(
+                x=np.asarray(self.frames[i]).flatten(),
+                y=np.asarray(self.magnitude_array[i]).flatten(),
+                z=np.asarray(self.angle_array[i]).flatten(),
+                text=np.asarray(self.temperatures_array[i]).flatten(),
+                mode="markers",
+                marker=dict(color=np.asarray(
+                    self.temperatures_array[i]).flatten(),
+                            size=5,
+                            colorbar_title='Temperature')))
+            fig.update_layout(height=1000,
+                              width=1000,
+                              title=title,
+                              scene=dict(
+                                  xaxis=dict(title='X: Frame'),
+                                  yaxis=dict(title='Y: Gradient Magnitude'),
+                                  zaxis=dict(title='Z: Gradient Angle')))
+            fig.show()
 
     def plotMagnitude(self):
         # Plotting
@@ -418,10 +430,5 @@ if __name__ == '__main__':
         '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy',
         end_frame=27000)
     plotter = Plots(dataset, [(50, 100), (123, 99)], threshold=500)
-    plotter.plotMagnitude()
-    plotter.plotAngle()
-    plotter.plot2DHistogram()
-    plotter.plotScatter()
-    plotter.plotHexBin()
-    plotter.plotLine()
+    plotter.plot3DBubble()
     plt.show()
