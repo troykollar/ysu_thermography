@@ -346,6 +346,31 @@ class Plots:
 
     def plotHexBin(self):
         # "Hexbin plot" - Magnitude vs Angle (degrees)
+
+        fig = []
+        ax = []
+        hexgrid = []
+        hexplot = []
+
+        for i, pixel in enumerate(self.plotted_pixels):
+            fig.append(None)
+            ax.append(None)
+            hexgrid.append(None)
+            hexplot.append(None)
+            hexgrid[i] = (self.binning1[i], self.binning2[i])
+            fig[i], ax[i] = plt.subplots()
+            fig[i].suptitle(
+                'Pixel {} Magnitude and Angle Hist:\nThreshold: {}\n'.format(
+                    (pixel[1], pixel[0]), self.threshold))
+            ax[i].set_xlabel('Angle (°)')
+            ax[i].set_ylabel('Magnitude (sqrt(x^2+y^2))')
+            hexplot[i] = ax[i].hexbin(self.angle_array[i],
+                                      self.magnitude_array[i],
+                                      gridsize=hexgrid[i],
+                                      cmap='gnuplot')
+            ax[i].grid(b=self.grid_lines, which='major', alpha=0.3)
+            plt.colorbar(hexplot[i])
+        """
         hexgrid = (self.binning1, self.binning2)
         fig5, ax5 = plt.subplots()
         fig5.suptitle(
@@ -359,6 +384,7 @@ class Plots:
                              cmap='gnuplot')
         ax5.grid(b=self.grid_lines, which='major', alpha=0.3)
         plt.colorbar(hexplot)
+        """
 
     def plotLine(self):
 
@@ -388,4 +414,5 @@ if __name__ == '__main__':
     plotter.plotAngle()
     plotter.plot2DHistogram()
     plotter.plotScatter()
+    plotter.plotHexBin()
     plt.show()
