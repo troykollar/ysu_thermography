@@ -391,28 +391,37 @@ class Plots:
         pixelTempHistory = []
         frame = []
 
-        for frameindex in range(self.frame_count):
-            frame.append(frameindex + self.start_frame)
-            tempdata = self.data[frameindex + self.start_frame]
-            pixelTempHistory.append(tempdata[self.pixel])
+        for pixel in self.pixels:
+            cur_pix_history = []
+            cur_pix_frames = []
+            for i, frame_data in enumerate(self.temp_data):
+                cur_pix_frames.append(i + self.temp_data.start_frame)
+                cur_pix_history.append(frame_data[pixel])
+            pixelTempHistory.append(cur_pix_history)
+            frame.append(cur_pix_frames)
 
         fig6, ax6 = plt.subplots()
-        fig6.suptitle('Pixel {} Temperature History:\n'.format(
-            self.cartesianPixel))
+        fig6.suptitle('Pixel {} Temperature History:\n'.format(self.pixels))
         ax6.set_xlabel('Frame')
         ax6.set_ylabel('Temperature')
-        hexplot = ax6.plot(frame, pixelTempHistory)
+        for history, frames, pixel in zip(pixelTempHistory, frame,
+                                          self.pixels):
+            ax6.plot(frames,
+                     history,
+                     label=str(pixel[1]) + ',' + str(pixel[0]))
 
-        plt.show()
+        plt.legend()
 
 
 if __name__ == '__main__':
     dataset = DataSet(
-        '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy')
-    plotter = Plots(dataset, [(50, 100), (123, 99), (1, 1)], threshold=500)
+        '/home/troy/thermography/4-20_corrected/thermal_cam_temps.npy',
+        end_frame=27000)
+    plotter = Plots(dataset, [(50, 100), (123, 99)], threshold=500)
     plotter.plotMagnitude()
     plotter.plotAngle()
     plotter.plot2DHistogram()
     plotter.plotScatter()
     plotter.plotHexBin()
+    plotter.plotLine()
     plt.show()
