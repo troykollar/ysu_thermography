@@ -3,7 +3,6 @@
 Creates a historgram for (a) given pixel(s) gradient magnitude taking the pixel location, the temp threshold to skip anything below and the bin resolution
 
 """
-import np_vid_viewer
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -20,7 +19,8 @@ def plotHistogram(temp_file, pixel, threshold=200, binCount=5, spacing=1):
         temp = temp_data[i].copy()
         gradientx, gradienty = np.gradient(temp, spacing)
         if temp[pixel] > threshold:
-            pixel_grad_mag.append(math.sqrt((gradientx[pixel] ** 2) + (gradienty[pixel] ** 2)))
+            pixel_grad_mag.append(
+                math.sqrt((gradientx[pixel]**2) + (gradienty[pixel]**2)))
             if gradientx[pixel] == 0:
                 if gradienty[pixel] > 0:
                     pixel_grad_dir.append(90)
@@ -29,9 +29,14 @@ def plotHistogram(temp_file, pixel, threshold=200, binCount=5, spacing=1):
                 else:
                     pixel_grad_dir.append(0)
             else:
-                pixel_grad_dir.append((180 / math.pi) * math.atan(gradienty[pixel] / gradientx[pixel]))
+                pixel_grad_dir.append(
+                    (180 / math.pi) *
+                    math.atan(gradienty[pixel] / gradientx[pixel]))
 
-    n, bins, patches = plt.hist(pixel_grad_dir, binCount, facecolor='blue', alpha=.5)
+    n, bins, patches = plt.hist(pixel_grad_dir,
+                                binCount,
+                                facecolor='blue',
+                                alpha=.5)
     plt.xlabel('Gradient Angle')
     plt.ylabel('Frequency')
     plt.show()
@@ -47,9 +52,4 @@ def plotLine(temp_file, pixel, startFrame: int, endFrame: int):
 
     plt.plot(frame, pixelTempHistory)
     plt.show()
-
-
-
-
-
 
