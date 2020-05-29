@@ -26,7 +26,7 @@ class DataSet:
         self.build_folder_name = self.build_folder[self.build_folder.
                                                    rfind('/') + 1:]
         self.frame_data = np.load(self.temp_fname,
-                                  mmap_mode='c',
+                                  mmap_mode='r',
                                   allow_pickle=True)
 
         self.meltpool_data = None
