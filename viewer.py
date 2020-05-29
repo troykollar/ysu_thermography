@@ -173,7 +173,7 @@ class Viewer:
         if center_y < frame_size:
             top_y = 0
             bot_y = frame_size * 2
-        elif center_y + (frame_size * 2) > frame.shape[0]:
+        elif center_y + frame_size > frame.shape[0]:
             bot_y = frame.shape[0]
             top_y = bot_y - (frame_size * 2)
         else:
