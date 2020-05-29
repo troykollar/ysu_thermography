@@ -72,9 +72,10 @@ class Viewer:
                   end='')
             if self.update_frame:
                 video_frame = self.generate_frame(self.dataset[self.cur_frame])
+                cv2.imshow(window_name, video_frame)
+                del video_frame
             if self.quit:
                 break
-            cv2.imshow(window_name, video_frame)
             if not self.pause:
                 self.advance_frame(1)
             else:
