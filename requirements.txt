@@ -1,3 +1,0 @@
-pip:
-    opencv-contrib-python
-    matplotlib

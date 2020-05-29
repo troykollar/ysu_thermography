@@ -1,75 +1,138 @@
-# Numpy Video Viewer
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Command Line](#command-line)
+    - [Dataset](#dataset)
+    - [Viewer](#viewer)
+    - [Composite](#composite)
+    - [Plots](#plots)
 
-## Installation
+# Installation
 
 The simplest installation of the package is using Git.
 
-Within the directory of the project where you will be using the package, run the following commands:
-
-If you are installing within a Git repository enter
+Clone the repository using:
 
 ```bash
-git submodule add https://github.com/troykollar/np_vid_viewer
+git clone https://github.com/troykollar/ysu_thermography.git
 ```
 
-This is very similar to cloning the GitHub repository of the `np_vid_viewer` package, but since it is bad practice to have a Git repository within another, a submodule is created. This allows you to pull updates by simplying entering the directory of the package and using `git pull`.
-
-If you are not using the package within a Git repository you can simply use:
+Install required libraries using (it is recommended, but not neccesary to do this within a virtual environment):
 
 ```bash
-git clone https://github.com/troykollar/np_vid_viewer
+pip install -r requirements.txt
 ```
 
-You can still download updates using `git pull`, however it is best not to use a Git repository within another unless it is a submodule.
+# Usage
 
-## Usage
+Nearly all of the functions of the software can be used through both the command line and the GUI.
 
-Once the `np_video_viewer` package is installed within your project directory. The package can be used by simply importing the package into your file. An example script is shown
+## Command Line
 
-```python
-import np_vid_viewer
+### Dataset
 
-temp_data_file = "/media/troy/TroyUSB/thermography/4-8_part_merged_data/4-8_part_merged_data/thermal_cam_temps.npy"
-merged_data_file = "/media/troy/TroyUSB/thermography/4-8_part_merged_data/4-8_part_merged_data/merged_data.npy"
+The file containing functions relevant to the dataset itself is `dataset.py`. This file generally will not be used directly, but can be used to help debug, as it will show the simplest possible video of the dataset if called directly.
 
-VIEWER = np_vid_viewer.NpVidTool(temp_filename=temp_data_file,
-                                 data_filename=merged_data_file,
-                                 mp_data_on_vid=False,
-                                 remove_top_reflection=False,
-                                 remove_bottom_reflection=False)
+To see all the possible arguments of `dataset.py` use:
 
-VIEWER.play_video()
+```bash
+python3 dataset.py -h
 ```
 
-## NpVidTool Constructor
+The arguments that are related to the dataset are:
 
-When creating an `NpVidTool` object, the constructor has 2 required arguments, `temp_filename` and `data_filename`. `temp_filename` is the location and filename of the thermal cam temperature data. `data_filename` is the location and filename of the merged data that is corresponding to the temperature data.
+```bash
+temp_data: required
+    filename (and location) of thermal cam temps file.
+mp_data: optional
+    filename (and location) of merged data file.
+top: optional
+    0 or 1 specifying whether or not to remove top reflections.
+bot: optional
+    0 or 1 specifying whether or not to remove bottom reflections.
+scale: optional
+    int specifying the factor to scale frames by.
+range: optional
+    start,end specifying frame range to use in dataset.
+```
 
-The other arguments of the constructor are:
+These arguments are used for other files wherever they are relevant.
 
-`mp_data_on_vid` - Setting this to true will overlay the meltpool data overtop of the video. This can be difficult to see on very small datasets, since the font size is proportional to the size of the frame.
+### Viewer
 
-`remove_top_reflection` - Settting this to true will attempt to remove the reflection of the laser head above the piece.
+The viewer class has functions for playing and saving videos of the dataset and possible tranformations of the data, as well as the ability to save individual frames of the dataset.
 
-`remove_bottom_reflection` - Setting this to true will attempt to remove the reflection of heat on the base underneath the piece. On certain datasets this can cause the program not to run because it may not be able to locate the lower bounds of the piece and crash. This issue is being looked into.
+To use the viewer, the `viewer.py` file will be used.
 
-## Functions
+To see all the possible arguments of `viewer.py` use:
 
-The function used in this example is `play_video(waitKey=1)`. This will simply generate and play the video of the thermal camera based on the arguments specified in the constructor (`mp_data_on_vid`, `remove_top_reflection`, `remove_bottom_reflection`). The argument `waitKey` is the number of milliseconds of delay between when each frame is shown. It must be an integer greater than 1.
+```bash
+python3 viewer.py -h
+```
 
-The other functions that can be used from the VIEWER class are:
+The arguments that are related to the viewer are:
 
-`save_video(playback_speed=15, realtime_framerate=4)`
+```bash
+play: optional
+    int specifying frame delay in ms to play the video using OpenCV.
+save: optional
+    int specifying the framerate to save the video in using OpenCV.
+frame: optional
+    int specifying a frame to save in 16 bit color using matplotlib.
+contour: optional
+    int specifying the threshold to use if drawing a contour.
+follow: optional
+    str specifying what to focus the frame on.
+    follow = 'max' centers the frame on the max temperature.
+    follow = 'contour' centers the frame on the center of gravity of the contour (if present).
+fsize: optional
+    int specifying the size of the window when following max temp or contour.
+info: optional
+    'mp' or 'contour' to display an info pane with relevant info above video.
+```
 
-- `playback_speed` represents the speed the video will be played relative to the realtime framerate the video was taken at. This defaults to 15, since the default realtime framerate is 4. Giving a video at 60 fps.
-- `realtime_framerate` is the realtime framerate the video was recorded at. This defaults to 4 (the current realtime framerate of the data available)
+These arguments are used for other files wherever they are relevant.
 
-`generate_threshold_image(threshold=800)`
+### Composite
 
-- `threshold` is the temperature threshold that a pixel must reach to be incremented in the threshold image.
+The Composite class has functions for generating and saving composite images.
 
-`save_hotspot_video(playback_speed=15, realtime_framerate=4, save_img=False)`
+To use the composite class, the `composite.py` file will be used.
 
-- `playback_speed` represents the speed the video will be played relative to the realtime framerate the video was taken at. This defaults to 15, since the default realtime framerate is 4. Giving a video at 60 fps.
-- `realtime_framerate` is the realtime framerate the video was recorded at. This defaults to 4 (the current realtime framerate of the data available)
-- `save_img` is a boolean that will tell the function to save the final image of the hotspot video as .png
+To see all the possible arguments of `composite.py` use:
+
+```bash
+python3 composite.py -h
+```
+
+The arguments that are related to `composite.py` are:
+
+```bash
+threshold: optional
+    int specifying the threshold to be used for the composite image.
+dst_folder: optional
+    str specifying where to save the composite image. Defaults to build folder.
+cap: optional
+    int specifying the max number of frames to use for composite.
+max: optional
+    0 or 1 specifying whether or not to generate a max temperature composite image.
+avg: optional
+    0 or 1 specifying whether or not to generate an average temperature composite image.
+int: optional
+    int specifying threshold to be used to generate a temperature integration composite image.
+hotspot: optional
+    0 or 1 specifying whether or not to generate a hotspot composite image.
+```
+
+These arguments are used for other files wherever they are relevant.
+
+### Plots
+
+Command line functions related to plotting can be done using the `pixel_selector.py` file.
+
+There are no arguments that relate directly to pixel_selector.py, but there are still other arguments needed (related to the dataset, and composite).
+
+To see all the possible arguments of `pixel_selector.py` use:
+
+```bash
+python3 pixel_selector.py -h
+```
