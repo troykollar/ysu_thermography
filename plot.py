@@ -277,6 +277,30 @@ class Plots:
         """
 
     def plot2DHistogram(self):
+        histgrid = []
+        fig = []
+        ax = []
+        histplot = []
+
+        for i, pixel in enumerate(self.plotted_pixels):
+            histgrid.append(None)
+            fig.append(None)
+            ax.append(None)
+            histplot.append(None)
+            histgrid[i] = (self.binning1[i], self.binning2[i])
+            fig[i], ax[i] = plt.subplots()
+            fig[i].suptitle(
+                'Pixel {} Magnitude vs Angle Histogram:\nThreshold: {}\n'.
+                format((pixel[1], pixel[0]), self.threshold))
+            ax[i].set_xlabel('Angle (°)')
+            ax[i].set_ylabel('Magnitude (sqrt(x^2+y^2))')
+            histplot[i] = ax[i].hist2d(self.angle_array[i],
+                                       self.magnitude_array[i],
+                                       bins=histgrid[i],
+                                       cmap='gnuplot')
+            ax[i].grid(b=self.grid_lines, which='major', alpha=0.3)
+            plt.colorbar(histplot[i][3])
+        """
         #2D Histogram - Magnitude vs Angle (degrees)
         histgrid = (self.binning1, self.binning2)
         fig3, ax3 = plt.subplots()
@@ -291,9 +315,25 @@ class Plots:
                               cmap='gnuplot')
         ax3.grid(b=self.grid_lines, which='major', alpha=0.3)
         plt.colorbar(histplot[3])
+        """
 
     def plotScatter(self):
         # Scatterplot - Magnitude vs Angle (degrees)
+        fig = []
+        ax = []
+
+        for i, pixel in enumerate(self.plotted_pixels):
+            fig.append(None)
+            ax.append(None)
+            fig[i], ax[i] = plt.subplots()
+            fig[i].suptitle(
+                'Pixel {} Magnitude vs Angle Scatterplot:\nThreshold: {}\n'.
+                format((pixel[1], pixel[0]), self.threshold))
+            ax[i].set_xlabel('Angle (°)')
+            ax[i].set_ylabel('Magnitude (sqrt(x^2+y^2))')
+            ax[i].scatter(self.angle_array[i], self.magnitude_array[i])
+            ax[i].grid(b=self.grid_lines, which='major', alpha=0.3)
+        """
         fig4, ax4 = plt.subplots()
         fig4.suptitle(
             'Pixel {} Magnitude vs Angle Scatterplot:\nThreshold: {}\n'.format(
@@ -302,6 +342,7 @@ class Plots:
         ax4.set_ylabel('Magnitude (sqrt(x^2+y^2))')
         ax4.scatter(self.angle_array, self.magnitude_array)
         ax4.grid(b=self.grid_lines, which='major', alpha=0.3)
+        """
 
     def plotHexBin(self):
         # "Hexbin plot" - Magnitude vs Angle (degrees)
@@ -345,4 +386,6 @@ if __name__ == '__main__':
     plotter = Plots(dataset, [(50, 100), (123, 99), (1, 1)], threshold=500)
     plotter.plotMagnitude()
     plotter.plotAngle()
+    plotter.plot2DHistogram()
+    plotter.plotScatter()
     plt.show()
