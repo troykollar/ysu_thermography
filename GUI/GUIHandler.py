@@ -80,10 +80,10 @@ def save_hotspot_composite(self):
     HotspotImg(self.dataset, self).save_img()
 
 
-def create_plots(self, pixel: tuple, relativeLoc=(0, 0)):
+def create_plots(self, pixels: list, relativeLoc=(0, 0)):
     grab_dataset(self)
     PLOTS = Plots(temp_data=self.dataset,
-                  pixel=pixel,
+                  pixels=pixels,
                   threshold=int(self.plot_TempThresh.get()),
                   start_frame=int(self.plot_StartFrame.get()),
                   end_frame=int(self.plot_EndFrame.get()),
@@ -128,5 +128,9 @@ def select_pixels(self):
     locations = pix_sel.location_list[2:]
     right_percents = pix_sel.percents_from_right[2:]
     bot_percents = pix_sel.percents_from_bot[2:]
+
+    create_plots(self, locations, (right_percents, bot_percents))
+    """
     for pixel, right, bot in zip(locations, right_percents, bot_percents):
         create_plots(self, pixel, (right * 100, bot * 100))
+    """
