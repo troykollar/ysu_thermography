@@ -173,12 +173,17 @@ class Viewer:
         if center_y < frame_size:
             top_y = 0
             bot_y = frame_size * 2
-        elif center_y + (frame_size * 2) > frame.shape[0]:
+        elif center_y + frame_size > frame.shape[0]:
             bot_y = frame.shape[0]
             top_y = bot_y - (frame_size * 2)
         else:
             top_y = center_y - frame_size
             bot_y = center_y + frame_size
+
+        print('\n')
+        print(center_x, center_y, frame.shape[0])
+        print(top_y, bot_y)
+        print(left_x, right_x)
 
         return frame[top_y:bot_y, left_x:right_x]
 
