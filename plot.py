@@ -407,6 +407,9 @@ class Plots:
             cur_pix_history = []
             cur_pix_frames = []
             for i, frame_data in enumerate(self.temp_data):
+                printProgressBar(i + self.temp_data.start_frame,
+                                 self.temp_data.end_frame,
+                                 'Generating temp history plot.')
                 cur_pix_frames.append(i + self.temp_data.start_frame)
                 cur_pix_history.append(frame_data[pixel])
             pixelTempHistory.append(cur_pix_history)
